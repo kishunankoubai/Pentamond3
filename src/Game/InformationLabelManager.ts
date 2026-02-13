@@ -1,163 +1,136 @@
-import { inputManager } from "../Interaction/InputManager";
-import { qsAll } from "../Utils";
+type VisibilityOptions = {
+    gameTime: boolean;
+    playTime: boolean;
+    line: boolean;
+    lastTrick: boolean;
+    chain: boolean;
+    score: boolean;
+};
 
-type InformationLabel = {
-    name: string;
-    label: HTMLDivElement;
-    content: string;
-    visible: boolean;
+type UpdateContentOptions = {
+    gameTime: string;
+    playTime: string;
+    line: string;
+    lastTrick: string;
+    chain: string;
+    score: string;
 };
 
 export class InformationLabelManager {
-    private labels = {
-        gameTime: {
-            name: "Time",
-            label: document.createElement("div"),
-            content: "",
-            visible: false,
-        },
-        playTime: {
-            name: "Time",
-            label: document.createElement("div"),
-            content: "",
-            visible: false,
-        },
-        line: {
-            name: "Line",
-            label: document.createElement("div"),
-            content: "",
-            visible: false,
-        },
-        lastTrick: {
-            name: "Trick",
-            label: document.createElement("div"),
-            content: "",
-            visible: false,
-        },
-        chain: {
-            name: "Chain",
-            label: document.createElement("div"),
-            content: "",
-            visible: false,
-        },
-        score: {
-            name: "Score",
-            label: document.createElement("div"),
-            content: "",
-            visible: false,
-        },
-    };
+    private readonly labels;
 
-    private base: HTMLDivElement = document.createElement("div");
+    private readonly base: HTMLDivElement = document.createElement("div");
+
     constructor(
+        playerNum: number,
         {
-            gameTime,
-            playTime,
+            gameTime = false,
+            playTime = false,
             line = false,
-            lastTrick,
-            chain,
-            score,
-        }: {
-            gameTime: boolean;
-            playTime: boolean;
-            line: boolean;
-            lastTrick: boolean;
-            chain: boolean;
-            score: boolean;
-        } = {
-            gameTime: false,
-            playTime: false,
-            line: false,
-            lastTrick: false,
-            chain: false,
-            score: false,
-        }
+            lastTrick = false,
+            chain = false,
+            score = false,
+            //
+        }: Partial<VisibilityOptions> = {}
     ) {
+        this.labels = this.createLabels(playerNum);
+
         this.s$visible = { gameTime, playTime, line, lastTrick, chain, score };
-        Object.values(this.labels).forEach((element) => {
-            element.label.classList.add("informationLabel");
-            this.base.appendChild(element.label);
-            if (element.name == "Trick") {
-                if (inputManager.g$registeredInputNumber == 1) {
-                    element.label.style.fontSize = "3vh";
-                } else {
-                    element.label.style.fontSize = `calc((100vh * 14 / 9 / ${inputManager.g$registeredInputNumber}) /33)`;
-                }
-            } else if (element.name == "Score") {
-                if (inputManager.g$registeredInputNumber == 1) {
-                    element.label.style.fontSize = "4vh";
-                } else {
-                    element.label.style.fontSize = `calc((100vh * 14 / 9 / ${inputManager.g$registeredInputNumber}) /28)`;
-                }
-            } else {
-                if (inputManager.g$registeredInputNumber == 1) {
-                    element.label.style.fontSize = "6vh";
-                } else {
-                    element.label.style.fontSize = `calc((100vh * 14 / 9 / ${inputManager.g$registeredInputNumber}) /17)`;
-                }
-            }
+
+        Object.values(this.labels).forEach((label) => {
+            this.base.appendChild(label.label);
         });
-        if (inputManager.g$registeredInputNumber == 1) {
-            this.labels.playTime.label.style.fontSize = "4vh";
-        } else {
-            this.labels.playTime.label.style.fontSize = `calc((100vh * 14 / 9 / ${inputManager.g$registeredInputNumber}) /28)`;
-        }
 
         this.base.classList.add("informationLabelBase");
-        // this.labels.lastTrick.label.style.fontSize = "3vh";
     }
+
+    private createLabels(playerNum: number) {
+        const isSinglePlayer = playerNum == 1;
+
+        const textFontSize = isSinglePlayer ? "6vh" : `calc((100vh * 14 / 9 / ${playerNum}) /17)`;
+        const headerFontSize = isSinglePlayer ? "4vh" : `calc((100vh * 14 / 9 / ${playerNum}) /22)`;
+
+        const labels = {
+            gameTime: new Label("Time", textFontSize, headerFontSize),
+            playTime: new Label("Time", textFontSize, headerFontSize),
+            line: new Label("Line", textFontSize, headerFontSize),
+            lastTrick: new Label("Trick", textFontSize, headerFontSize),
+            chain: new Label("Chain", textFontSize, headerFontSize),
+            score: new Label("Score", textFontSize, headerFontSize),
+        };
+
+        labels.lastTrick.setTextFontSize(isSinglePlayer ? "3vh" : `calc((100vh * 14 / 9 / ${playerNum}) / 33)`);
+        labels.score.setTextFontSize(isSinglePlayer ? "4vh" : `calc((100vh * 14 / 9 / ${playerNum}) / 28)`);
+        labels.playTime.setTextFontSize(isSinglePlayer ? "4vh" : `calc((100vh * 14 / 9 / ${playerNum}) / 28)`);
+
+        return labels;
+    }
+
     get g$element() {
         return this.base;
     }
 
-    set s$visible({ gameTime, playTime, line, lastTrick, chain, score }: { gameTime: boolean; playTime: boolean; line: boolean; lastTrick: boolean; chain: boolean; score: boolean }) {
-        [this.labels.gameTime.visible, this.labels.playTime.visible, this.labels.line.visible, this.labels.lastTrick.visible, this.labels.chain.visible, this.labels.score.visible] = [
-            gameTime,
-            playTime,
-            line,
-            lastTrick,
-            chain,
-            score,
-        ];
-        this.labels.gameTime.label.style.display = gameTime ? "" : "none";
-        this.labels.playTime.label.style.display = playTime ? "" : "none";
-        this.labels.line.label.style.display = line ? "" : "none";
-        this.labels.lastTrick.label.style.display = lastTrick ? "" : "none";
-        this.labels.chain.label.style.display = chain ? "" : "none";
-        this.labels.score.label.style.display = score ? "" : "none";
+    set s$visible(options: VisibilityOptions) {
+        Object.entries(options).forEach(([key, value]) => {
+            console.log(key, value);
+            this.labels[key as keyof typeof this.labels].setVisibility(value);
+        });
     }
 
-    updateContents({ gameTime, playTime, line, lastTrick, chain, score }: { gameTime?: string; playTime?: string; line?: string; lastTrick?: string; chain?: string; score?: string }) {
-        if (gameTime != undefined && this.labels.gameTime.visible && this.labels.gameTime.content != gameTime) {
-            this.labels.gameTime.content = gameTime;
-            this.labels.gameTime.label.innerHTML = `<div class="informationLabelHeader">${this.labels.gameTime.name}</div>` + gameTime;
-        }
-        if (playTime != undefined && this.labels.playTime.visible && this.labels.playTime.content != playTime) {
-            this.labels.playTime.content = playTime;
-            this.labels.playTime.label.innerHTML = `<div class="informationLabelHeader">${this.labels.playTime.name}</div>` + playTime;
-        }
-        if (line != undefined && this.labels.line.visible && this.labels.line.content != line) {
-            this.labels.line.content = line;
-            this.labels.line.label.innerHTML = `<div class="informationLabelHeader">${this.labels.line.name}</div>` + line;
-        }
-        if (lastTrick != undefined && this.labels.lastTrick.visible && this.labels.lastTrick.content != lastTrick) {
-            this.labels.lastTrick.content = lastTrick;
-            this.labels.lastTrick.label.innerHTML = `<div class="informationLabelHeader">${this.labels.lastTrick.name}</div>` + lastTrick;
-        }
-        if (chain != undefined && this.labels.chain.visible && this.labels.chain.content != chain) {
-            this.labels.chain.content = chain;
-            this.labels.chain.label.innerHTML = `<div class="informationLabelHeader">${this.labels.chain.name}</div>` + chain;
-        }
-        if (score != undefined && this.labels.score.visible && this.labels.score.content != score) {
-            this.labels.score.content = score;
-            this.labels.score.label.innerHTML = `<div class="informationLabelHeader">${this.labels.score.name}</div>` + score;
-        }
-        qsAll(".informationLabelHeader").forEach((element) => {
-            if (inputManager.g$registeredInputNumber == 1) {
-                element.style.fontSize = "4vh";
-            } else {
-                element.style.fontSize = `calc((100vh * 14 / 9 / ${inputManager.g$registeredInputNumber}) /22)`;
-            }
+    updateContents(options: Partial<UpdateContentOptions>) {
+        Object.entries(options).forEach(([key, value]) => {
+            const label = this.labels[key as keyof typeof this.labels];
+            label.setTextContent(value);
         });
+    }
+}
+
+class Label {
+    readonly label = document.createElement("div");
+    private readonly header = document.createElement("div");
+    private readonly text = document.createElement("div");
+
+    private readonly title: string;
+
+    private isFirstUpdated = false;
+
+    constructor(title: string, textFontSize: string, headerFontSize: string) {
+        this.title = title;
+
+        this.text.classList.add("informationLabelContent");
+
+        this.header.textContent = String(this.title);
+        this.header.classList.add("informationLabelHeader");
+        this.header.style.display = "none";
+
+        this.label.classList.add("informationLabel");
+        this.label.appendChild(this.header);
+        this.label.appendChild(this.text);
+
+        this.setTextFontSize(textFontSize);
+        this.setHeaderFontSize(headerFontSize);
+    }
+
+    setTextFontSize(fontSize: string) {
+        this.text.style.fontSize = fontSize;
+    }
+
+    setHeaderFontSize(fontSize: string) {
+        this.header.style.fontSize = fontSize;
+    }
+
+    setVisibility(visible: boolean) {
+        this.label.style.display = visible ? "" : "none";
+    }
+
+    setTextContent(text: string) {
+        if (this.text.textContent === text) return;
+
+        this.text.textContent = text;
+
+        if (!this.isFirstUpdated) {
+            this.header.style.display = "";
+            this.isFirstUpdated = true;
+        }
     }
 }

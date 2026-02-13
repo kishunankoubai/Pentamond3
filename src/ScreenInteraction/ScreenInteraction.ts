@@ -123,25 +123,3 @@ class ScreenInteraction implements MyEventListener {
 }
 
 export const screenInteraction = new ScreenInteraction();
-
-screenInteraction.addEvent(["interaction"], () => {
-    const currentPageId = pageManager.g$currentPageId;
-    if (currentPageId == "play") {
-        const pauseInteractions = ["KeyP", ...Setting.gamepadConfigPresets[0].pause];
-
-        const requiredPause = screenInteraction.areOperated(pauseInteractions);
-
-        if (requiredPause) {
-            const currentGame = GameProcessing.currentGame;
-            if (!currentGame) throw new Error("ゲームが始められていないのにポーズされた。");
-
-            if (GameProcessing.isReplaying() && currentGame.g$isPlaying) {
-                currentGame.game.stop();
-                screenInteraction.s$focusFlag = true;
-                screenInteraction.updateLastOperationTime();
-                pageManager.setPage("replayPause");
-            }
-        }
-        return;
-    }
-});

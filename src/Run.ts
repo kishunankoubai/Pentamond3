@@ -47,6 +47,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     elementManager.init();
     inputManager.s$maxInputNumber = 1;
 
+    Replay.setEvents();
+
     ResultPageHandler.setEvents();
     GameStartEventSetter.setEvents();
 

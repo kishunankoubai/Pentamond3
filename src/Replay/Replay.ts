@@ -10,6 +10,8 @@ import { pageManager } from "../UtilManagers/PageManager";
 import { ReplayEventSetter } from "./ReplayEventSetter";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { qsAll } from "../Utils";
+import { GameProcessing } from "../GameProcessing/GameProcessing";
+import { screenInteraction } from "../ScreenInteraction/ScreenInteraction";
 
 //リプレイ
 export type ReplayData = {
@@ -84,5 +86,32 @@ export class Replay {
 
     static saveLastOne() {
         return this.save(ReplayDataHandler.tempDataList.at(-1)!);
+    }
+
+    static setEvents() {
+        screenInteraction.addEvent(["interaction"], () => {
+            // 今play画面か?
+            const currentPageId = pageManager.g$currentPageId;
+            if (currentPageId !== "play") return;
+
+            // ポーズボタンが押されたか?
+            const pauseInteractions = ["KeyP", ...Setting.gamepadConfigPresets[0].pause];
+            const requiredPause = screenInteraction.areOperated(pauseInteractions);
+            if (!requiredPause) return;
+
+            this.pauseReplay();
+        });
+    }
+
+    private static pauseReplay() {
+        const currentGame = GameProcessing.currentGame;
+        if (!currentGame) throw new Error("ゲームが始められていないのにポーズされた。");
+
+        if (GameProcessing.isReplaying() && currentGame.g$isPlaying) {
+            currentGame.game.stop();
+            screenInteraction.s$focusFlag = true;
+            screenInteraction.updateLastOperationTime();
+            pageManager.setPage("replayPause");
+        }
     }
 }

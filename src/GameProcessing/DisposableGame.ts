@@ -104,7 +104,7 @@ export class DisposableGame {
     }
 
     private static createPlayers(maxGameTime: number, inputs: Input[], inputCount: number, { replayData }: { replayData?: ReplayData }) {
-        const players = inputs.map((input) => new GamePlayer(input));
+        const players = inputs.map((input) => new GamePlayer(input, inputCount, maxGameTime));
 
         players.forEach((player, i) => {
             if (inputCount == 1) {
@@ -116,9 +116,6 @@ export class DisposableGame {
                 player.g$element.style.height = "";
                 player.g$element.style.width = `0px`;
             }
-
-            player.playInfo.maxGameTime = maxGameTime;
-            player.playInfo.gameTime = maxGameTime;
 
             //リプレイ情報の読み込み
             if (replayData) {

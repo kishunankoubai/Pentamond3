@@ -82,7 +82,7 @@ export class ResultPageHandler {
                 <div class="text">
                     Player : ${i + 1}<br />
                     ${[1].includes(playSetting.mode) ? `開始Time : ${p.playInfo.maxGameTime}<br />` : ""}
-                    ${[1].includes(playSetting.mode) ? `残りTime : ${p.playInfo.gameTime}<br />` : ""}
+                    ${[1].includes(playSetting.mode) ? `残りTime : ${p.getCurrentTime()}<br />` : ""}
                     プレイ時間 : ${(p.playInfo.playTime / 1000).toFixed(2)}<br />
                     役の回数 : ${p.playInfo.trickCount}<br />
                     一列揃え : ${p.playInfo.line}<br />

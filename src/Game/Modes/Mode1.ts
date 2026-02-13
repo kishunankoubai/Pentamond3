@@ -40,14 +40,13 @@ export class Mode1 extends GameMode {
 
         //プレイヤーの生死状態を更新する
         this.players.forEach((p) => {
-            p.updateGameTime();
-            if (p.playInfo.gameTime == 0) {
+            if (p.getCurrentTime() == 0) {
                 if (p.state.hasFinished) {
                     return;
                 }
                 p.finish();
                 p.label.updateContents({
-                    gameTime: p.playInfo.gameTime + "",
+                    gameTime: p.getCurrentTime() + "",
                     playTime: "",
                     line: "",
                     lastTrick: p.playInfo.lastTrick ? p.playInfo.lastTrick.name : "　",
@@ -64,12 +63,10 @@ export class Mode1 extends GameMode {
         //一人プレイでなく、プレイしている人が一人なら勝利
         if (playingPlayers.length == 1 && this.players.length >= 1) {
             this.winners = [playingPlayers[0]];
-            playingPlayers[0].updateGameTime();
             //プレイしている人がいない場合、最も時間を残している人が全員勝利
         } else if (playingPlayers.length == 0) {
             const max = Math.max(
                 ...this.players.map((player) => {
-                    player.updateGameTime();
                     return player.loop.g$elapsedTime;
                 })
             );
@@ -81,7 +78,7 @@ export class Mode1 extends GameMode {
             this.stop();
             this.players.forEach((p) => {
                 p.label.updateContents({
-                    gameTime: p.playInfo.gameTime + "",
+                    gameTime: p.getCurrentTime() + "",
                     playTime: "",
                     line: "",
                     lastTrick: p.playInfo.lastTrick ? p.playInfo.lastTrick.name : "　",
@@ -142,7 +139,7 @@ export class Mode1 extends GameMode {
         p.label.s$visible = { gameTime: true, playTime: false, line: false, lastTrick: true, chain: true, score: true };
         const updateLabel = () => {
             p.label.updateContents({
-                gameTime: p.playInfo.gameTime + "",
+                gameTime: p.getCurrentTime() + "",
                 playTime: "",
                 line: "",
                 lastTrick: p.playInfo.lastTrick ? p.playInfo.lastTrick.name : "　",
@@ -183,16 +180,15 @@ export class Mode1 extends GameMode {
 
                 p.playInfo.playTime = p.loop.g$elapsedTime;
                 updateLabel();
-                p.updateGameTime();
 
-                if (p.playInfo.gameTime <= Setting.warningGameTime) {
+                if (p.getCurrentTime() <= Setting.warningGameTime) {
                     if (p.animations.timeWarning.playState != "running") {
                         p.animations.timeWarning.play();
                     }
                 } else if (p.animations.timeWarning.playState == "running") {
                     p.animations.timeWarning.cancel();
                 }
-                if (p.playInfo.gameTime == 0) {
+                if (p.getCurrentTime() == 0) {
                     this.proceedPlayerFinish();
                 }
 
@@ -263,14 +259,20 @@ export class Mode1 extends GameMode {
                 const lastTrick = p.operator.g$lastTrick;
                 if (lastTrick) {
                     p.playInfo.penaltyTask = 0;
+
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {
                         p.playInfo.line += 1;
                     }
+
                     p.playInfo.score += p.playInfo.chain * 100;
                     p.playInfo.score += (lastTrick.time + lastTrick.attack) * 50;
+
                     p.damageInfo.attackTask += lastTrick.attack + Math.ceil(p.playInfo.chain / 5);
+
                     p.playInfo.maxChain = Math.max(p.playInfo.maxChain, p.playInfo.chain);
-                    p.playInfo.recovery += lastTrick.time;
+
+                    p.recover(lastTrick.time);
+
                     p.playInfo.chain += 1;
                     p.playInfo.trickCount += 1;
                     if (GraphicSetting.removeShake) {

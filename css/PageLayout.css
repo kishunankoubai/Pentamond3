@@ -284,9 +284,16 @@ button {
                 text-align: center;
                 display: flex;
                 flex-direction: column;
+
                 & .informationLabelHeader {
                     font-family: "RocknRoll One", Arial;
                     color: #444;
+                    text-align: center;
+                }
+
+                & .informationLabelContent {
+                    font-family: "RocknRoll One", Arial;
+                    color: #2ac;
                     text-align: center;
                 }
             }
