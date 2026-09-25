@@ -55,6 +55,22 @@ export abstract class InputObserver extends MyEventListener {
         return this.validInputs.at(-1)?.time || -1;
     }
 
+    get g$latestPressingKey(): string {
+        return this.g$latestInputName;
+    }
+
+    get g$latestPressTime(): number {
+        return this.g$latestInputTime;
+    }
+
+    get g$oldestPressingKey(): string {
+        return this.validInputs[0]?.name || "";
+    }
+
+    get g$oldestPressTime(): number {
+        return this.validInputs[0]?.time || -1;
+    }
+
     get g$validInputNames(): string[] {
         return this.validInputs.map((input) => input.name);
     }
@@ -62,6 +78,34 @@ export abstract class InputObserver extends MyEventListener {
     existsValid(inputNames: string | string[]): boolean {
         const names = Array.isArray(inputNames) ? inputNames : [inputNames];
         return this.validInputs.some((input) => names.includes(input.name));
+    }
+
+    isPressing(inputName: string): boolean {
+        return this.existsValid(inputName);
+    }
+
+    arePressing(inputNames: string[]): boolean {
+        return this.areEveryValid(inputNames);
+    }
+
+    existsPressingKey(inputNames: string[]): boolean {
+        return this.existsValid(inputNames);
+    }
+
+    getPressTime(inputName: string): number {
+        return this.validInputs.find((input) => input.name === inputName)?.time ?? -1;
+    }
+
+    getLatestPressingKey(inputNames: string[]): string {
+        return this.getLatest(inputNames)?.name || "";
+    }
+
+    getOldestPressingKey(inputNames: string[]): string {
+        return this.validInputs.find((input) => inputNames.includes(input.name))?.name || "";
+    }
+
+    getAllPressingKeys(inputNames: string[]): string[] {
+        return this.validInputs.filter((input) => inputNames.includes(input.name)).map((input) => input.name);
     }
 
     areEveryValid(inputNames: string | string[]): boolean {

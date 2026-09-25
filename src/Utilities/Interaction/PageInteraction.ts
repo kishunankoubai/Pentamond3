@@ -2,6 +2,7 @@ import { getMaxElements } from "../Common";
 import { Scene } from "../SceneManager";
 import { inputManager } from "./InputManager";
 import { InputInfo, InputObserver } from "./InputObserver";
+import { MyEvent } from "../MyEventListener";
 
 type InteractionElement = {
     element: HTMLElement;
@@ -18,6 +19,7 @@ export class PageInteraction {
 
     private interactionElements: InteractionElement[] = [];
     private backElement: InteractionElement | undefined = undefined;
+    private inputEvents: MyEvent[] = [];
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -39,13 +41,16 @@ export class PageInteraction {
     stop() {
         if (!this.isValid) return;
         this.isValid = false;
+        inputManager.removeEvent(this.inputEvents);
+        this.inputEvents = [];
     }
 
     setInteraction() {
-        inputManager.reset();
-        inputManager.addHandler("inputValid", () => {
+        inputManager.removeEvent(this.inputEvents);
+        this.inputEvents = [];
+        this.inputEvents.push(inputManager.addHandler("inputValid", () => {
             document.body.classList.add("cursorHidden");
-        });
+        }));
 
         this.getInteractionElements();
         if (!this.interactionElements.length) return;
@@ -71,7 +76,7 @@ export class PageInteraction {
             this.proceedInteraction(activeElement, item[1].name);
         };
 
-        inputManager.addHandler("inputValid", handler.bind(this));
+        this.inputEvents.push(inputManager.addHandler("inputValid", handler.bind(this)));
     }
 
     static updateLastOperateTime() {

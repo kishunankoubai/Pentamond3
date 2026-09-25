@@ -11,6 +11,7 @@ export type MyEvent = {
     readonly className: EventClassName[];
     readonly handler: Function;
     readonly lifeCount: LifeCounter;
+    owner?: MyEventListener;
 };
 
 /**
@@ -68,6 +69,7 @@ export abstract class MyEventListener {
      */
     addEvent(event: MyEvent | MyEvent[]): MyEvent[] {
         const livingEvent = EventManager.getLivingEvent(event);
+        livingEvent.forEach((e) => (e.owner = this));
         this.registeredEvents.push(...livingEvent);
         return livingEvent;
     }

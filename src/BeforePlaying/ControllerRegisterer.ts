@@ -1,18 +1,22 @@
-import { inputManager } from "../Interaction/InputManager";
+import { inputManager } from "../Utilities/Interaction/InputManager";
 import { qs, qsAddEvent, qsAll, sleep } from "../Utils";
 
 import * as Setting from "../Settings";
 import { debug } from "../Run";
 import { PlaySettingSetter } from "./PlaySettingSetter";
 import { sceneManager } from "../Utilities/SceneManager";
+import { MyEvent } from "../Utilities/MyEventListener";
 
 /**
  * コントローラーの登録をしたりする
  *  */
 export class ControllerRegisterer {
     static gamepadConfigs: Setting.GamepadConfig[] = [];
+    private static inputEvents: MyEvent[] = [];
 
     static setEvents() {
+        inputManager.removeEvent(this.inputEvents);
+        this.inputEvents = [];
         let pageManager = sceneManager.g$currentPageManager;
         if (!pageManager) return;
         // closure
@@ -38,14 +42,14 @@ export class ControllerRegisterer {
         });
 
         // 登録されたとき
-        inputManager.addEvent(["inputRegistered"], () => {
+        this.inputEvents.push(inputManager.addHandler("inputRegistered", () => {
             // アイコンをだす
             this.onInputRegistered(currentPlayerNumber);
-        });
+        }));
 
-        inputManager.addEvent(["finishRegister"], () => {
+        this.inputEvents.push(inputManager.addHandler("finishRegister", () => {
             qs("#registerText").innerHTML = '<div style="color:#d66">完了！</div>';
-        });
+        }));
 
         qsAddEvent("#registerButton", "click", () => {
             this.onClickOk(currentPlayerNumber);

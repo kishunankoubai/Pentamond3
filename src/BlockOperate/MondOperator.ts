@@ -1,6 +1,6 @@
 import { BlockManager } from "./BlockManager";
 import { GraphicData } from "../CanvasManager";
-import { EventId, EventManager, MyEventListener } from "../UtilManagers/EventManager";
+import { MyEventListener } from "../Utilities/MyEventListener";
 import { MondState } from "./Monoiamond";
 import { NextManager } from "./NextManager";
 import { Pentiamond } from "./Pentiamond";
@@ -8,7 +8,7 @@ import * as Setting from "../Settings";
 import { TrickInfo } from "../Trick";
 import { BlockKind } from "./Block";
 
-export class MondOperator implements MyEventListener {
+export class MondOperator extends MyEventListener {
     blockManager: BlockManager = new BlockManager();
     private hand: Pentiamond = new Pentiamond();
     private prevPosition: [number, number] | null = null;
@@ -17,15 +17,9 @@ export class MondOperator implements MyEventListener {
     private pausing: boolean = true;
     private lastTrick: TrickInfo | null = null;
 
-    readonly eventClassNames: string[] = ["move", "move-left", "move-right", "move-down", "spin", "spin-left", "spin-right", "put", "unput", "removeLine", "hold"];
-    eventIds: EventId[] = [];
-    addEvent(classNames: string[], handler: Function): EventId {
-        const eventId = EventManager.addEvent({ classNames: classNames.filter((className) => this.eventClassNames.includes(className)), handler });
-        this.eventIds.push(eventId);
-        return eventId;
+    constructor() {
+        super();
     }
-
-    constructor() {}
 
     get g$graphicData(): GraphicData {
         return {
@@ -96,8 +90,7 @@ export class MondOperator implements MyEventListener {
             return;
         }
         if (this.blockManager.move(this.hand, moveDirection)) {
-            EventManager.executeListeningEvents("move", this.eventIds);
-            EventManager.executeListeningEvents("move-" + moveDirection, this.eventIds);
+            this.executeEvent(["move", "move-" + moveDirection]);
         }
     }
 
@@ -106,8 +99,7 @@ export class MondOperator implements MyEventListener {
             return;
         }
         if (this.blockManager.spin(this.hand, rotate)) {
-            EventManager.executeListeningEvents("spin", this.eventIds);
-            EventManager.executeListeningEvents("spin-" + rotate, this.eventIds);
+            this.executeEvent(["spin", "spin-" + rotate]);
         }
     }
 
@@ -119,7 +111,7 @@ export class MondOperator implements MyEventListener {
         this.next.hold();
         this.initializeHand();
         this.blockManager.displayPentiamond(this.hand);
-        EventManager.executeListeningEvents("hold", this.eventIds);
+        this.executeEvent("hold");
     }
 
     put() {
@@ -130,7 +122,7 @@ export class MondOperator implements MyEventListener {
         this.prevPosition = this.hand.g$position;
         this.prevDirection = this.hand.g$direction;
         this.proceed();
-        EventManager.executeListeningEvents("put", this.eventIds);
+        this.executeEvent("put");
     }
 
     unput() {
@@ -148,7 +140,7 @@ export class MondOperator implements MyEventListener {
         this.hand.s$direction = 0;
         this.blockManager.displayPentiamond(this.hand);
         this.forgetPrev();
-        EventManager.executeListeningEvents("unput", this.eventIds);
+        this.executeEvent("unput");
     }
 
     removeLine() {
@@ -161,7 +153,7 @@ export class MondOperator implements MyEventListener {
         this.hand.s$position = [Setting.initialX, Setting.initialY];
         this.hand.s$direction = 0;
         this.blockManager.displayPentiamond(this.hand);
-        EventManager.executeListeningEvents("removeLine", this.eventIds);
+        this.executeEvent("removeLine");
     }
 
     forgetPrev() {

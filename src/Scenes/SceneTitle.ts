@@ -47,9 +47,12 @@ export class SceneTitle extends Scene {
         // リプレイのイベントの設定と、リプレイページの設定
         Replay.setupSavedReplayPage();
         GameStartEventSetter.normal();
+        if (Music.g$initialized) MusicManager.playExclusiveBGM("つみきのおしろ");
     }
 
-    protected close(): void {}
+    protected close(): void {
+        this.pageInteraction.stop();
+    }
 
     defaultStart(): void {
         this.pageManager.openPage("pageStart");

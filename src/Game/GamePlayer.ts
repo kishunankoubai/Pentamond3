@@ -1,22 +1,22 @@
 import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { MondOperator } from "../BlockOperate/MondOperator";
 import { NuisanceMondManager } from "./NuisanceMondManager";
-import { Input } from "../Interaction/Input";
+import { AutoInputObserver } from "../Utilities/Interaction/AutoInputObserver";
+import { InputObserver } from "../Utilities/Interaction/InputObserver";
 import { CanvasManager } from "../CanvasManager";
 import { InformationLabelManager } from "./InformationLabelManager";
 import { TrickInfo } from "../Trick";
 import * as Setting from "../Settings";
 import { gameEvents } from "./GameMode";
 import { GraphicSetting } from "../GraphicSetting";
-import { inputManager } from "../Interaction/InputManager";
 
 export class GamePlayer {
     operator: MondOperator = new MondOperator();
     loop: LoopManager = new LoopManager();
     nuisanceMondManager: NuisanceMondManager;
     canvas: CanvasManager = new CanvasManager();
-    label: InformationLabelManager = new InformationLabelManager(inputManager.g$registeredInputNumber);
-    input: Input;
+    label: InformationLabelManager;
+    input: InputObserver;
     playField: HTMLDivElement = document.createElement("div");
     playInfo = {
         maxGameTime: 300,
@@ -215,11 +215,12 @@ export class GamePlayer {
     };
     runningAnimations: Animation[] = [];
 
-    constructor(input: Input) {
+    constructor(input: InputObserver, playerCount: number) {
+        this.label = new InformationLabelManager(playerCount);
         this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager);
         this.loop.s$onTime = false;
         gameEvents.push(
-            this.nuisanceMondManager.addEvent(["finishDamage"], () => {
+            this.nuisanceMondManager.addHandler("finishDamage", () => {
                 this.state.damaging = false;
                 this.damageInfo.damageTask = 0;
                 this.operator.forgetPrev();
@@ -231,15 +232,15 @@ export class GamePlayer {
                 }
                 this.updateCanvas();
             }),
-            this.nuisanceMondManager.addEvent(["damageBoard"], () => {
+            this.nuisanceMondManager.addHandler("damageBoard", () => {
                 this.playInfo.penalty += 1;
                 this.animations.damageBoard.play();
             }),
-            this.nuisanceMondManager.addEvent(["progress"], () => {
+            this.nuisanceMondManager.addHandler("progress", () => {
                 this.canvas.readData(this.operator.g$graphicData);
                 this.canvas.paintPlayCanvas();
             }),
-            this.operator.addEvent(["put"], () => {
+            this.operator.addHandler("put", () => {
                 if (GraphicSetting.putShake) {
                     this.animations.put.play();
                 }
@@ -278,9 +279,7 @@ export class GamePlayer {
         this.runningAnimations.forEach((animation) => {
             animation.play();
         });
-        if (this.input.g$type == "autoKeyboard") {
-            this.input.g$manager.start();
-        }
+        if (this.input instanceof AutoInputObserver) this.input.start();
     }
 
     stop() {
@@ -293,9 +292,7 @@ export class GamePlayer {
         this.runningAnimations.forEach((animation) => {
             animation.pause();
         });
-        if (this.input.g$type == "autoKeyboard") {
-            this.input.g$manager.stop();
-        }
+        if (this.input instanceof AutoInputObserver) this.input.stop();
     }
 
     finish() {

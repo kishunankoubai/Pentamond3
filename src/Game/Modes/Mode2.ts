@@ -1,4 +1,3 @@
-import { EventManager } from "../../UtilManagers/EventManager";
 import { gameEvents, GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
 import * as Setting from "../../Settings";
@@ -6,7 +5,6 @@ import { qsAll, removeMousePointerTemporary } from "../../Utils";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { ControllerRegisterer } from "../../BeforePlaying/ControllerRegisterer";
-import { sceneManager } from "../../Utilities/SceneManager";
 
 export class Mode2 extends GameMode {
     constructor(players: GamePlayer[]) {
@@ -67,15 +65,12 @@ export class Mode2 extends GameMode {
                 resultLabel.innerHTML = `Time : ${this.winners[0].g$playTimeString}`;
             }
         });
-        EventManager.executeListeningEvents("gameFinish", this.eventIds);
+        this.executeEvent("gameFinish");
     }
 
     addPlayerBehavior(index: number): void {
-        let pageManager = sceneManager.g$currentPageManager;
-        if (!pageManager) return;
-
         const p = this.players[index];
-        const input = p.input.g$manager;
+        const input = p.input;
         const operate = (keyCode: string) => {
             if (["ArrowLeft", ...ControllerRegisterer.gamepadConfigs[index].moveLeft].includes(keyCode)) {
                 p.operator.move("left");
@@ -95,12 +90,6 @@ export class Mode2 extends GameMode {
                 p.operator.hold();
             } else if (["Enter", ...ControllerRegisterer.gamepadConfigs[index].removeLine].includes(keyCode)) {
                 p.operator.removeLine();
-            } else if (["KeyP", ...ControllerRegisterer.gamepadConfigs[index].pause].includes(keyCode)) {
-                if (p.loop.g$isStopping || this.state.hasFinished) {
-                    return;
-                }
-                this.stop();
-                pageManager.openPage("pause");
             } else {
                 return;
             }
@@ -122,7 +111,7 @@ export class Mode2 extends GameMode {
         let lastOperateTime = 0;
         p.canvas.guideBorder = true;
         gameEvents.push(
-            input.addEvent(["onKeydown", "onButtondown", "onStickActive"], () => {
+            input.addHandler("inputValid", () => {
                 if (p.loop.g$isStopping) {
                     return;
                 }
@@ -152,24 +141,24 @@ export class Mode2 extends GameMode {
                 updateLabel();
             }),
 
-            p.operator.addEvent(["put"], () => {
+            p.operator.addHandler("put", () => {
                 p.playInfo.put += 1;
                 p.playInfo.lastTrick = null;
                 p.playInfo.chain = 0;
                 p.playInfo.score += 10;
             }),
 
-            p.operator.addEvent(["unput"], () => {
+            p.operator.addHandler("unput", () => {
                 p.playInfo.put -= 1;
                 p.playInfo.score -= 10;
                 p.playInfo.unput += 1;
             }),
 
-            p.operator.addEvent(["hold"], () => {
+            p.operator.addHandler("hold", () => {
                 p.playInfo.hold += 1;
             }),
 
-            p.operator.addEvent(["removeLine"], () => {
+            p.operator.addHandler("removeLine", () => {
                 const lastTrick = p.operator.g$lastTrick;
                 if (lastTrick) {
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {

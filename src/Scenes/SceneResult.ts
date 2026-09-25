@@ -10,6 +10,7 @@ import { MusicManager } from "../Utilities/Music/MusicManager";
 import { Scene } from "../Utilities/SceneManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
+import { GameProcessing } from "../GameProcessing/GameProcessing";
 
 export class SceneResult extends Scene {
     private elementManager: ElementManager;
@@ -32,9 +33,14 @@ export class SceneResult extends Scene {
         this.setPageAnimation();
         this.pageInteraction.start();
         ResultPageHandler.setEvents();
+        MusicManager.playExclusiveBGM("さよならさんかく");
+        document.querySelector<HTMLElement>("#result .restart")?.addEventListener("click", () => GameProcessing.restartNormal());
+        document.querySelector<HTMLElement>("#replayResult .replayStart")?.addEventListener("click", () => GameProcessing.restartReplay());
     }
 
-    protected close(): void {}
+    protected close(): void {
+        this.pageInteraction.stop();
+    }
 
     defaultStart(): void {
         this.pageManager.openPage("result");

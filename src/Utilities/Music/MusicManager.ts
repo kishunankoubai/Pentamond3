@@ -19,6 +19,17 @@ export class MusicManager {
         });
     }
 
+    static async playExclusiveBGM(name: string) {
+        const music = this.get(name);
+        if (!music || music.data.type !== "BGM") return;
+
+        this.musics.forEach((candidate) => {
+            if (candidate.data.type === "BGM" && candidate !== music) candidate.stop();
+        });
+        music.setVolume(1);
+        await music.play();
+    }
+
     static updateAllGain() {
         this.musics.forEach((music) => {
             music.updateGain();

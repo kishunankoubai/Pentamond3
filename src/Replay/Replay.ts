@@ -1,5 +1,5 @@
 import { BlockKind } from "../BlockOperate/Block";
-import { AutoKeyboardInputData } from "../Interaction/AutoKeyboardManager";
+import { AutoInputData } from "../Utilities/Interaction/AutoInputObserver";
 import * as Setting from "../Settings";
 import { GamePlayer } from "../Game/GamePlayer";
 import { GameMode } from "../Game/GameMode";
@@ -13,7 +13,7 @@ import { sceneManager } from "../Utilities/SceneManager";
 
 //リプレイ
 export type ReplayData = {
-    inputData: AutoKeyboardInputData[][];
+    inputData: AutoInputData[][];
     nextData: BlockKind[][];
     playSetting: PlaySetting;
     finishTime: number;

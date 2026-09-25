@@ -1,5 +1,5 @@
 import { BlockManager } from "../BlockOperate/BlockManager";
-import { EventId, EventManager, MyEventListener } from "../UtilManagers/EventManager";
+import { MyEventListener } from "../Utilities/MyEventListener";
 import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { Monoiamond } from "../BlockOperate/Monoiamond";
 import * as Setting from "../Settings";
@@ -8,7 +8,7 @@ import { gameEvents } from "./GameMode";
 /**
  * じゃまモンドに関連する処理を行う
  */
-export class NuisanceMondManager implements MyEventListener {
+export class NuisanceMondManager extends MyEventListener {
     //実際にnuisanceBlockを表示するblockManager
     private blockManager: BlockManager;
     //現在盤面上にあるnuisanceBlockを持つ配列
@@ -35,15 +35,8 @@ export class NuisanceMondManager implements MyEventListener {
      * @param damageBoard 盤面へのダメージ
      * @param finishDamage ダメージ処理終了
      */
-    eventClassNames: string[] = ["startDamage", "progress", "destroyMond", "damageBoard", "finishDamage"];
-    eventIds: EventId[] = [];
-    addEvent(classNames: string[], handler: Function): EventId {
-        const eventId = EventManager.addEvent({ classNames: classNames.filter((className) => this.eventClassNames.includes(className)), handler });
-        this.eventIds.push(eventId);
-        return eventId;
-    }
-
     constructor(blockManager: BlockManager) {
+        super();
         this.blockManager = blockManager;
         gameEvents.push(
             this.loop.addHandler("loop", () => {
@@ -108,7 +101,7 @@ export class NuisanceMondManager implements MyEventListener {
         this.progressCount = 0;
         this.loop.reset();
         this.loop.s$loopFrequency = this.g$progressFrequency;
-        EventManager.executeListeningEvents("startDamage", this.eventIds);
+        this.executeEvent("startDamage");
     }
 
     //NuisanceBlockを進行させて、すでにあるブロックとぶつかった場合は対消滅する
@@ -220,17 +213,17 @@ export class NuisanceMondManager implements MyEventListener {
                 this.blockManager.displayMonoiamond(nuisanceMond);
             } else {
                 if (damageBoard) {
-                    EventManager.executeListeningEvents("damageBoard", this.eventIds);
+                    this.executeEvent("damageBoard");
                     this.penalty++;
                 } else {
-                    EventManager.executeListeningEvents("destroyMond", this.eventIds);
+                    this.executeEvent("destroyMond");
                 }
             }
         }
 
         //対消滅したnuisanceBlockをリストから削除する
         this.nuisanceMonds = this.nuisanceMonds.filter((nuisanceMond) => nuisanceMond.g$visible);
-        EventManager.executeListeningEvents("progress", this.eventIds);
+        this.executeEvent("progress");
     }
 
     //progressFrequencyの頻度でNuisanceBlockを進行させつつ、三回に一回の割合で、taskの分だけNuisanceBlockを生成する
@@ -272,7 +265,7 @@ export class NuisanceMondManager implements MyEventListener {
         this.task = 0;
         this.progressCount = 0;
         this.taskCount = 0;
-        EventManager.executeListeningEvents("finishDamage", this.eventIds);
+        this.executeEvent("finishDamage");
         this.damaging = false;
     }
 

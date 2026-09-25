@@ -1,8 +1,8 @@
 import { sleep } from "../Utils";
 
-import { GameMode } from "../Game/GameMode";
+import { gameEvents, GameMode } from "../Game/GameMode";
 import { GamePlayer } from "../Game/GamePlayer";
-import { Input } from "../Interaction/Input";
+import { InputObserver } from "../Utilities/Interaction/InputObserver";
 import { ReplayData } from "../Replay/Replay";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 
@@ -38,7 +38,7 @@ export class DisposableGame {
 
     onFinished = () => {};
 
-    constructor(gameModeList: (typeof GameMode)[], inputs: Input[], inputCount: number, { playSetting, replayData }: { playSetting?: PlaySetting; replayData?: ReplayData }) {
+    constructor(gameModeList: (typeof GameMode)[], inputs: InputObserver[], inputCount: number, { playSetting, replayData }: { playSetting?: PlaySetting; replayData?: ReplayData }) {
         if (replayData) {
             this.replayData = replayData;
             this.playSetting = replayData.playSetting;
@@ -55,9 +55,11 @@ export class DisposableGame {
         const CurrentMode = gameModeList[this.playSetting.mode - 1];
         // @ts-ignore
         this.game = new CurrentMode(this.players);
-        this.game.addEvent(["gameFinish"], async () => {
-            await this.onGameFinish();
-        });
+        gameEvents.push(
+            this.game.addHandler("gameFinish", async () => {
+                await this.onGameFinish();
+            })
+        );
     }
 
     quit() {
@@ -103,8 +105,8 @@ export class DisposableGame {
         });
     }
 
-    private static createPlayers(maxGameTime: number, inputs: Input[], inputCount: number, { replayData }: { replayData?: ReplayData }) {
-        const players = inputs.map((input) => new GamePlayer(input));
+    private static createPlayers(maxGameTime: number, inputs: InputObserver[], inputCount: number, { replayData }: { replayData?: ReplayData }) {
+        const players = inputs.map((input) => new GamePlayer(input, inputCount));
 
         players.forEach((player, i) => {
             if (inputCount == 1) {

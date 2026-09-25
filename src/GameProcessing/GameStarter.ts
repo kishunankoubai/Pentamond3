@@ -1,6 +1,6 @@
 import { qsAddEvent } from "../Utils";
 import { GameProcessing } from "./GameProcessing";
-import { inputManager } from "../Interaction/InputManager";
+import { inputManager } from "../Utilities/Interaction/InputManager";
 import { PlaySettingSetter } from "../BeforePlaying/PlaySettingSetter";
 import { sceneManager } from "../Utilities/SceneManager";
 import { ScenePlay } from "../Scenes/ScenePlay";

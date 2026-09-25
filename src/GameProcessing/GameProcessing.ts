@@ -1,7 +1,7 @@
 import { Mode1 } from "../Game/Modes/Mode1";
 import { Mode2 } from "../Game/Modes/Mode2";
-import { Input } from "../Interaction/Input";
-import { inputManager } from "../Interaction/InputManager";
+import { AutoInputObserver } from "../Utilities/Interaction/AutoInputObserver";
+import { inputManager } from "../Utilities/Interaction/InputManager";
 import { playBackground } from "../PlayBackground";
 import { Replay, ReplayData } from "../Replay/Replay";
 import { DisposableGame } from "./DisposableGame";
@@ -11,6 +11,9 @@ import { qs } from "../Utils";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { sceneManager } from "../Utilities/SceneManager";
 import { SceneResult } from "../Scenes/SceneResult";
+import { SceneReplay } from "../Scenes/SceneReplay";
+import { ScenePlay } from "../Scenes/ScenePlay";
+import { MusicManager } from "../Utilities/Music/MusicManager";
 
 //ゲーム開始
 export class GameProcessing {
@@ -23,6 +26,17 @@ export class GameProcessing {
         this.currentGame.game.start();
     }
 
+    static pause() {
+        if (!this.currentGame || this.currentGame.g$hasFinished) return;
+        this.currentGame.game.stop();
+    }
+
+    static quit() {
+        this.currentGame?.quit();
+        this.currentGame = null;
+        inputManager.removeVirtualInputs();
+    }
+
     static isReplaying(): this is GameProcessing & { currentGame: DisposableGame & { replayData: ReplayData } } {
         return !!this.currentGame?.isReplay();
     }
@@ -30,21 +44,22 @@ export class GameProcessing {
     /**
      * 前回の設定と同じでプレイする
      */
-    static restartNormal() {
+    static async restartNormal() {
         if (!this.currentGame) throw new Error("一度もプレイされていない");
-        this.startNormal(this.currentGame.playSetting);
+        if (!(sceneManager.g$currentScene instanceof ScenePlay) || sceneManager.g$currentScene instanceof SceneReplay) await sceneManager.change(ScenePlay);
+        await this.startNormal(this.currentGame.playSetting);
     }
 
     /**
      * 前回の設定と同じでリプレイする
      */
-    static restartReplay() {
+    static async restartReplay() {
         if (!this.isReplaying()) throw new Error("リプレイ中ではない");
-        this.startReplay(this.currentGame.replayData);
+        await this.startReplay(this.currentGame.replayData);
     }
 
     static async startNormal(playSetting: PlaySetting) {
-        this.beforeStart();
+        await this.beforeStart();
 
         this.currentGame = new DisposableGame(
             this.ModeClassList,
@@ -60,11 +75,14 @@ export class GameProcessing {
 
         this.currentGame.appendPlayersTo(qs("#play"));
 
+        await this.playGameBGM(playSetting.playerNumber);
+
         await this.countDownAndStart();
     }
 
     static async startReplay(replayData: ReplayData) {
-        this.beforeStart();
+        if (!(sceneManager.g$currentScene instanceof SceneReplay)) await sceneManager.change(SceneReplay);
+        await this.beforeStart();
 
         this.setupReplayInputs(replayData);
 
@@ -82,6 +100,8 @@ export class GameProcessing {
 
         this.currentGame.appendPlayersTo(qs("#play"));
 
+        await this.playGameBGM(replayData.playSetting.playerNumber);
+
         await this.countDownAndStart();
 
         this.startAutoPlay();
@@ -94,26 +114,22 @@ export class GameProcessing {
 
         const playerNumber = replayData.playSetting.playerNumber;
         for (let i = 0; i < playerNumber; i++) {
-            const input = new Input("autoKeyboard");
-
-            if (!input.isAuto()) throw new Error("inputが自動ではありません");
-
-            input.g$manager.s$inputData = replayData.inputData[i];
+            const input = new AutoInputObserver(replayData.inputData[i]);
             inputManager.register(input);
         }
     }
 
     private static startAutoPlay() {
         inputManager.g$registeredInputs.forEach((input) => {
-            if (!input.isAuto()) throw new Error("inputが自動ではありません");
+            if (!(input instanceof AutoInputObserver)) throw new Error("inputが自動ではありません");
 
-            input.g$manager.playReset();
-            input.g$manager.playStart();
+            input.playReset();
+            input.playStart();
         });
     }
 
     private static async onFinishNormal() {
-        // pageManager.setPage("result");
+        await MusicManager.fadeOutBGM(300);
         await sceneManager.change(SceneResult);
         inputManager.removeVirtualInputs();
 
@@ -122,9 +138,10 @@ export class GameProcessing {
         ResultPageHandler.updateDetailedResultPage(this.currentGame!);
     }
 
-    private static onFinishReplay() {
-        //後で修正
-        // pageManager.setPage("replayResult");
+    private static async onFinishReplay() {
+        await MusicManager.fadeOutBGM(300);
+        await sceneManager.change(SceneResult, false);
+        sceneManager.g$currentPageManager?.openPage("replayResult");
         inputManager.removeVirtualInputs();
 
         ResultPageHandler.OverWriteTime(this.currentGame!.replayData!.finishTime);
@@ -142,7 +159,7 @@ export class GameProcessing {
         pageManager.backPage(1);
     }
 
-    private static beforeStart() {
+    private static async beforeStart() {
         let pageManager = sceneManager.g$currentPageManager;
         if (!pageManager) return;
 
@@ -151,8 +168,14 @@ export class GameProcessing {
         // 背景をリセット
         playBackground.reset();
 
+        MusicManager.stopAllBGM();
+
         // ページ移動
         pageManager.openPage("play", true);
         pageManager.openPage("startEffect");
+    }
+
+    private static playGameBGM(playerNumber: number) {
+        return MusicManager.playExclusiveBGM(playerNumber === 1 ? "ならべてトライアングル" : "Top of the Pyramid");
     }
 }

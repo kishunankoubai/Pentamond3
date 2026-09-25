@@ -1,5 +1,4 @@
 import { qs, qsAddEvent, qsAll, sleep } from "./Utils";
-import { inputManager } from "./Interaction/InputManager";
 import { Replay } from "./Replay/Replay";
 import { GraphicSetting } from "./GraphicSetting";
 import { ControllerRegisterer } from "./BeforePlaying/ControllerRegisterer";

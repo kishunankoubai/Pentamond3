@@ -217,8 +217,12 @@ export class PageManager extends MyEventListener {
         const currentMemory = PageManager.pageMemories.at(-1)!;
         const memory = PageManager.pageMemories[targetIndex];
         PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
-        if (memory.scene !== currentMemory.scene) await sceneManager.change(memory.scene, false);
-        this.setPagesVisibility(memory.displayingPageIds, true);
+        let pageManager: PageManager = this;
+        if (memory.scene !== currentMemory.scene) {
+            await sceneManager.change(memory.scene, false);
+            pageManager = sceneManager.g$currentPageManager!;
+        }
+        pageManager.setPagesVisibility(memory.displayingPageIds, true);
     }
 
     /**

@@ -1,15 +1,16 @@
-import { DataManager } from "../DataManager";
-import { GameStartEventSetter } from "../GameProcessing/GameStarter";
+import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
+import { GameProcessing } from "../GameProcessing/GameProcessing";
 import { setupPlayBackground } from "../PlayBackground";
-import { sleep } from "../Utilities/Common";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 import { inputManager } from "../Utilities/Interaction/InputManager";
-import { InputInfo } from "../Utilities/Interaction/InputObserver";
+import { InputInfo, InputObserver } from "../Utilities/Interaction/InputObserver";
 import { PageInteraction } from "../Utilities/Interaction/PageInteraction";
 import { PageInteractionSetter } from "../Utilities/Interaction/PageInteractionSetter";
 import { MusicManager } from "../Utilities/Music/MusicManager";
-import { Scene, sceneManager } from "../Utilities/SceneManager";
+import { Scene } from "../Utilities/SceneManager";
+import { MyEvent } from "../Utilities/MyEventListener";
+import { PageManager } from "../Utilities/Page/PageManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
 
@@ -18,6 +19,7 @@ export class ScenePlay extends Scene {
     private pageInteraction: PageInteraction;
     private talkManager: TalkManager;
     private controller = new AbortController();
+    private pauseInputEvent: MyEvent | null = null;
 
     constructor() {
         super("src/HTML/ScenePlay.html");
@@ -40,7 +42,8 @@ export class ScenePlay extends Scene {
     }
 
     protected close(): void {
-        // this.game?.loop?.stop();
+        if (this.pauseInputEvent) inputManager.removeEvent(this.pauseInputEvent);
+        this.pageInteraction.stop();
         this.controller.abort();
     }
 
@@ -92,48 +95,66 @@ export class ScenePlay extends Scene {
         });
     }
 
-    setupPausePage() {
-        this.pageManager.addHandler("changePage-play", () => {
-            inputManager.addHandler("inputValid", ([_, info]: [any, InputInfo]) => {
-                const pauseInputName = ["KeyP", "Escape", "button:9"];
-                // if (pauseInputName.includes(info.name) && this.game && !this.game.loop.g$isStopping && this.game.g$operable) {
-                //     this.game.loop.stop();
-                //     this.pageManager.openPage("pause");
-                // }
-            });
+    protected setupPausePage() {
+        this.pauseInputEvent = inputManager.addHandler("inputValid", ([input, info]: [InputObserver, InputInfo]) => {
+            const playerIndex = inputManager.g$registeredInputs.indexOf(input);
+            if (playerIndex < 0) return;
+            const pauseInputs = ["KeyP", "Escape", ...(ControllerRegisterer.gamepadConfigs[playerIndex]?.pause || [])];
+            if (pauseInputs.includes(info.name)) this.pauseGame();
         });
 
         //画面を閉じたりした場合、自動でポーズにする
         document.addEventListener(
             "visibilitychange",
             () => {
-                // if (document.hidden && this.game && !this.game.g$hasFinished && !this.game.loop.g$isStopping && this.game.g$operable) {
-                //     this.game.loop.stop();
-                //     this.pageManager.openPage("pause");
-                // }
+                if (document.hidden) this.pauseGame();
             },
             { signal: this.controller.signal }
         );
 
-        const container = document.querySelector<HTMLElement>("#pause .container")!;
-        container.querySelector(":nth-child(1)")?.addEventListener("click", () => {
-            // if (this.game) this.game.loop.start();
-            this.pageManager.backPage(1);
-            MusicManager.fadeAllBGM(1, 200);
+        document.getElementById("resumeButton")?.addEventListener("click", async () => {
+            await this.pageManager.backPage(1);
+            GameProcessing.resume();
+            await MusicManager.fadeAllBGM(1, 200);
         });
-        container.querySelector(":nth-child(2)")?.addEventListener("click", async () => {
-            await MusicManager.fadeOutBGM(100);
-            await this.pageManager.backPageImmediately(2);
-            sceneManager.change(ScenePlay);
+        document.getElementById("pauseRestartButton")?.addEventListener("click", async () => {
+            await this.pageManager.backPageImmediately(1);
+            await this.restartGame();
         });
-        container.querySelector(":nth-child(3)")?.addEventListener("click", async () => {
-            await MusicManager.fadeOutBGM(100);
-            this.pageManager.backPage(2);
+        document.getElementById("playPrepareButton")?.addEventListener("click", () => this.returnTo("playPrepare"));
+        document.getElementById("modeSelectButton")?.addEventListener("click", () => {
+            const target = GameProcessing.currentGame?.playSetting.playerNumber === 1 ? "soloStageSelect" : "multiStageSelect";
+            this.returnTo(target);
         });
+        document.getElementById("titleButton")?.addEventListener("click", () => this.returnTo("title"));
 
         this.pageManager.addHandler("openPage-pause", () => {
             MusicManager.fadeAllBGM(0.5, 200);
         });
     }
+
+    protected pauseGame(): void {
+        const game = GameProcessing.currentGame;
+        if (!game || game.g$hasFinished || !game.g$isPlaying || this.pageManager.g$currentPageId !== "play") return;
+        GameProcessing.pause();
+        this.pageManager.openPage("pause");
+    }
+
+    protected async returnTo(pageId: string): Promise<void> {
+        const back = PageManager.getBackIndex(pageId);
+        if (back <= 0) {
+            console.warn(`戻り先のページが履歴にありません: ${pageId}`);
+            return;
+        }
+        GameProcessing.quit();
+        await MusicManager.fadeOutBGM(150);
+        await this.pageManager.backPageImmediately(back);
+        await MusicManager.playExclusiveBGM("つみきのおしろ");
+    }
+
+    protected restartGame(): Promise<void> {
+        return GameProcessing.restartNormal();
+    }
+
     async setupGame() {}
 }
