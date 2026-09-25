@@ -11,7 +11,7 @@ import { gameEvents } from "./GameMode";
 import { GraphicSetting } from "../GraphicSetting";
 
 export class GamePlayer {
-    operator: MondOperator = new MondOperator();
+    operator: MondOperator;
     loop: LoopManager = new LoopManager();
     nuisanceMondManager: NuisanceMondManager;
     canvas: CanvasManager = new CanvasManager();
@@ -215,9 +215,10 @@ export class GamePlayer {
     };
     runningAnimations: Animation[] = [];
 
-    constructor(input: InputObserver, playerCount: number) {
+    constructor(input: InputObserver, playerCount: number, seeds: { next: number; nuisance: number }) {
+        this.operator = new MondOperator(seeds.next);
         this.label = new InformationLabelManager(playerCount);
-        this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager);
+        this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance);
         this.loop.s$onTime = false;
         gameEvents.push(
             this.nuisanceMondManager.addHandler("finishDamage", () => {

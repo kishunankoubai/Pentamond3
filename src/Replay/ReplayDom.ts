@@ -29,14 +29,16 @@ export class ReplayDom {
 
         //座標の割り振り
         qsAll("#savedReplay .replayButton").forEach((button, i) => {
-            button.dataset.mapping = `[0,${i}]`;
+            button.dataset.xy = `[0,${i}]`;
+            button.tabIndex = 0;
         });
 
         qsAll("#savedReplay .replayDeleteButton").forEach((button, i) => {
-            button.dataset.mapping = `[1,${i}]`;
+            button.dataset.xy = `[1,${i}]`;
+            button.tabIndex = 0;
         });
 
-        qs("#savedReplay .back").dataset.mapping = `[0,${replayDataList.length}]`;
+        qs("#savedReplay .back").dataset.xy = `[0,${replayDataList.length}]`;
 
         return { deleteButtons, replayButtons };
     }
@@ -73,7 +75,7 @@ export class ReplayDom {
     }
 
     private static createReplayDataDescription(replayData: ReplayData) {
-        const solo = replayData.nextData.length == 1 ? "ソロ" : "マルチ";
+        const solo = replayData.playSetting.playerNumber == 1 ? "ソロ" : "マルチ";
         const mode = this.stringifyMode(replayData.playSetting.mode);
         const time = (replayData.finishTime / 1000).toFixed(2);
 
@@ -109,6 +111,7 @@ export class ReplayDom {
         replayContainer.appendChild(replayButton);
         replayContainer.appendChild(saveButton);
         replayContainer.querySelectorAll("button").forEach((button) => {
+            button.tabIndex = 0;
             button.addEventListener("mouseover", () => {
                 button.focus();
             });
@@ -136,5 +139,11 @@ export class ReplayDom {
         qs("#replay .back").dataset.xy = `[0,${tempDataListLength}]`;
 
         return { replayButton, saveButton };
+    }
+
+    static setupTempReplayPage(replayDataList: ReplayData[]) {
+        const container = qs("#replay .options");
+        container.querySelectorAll(".replayDataContainer").forEach((element) => element.remove());
+        return replayDataList.map((data) => this.createTempReplayButton(data.date));
     }
 }

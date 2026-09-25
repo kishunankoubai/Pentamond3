@@ -1,5 +1,5 @@
 import { BlockKind } from "./Block";
-import { mixArray } from "../Utils";
+import { SeededRandom } from "../Utilities/Random/SeededRandom";
 
 export class NextManager {
     private next: BlockKind[] = ["L", "J", "p", "q", "U", "I"];
@@ -9,11 +9,13 @@ export class NextManager {
     private prevKind: BlockKind | null = null;
     private count: number = 0;
     private nextMemory: BlockKind[] = [];
+    private random: SeededRandom;
 
-    constructor() {
+    constructor(seed: number) {
+        this.random = new SeededRandom(seed);
         this.next2 = window.structuredClone(this.next);
-        mixArray(this.next);
-        mixArray(this.next2);
+        this.random.shuffle(this.next);
+        this.random.shuffle(this.next2);
         this.nextMemory = window.structuredClone(this.next);
     }
 
@@ -58,7 +60,7 @@ export class NextManager {
         this.currentKind = this.next.shift()!;
         this.count++;
         if (this.count % this.next2.length == 0) {
-            mixArray(this.next2);
+            this.random.shuffle(this.next2);
         }
     }
 

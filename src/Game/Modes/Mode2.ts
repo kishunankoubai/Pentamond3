@@ -71,24 +71,25 @@ export class Mode2 extends GameMode {
     addPlayerBehavior(index: number): void {
         const p = this.players[index];
         const input = p.input;
+        const gamepadConfig = ControllerRegisterer.gamepadConfigs[index] ?? Setting.gamepadConfigPresets[0];
         const operate = (keyCode: string) => {
-            if (["ArrowLeft", ...ControllerRegisterer.gamepadConfigs[index].moveLeft].includes(keyCode)) {
+            if (["ArrowLeft", ...gamepadConfig.moveLeft].includes(keyCode)) {
                 p.operator.move("left");
-            } else if (["ArrowRight", ...ControllerRegisterer.gamepadConfigs[index].moveRight].includes(keyCode)) {
+            } else if (["ArrowRight", ...gamepadConfig.moveRight].includes(keyCode)) {
                 p.operator.move("right");
-            } else if (["ArrowDown", ...ControllerRegisterer.gamepadConfigs[index].moveDown].includes(keyCode)) {
+            } else if (["ArrowDown", ...gamepadConfig.moveDown].includes(keyCode)) {
                 p.operator.move("down");
-            } else if (["ArrowUp", ...ControllerRegisterer.gamepadConfigs[index].put].includes(keyCode)) {
+            } else if (["ArrowUp", ...gamepadConfig.put].includes(keyCode)) {
                 p.operator.put();
-            } else if (["KeyC", ...ControllerRegisterer.gamepadConfigs[index].spinLeft].includes(keyCode)) {
+            } else if (["KeyC", ...gamepadConfig.spinLeft].includes(keyCode)) {
                 p.operator.spin("left");
-            } else if (["KeyV", ...ControllerRegisterer.gamepadConfigs[index].spinRight].includes(keyCode)) {
+            } else if (["KeyV", ...gamepadConfig.spinRight].includes(keyCode)) {
                 p.operator.spin("right");
-            } else if (["KeyB", ...ControllerRegisterer.gamepadConfigs[index].unput].includes(keyCode)) {
+            } else if (["KeyB", ...gamepadConfig.unput].includes(keyCode)) {
                 p.operator.unput();
-            } else if (["Space", ...ControllerRegisterer.gamepadConfigs[index].hold].includes(keyCode)) {
+            } else if (["Space", ...gamepadConfig.hold].includes(keyCode)) {
                 p.operator.hold();
-            } else if (["Enter", ...ControllerRegisterer.gamepadConfigs[index].removeLine].includes(keyCode)) {
+            } else if (["Enter", ...gamepadConfig.removeLine].includes(keyCode)) {
                 p.operator.removeLine();
             } else {
                 return;
@@ -123,9 +124,9 @@ export class Mode2 extends GameMode {
                     "ArrowLeft",
                     "ArrowRight",
                     "ArrowDown",
-                    ...ControllerRegisterer.gamepadConfigs[index].moveLeft,
-                    ...ControllerRegisterer.gamepadConfigs[index].moveRight,
-                    ...ControllerRegisterer.gamepadConfigs[index].moveDown,
+                    ...gamepadConfig.moveLeft,
+                    ...gamepadConfig.moveRight,
+                    ...gamepadConfig.moveDown,
                 ];
                 const latestKey = input.getLatestPressingKey(moveKeys);
                 const pressTime = Date.now() - input.getPressTime(latestKey);

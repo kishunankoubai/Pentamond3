@@ -148,8 +148,7 @@ export class ScenePlay extends Scene {
         }
         GameProcessing.quit();
         await MusicManager.fadeOutBGM(150);
-        await this.pageManager.backPageImmediately(back);
-        await MusicManager.playExclusiveBGM("つみきのおしろ");
+        await this.pageManager.backPage(back);
     }
 
     protected restartGame(): Promise<void> {

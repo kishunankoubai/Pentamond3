@@ -15,8 +15,7 @@ export class ControllerRegisterer {
     private static inputEvents: MyEvent[] = [];
 
     static setEvents() {
-        inputManager.removeEvent(this.inputEvents);
-        this.inputEvents = [];
+        this.clearEvents();
         let pageManager = sceneManager.g$currentPageManager;
         if (!pageManager) return;
         // closure
@@ -48,12 +47,18 @@ export class ControllerRegisterer {
         }));
 
         this.inputEvents.push(inputManager.addHandler("finishRegister", () => {
-            qs("#registerText").innerHTML = '<div style="color:#d66">完了！</div>';
+            const registerText = document.getElementById("registerText");
+            if (registerText) registerText.innerHTML = '<div style="color:#d66">完了！</div>';
         }));
 
         qsAddEvent("#registerButton", "click", () => {
             this.onClickOk(currentPlayerNumber);
         });
+    }
+
+    static clearEvents() {
+        inputManager.removeEvent(this.inputEvents);
+        this.inputEvents = [];
     }
 
     private static async onClickOk(playerNumber: number) {
@@ -113,14 +118,19 @@ export class ControllerRegisterer {
     // コントローラーが登録されたときアイコンを出す
     private static onInputRegistered(playerNumber: number) {
         const registerInputs = inputManager.g$registeredInputs;
+        const registeredInput = registerInputs.at(-1);
+        const connectionLabel = document.getElementById("connectionLabel");
+        const registerText = document.getElementById("registerText");
+
+        // このイベントはタイトル画面の登録UI専用。別Sceneでは何もしない。
+        if (!registeredInput || !connectionLabel || !registerText) return;
 
         const typeIcon = document.createElement("div");
-        typeIcon.dataset.inputType = registerInputs[registerInputs.length - 1].g$type;
+        typeIcon.dataset.inputType = registeredInput.g$type;
         typeIcon.classList.add("inputTypeIcon");
-        // typeIcon.innerHTML = registerInputs[registerInputs.length - 1].g$type;
-        qs("#connectionLabel").appendChild(typeIcon);
+        connectionLabel.appendChild(typeIcon);
 
-        qs("#registerText").innerText = `登録したい入力機器のボタンを押してください：あと${playerNumber - inputManager.g$registeredInputNumber}人`;
+        registerText.innerText = `登録したい入力機器のボタンを押してください：あと${playerNumber - inputManager.g$registeredInputNumber}人`;
 
         this.gamepadConfigs.push(Setting.gamepadConfigPresets[0]);
     }

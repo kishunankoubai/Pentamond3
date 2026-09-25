@@ -3,8 +3,9 @@ import { sleep } from "../Utils";
 import { gameEvents, GameMode } from "../Game/GameMode";
 import { GamePlayer } from "../Game/GamePlayer";
 import { InputObserver } from "../Utilities/Interaction/InputObserver";
-import { ReplayData } from "../Replay/Replay";
+import type { ReplayData, ReplayRandomSeeds } from "../Replay/Replay";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
+import { createRandomSeed } from "../Utilities/Random/SeededRandom";
 
 /**
  * ゲームのセッティングから片付けまでやって捨てられるクラス
@@ -15,6 +16,7 @@ export class DisposableGame {
 
     readonly playSetting: PlaySetting;
     readonly replayData?: ReplayData;
+    readonly randomSeeds: ReplayRandomSeeds;
 
     private hasStarted = false;
     /**
@@ -48,8 +50,13 @@ export class DisposableGame {
             throw new Error("引数不足");
         }
 
+        this.randomSeeds = this.replayData?.randomSeeds ?? {
+            next: Array.from({ length: inputCount }, () => createRandomSeed()),
+            nuisance: Array.from({ length: inputCount }, () => createRandomSeed()),
+        };
+
         //登録されているinputをもとにplayersを作成する
-        this.players = DisposableGame.createPlayers(this.playSetting.maxGameTime, inputs, inputCount, { replayData: this.replayData });
+        this.players = DisposableGame.createPlayers(this.playSetting.maxGameTime, inputs, inputCount, this.randomSeeds, { replayData: this.replayData });
 
         // ゲームを作成
         const CurrentMode = gameModeList[this.playSetting.mode - 1];
@@ -105,8 +112,13 @@ export class DisposableGame {
         });
     }
 
-    private static createPlayers(maxGameTime: number, inputs: InputObserver[], inputCount: number, { replayData }: { replayData?: ReplayData }) {
-        const players = inputs.map((input) => new GamePlayer(input, inputCount));
+    private static createPlayers(maxGameTime: number, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds, { replayData }: { replayData?: ReplayData }) {
+        const players = inputs.map((input, i) =>
+            new GamePlayer(input, inputCount, {
+                next: randomSeeds.next[i],
+                nuisance: randomSeeds.nuisance[i],
+            })
+        );
 
         players.forEach((player, i) => {
             if (inputCount == 1) {
@@ -123,8 +135,10 @@ export class DisposableGame {
             player.playInfo.gameTime = maxGameTime;
 
             //リプレイ情報の読み込み
-            if (replayData) {
+            if (replayData?.nextData?.[i]) {
                 player.operator.s$next = replayData.nextData[i];
+            }
+            if (replayData?.nuisanceBlockData?.[i]) {
                 player.nuisanceMondManager.s$spawnCoordinates = replayData.nuisanceBlockData[i];
             }
         });

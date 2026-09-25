@@ -11,6 +11,7 @@ import { Scene } from "../Utilities/SceneManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
 import { GameProcessing } from "../GameProcessing/GameProcessing";
+import { PageManager } from "../Utilities/Page/PageManager";
 
 export class SceneResult extends Scene {
     private elementManager: ElementManager;
@@ -33,9 +34,17 @@ export class SceneResult extends Scene {
         this.setPageAnimation();
         this.pageInteraction.start();
         ResultPageHandler.setEvents();
-        MusicManager.playExclusiveBGM("さよならさんかく");
-        document.querySelector<HTMLElement>("#result .restart")?.addEventListener("click", () => GameProcessing.restartNormal());
-        document.querySelector<HTMLElement>("#replayResult .replayStart")?.addEventListener("click", () => GameProcessing.restartReplay());
+        MusicManager.playExclusiveBGM("おかたづけ");
+        document.getElementById("resultRestartButton")?.addEventListener("click", () => GameProcessing.restartNormal());
+        document.getElementById("resultPlayPrepareButton")?.addEventListener("click", () => this.returnTo("playPrepare"));
+        document.getElementById("resultModeSelectButton")?.addEventListener("click", () => {
+            const target = GameProcessing.currentGame?.playSetting.playerNumber === 1 ? "soloStageSelect" : "multiStageSelect";
+            this.returnTo(target);
+        });
+        document.getElementById("resultTitleButton")?.addEventListener("click", () => this.returnTo("title"));
+        document.getElementById("replayRestartButton")?.addEventListener("click", () => GameProcessing.restartReplay());
+        document.getElementById("replayListButton")?.addEventListener("click", () => this.returnToClosest(["replay", "savedReplay"]));
+        document.getElementById("replayResultTitleButton")?.addEventListener("click", () => this.returnTo("title"));
     }
 
     protected close(): void {
@@ -44,6 +53,29 @@ export class SceneResult extends Scene {
 
     defaultStart(): void {
         this.pageManager.openPage("result");
+    }
+
+    private async returnTo(pageId: string): Promise<void> {
+        const back = PageManager.getBackIndex(pageId);
+        if (back <= 0) {
+            console.warn(`戻り先のページが履歴にありません: ${pageId}`);
+            return;
+        }
+        GameProcessing.quit();
+        await MusicManager.fadeOutBGM(150);
+        await this.pageManager.backPage(back);
+    }
+
+    private returnToClosest(pageIds: string[]): Promise<void> {
+        const target = pageIds
+            .map((pageId) => ({ pageId, back: PageManager.getBackIndex(pageId) }))
+            .filter(({ back }) => back > 0)
+            .sort((a, b) => a.back - b.back)[0];
+        if (!target) {
+            console.warn(`戻り先のページが履歴にありません: ${pageIds.join(", ")}`);
+            return Promise.resolve();
+        }
+        return this.returnTo(target.pageId);
     }
 
     private setPageAnimation() {

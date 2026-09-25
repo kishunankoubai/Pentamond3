@@ -1,12 +1,11 @@
 import LZString from "lz-string";
 
-import { GameMode, OperateName } from "../Game/GameMode";
-import { GamePlayer } from "../Game/GamePlayer";
+import { OperateName } from "../Game/GameMode";
 import { ReplayData } from "./Replay";
 
 import { qs } from "../Utils";
 import { replayDataDecryption, replayDataEncryption } from "./DataCompression";
-import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
+import type { DisposableGame } from "../GameProcessing/DisposableGame";
 
 export class ReplayDataHandler {
     static tempDataList: ReplayData[] = [];
@@ -24,20 +23,18 @@ export class ReplayDataHandler {
         return new Blob([localStorage.getItem("Pentamond3-replayData") ?? "[]"]).size;
     }
 
-    static createReplayData(players: GamePlayer[], game: GameMode, playSetting: PlaySetting) {
+    static createReplayData({ players, game, playSetting, randomSeeds }: DisposableGame) {
         const inputData = game.operateMemories.map((operateMemory) => operateMemory.map(({ time, operateName }) => ({ time: time, keyCode: this.convertOperateName(operateName), type: "downup" })));
-        const nextData = players.map((p) => p.operator.g$nextMemory);
         const finishTime = Math.max(...players.map((player) => player.playInfo.playTime));
         const finishPlayers = players.map((player, i) => (player.playInfo.playTime == finishTime ? i + 1 : -1)).filter((value) => value != -1);
-        const nuisanceBlockData = players.map((player) => player.nuisanceMondManager.g$spawnCoordinateMemory);
 
         const replayData = structuredClone({
             inputData,
-            nextData,
             playSetting,
             finishTime,
             finishPlayers,
-            nuisanceBlockData,
+            randomSeeds,
+            version: 2,
             date: Date.now(),
         }) as ReplayData;
 
@@ -87,10 +84,10 @@ export class ReplayDataHandler {
         const json = localStorage.getItem("Pentamond3-replayData");
         const encodedList: string[] = json ? JSON.parse(json) : [];
 
-        return encodedList
-            .map((str) => LZString.decompressFromUTF16(str))
-            .map((str) => JSON.parse(str))
-            .map((obj) => obj[6]);
+        return encodedList.map((str) => {
+            const data = JSON.parse(LZString.decompressFromUTF16(str));
+            return data[0] === 2 ? data[5] : data[6];
+        });
     }
 
     static async saveReplayData(data: ReplayData, { onOverMax, onError }: { onOverMax: () => void; onError: () => void }): Promise<boolean> {

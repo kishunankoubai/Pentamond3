@@ -23,8 +23,23 @@ export async function replayDataEncryption(data: ReplayData): Promise<string> {
             })
             .join("")
     );
-    const nextData = data.nextData.map((playerNextData) => playerNextData.map((kind) => blockKinds.indexOf(kind) + "").join(""));
-    const nuisanceBlockData = data.nuisanceBlockData.map((playerNuisanceData) => playerNuisanceData.map((x) => numbers[x]).join(""));
+    if (data.version === 2 && data.randomSeeds) {
+        return LZString.compressToUTF16(
+            JSON.stringify([
+                2,
+                inputData,
+                [data.playSetting.playerNumber, data.playSetting.mode, data.playSetting.maxGameTime, data.playSetting.handy],
+                data.finishTime,
+                data.finishPlayers,
+                data.date,
+                data.randomSeeds.next,
+                data.randomSeeds.nuisance,
+            ])
+        );
+    }
+
+    const nextData = (data.nextData ?? []).map((playerNextData) => playerNextData.map((kind) => blockKinds.indexOf(kind) + "").join(""));
+    const nuisanceBlockData = (data.nuisanceBlockData ?? []).map((playerNuisanceData) => playerNuisanceData.map((x) => numbers[x]).join(""));
     const data1 = [
         inputData,
         nextData,
@@ -40,9 +55,11 @@ export async function replayDataEncryption(data: ReplayData): Promise<string> {
 
 export async function replayDataDecryption(encryptedData: string): Promise<ReplayData> {
     const objectData = JSON.parse(LZString.decompressFromUTF16(encryptedData));
-    const inputData = objectData[0]
+    const version2 = objectData[0] === 2;
+    const inputSource = version2 ? objectData[1] : objectData[0];
+    const inputData = inputSource
         .map((playerInputData: string) => {
-            return playerInputData.match(/[0-4]+[^0-4]*|[^0-4]+/g);
+            return playerInputData.match(/[0-4]+[^0-4]*|[^0-4]+/g) ?? [];
         })
         .map((playerInputData: string[]) => {
             return playerInputData.map((_, i) => ({
@@ -51,6 +68,23 @@ export async function replayDataDecryption(encryptedData: string): Promise<Repla
                 type: "downup",
             }));
         });
+    if (version2) {
+        return {
+            inputData,
+            playSetting: {
+                playerNumber: objectData[2][0],
+                mode: objectData[2][1],
+                maxGameTime: objectData[2][2],
+                handy: objectData[2][3],
+            },
+            finishTime: objectData[3],
+            finishPlayers: objectData[4],
+            date: objectData[5],
+            randomSeeds: { next: objectData[6], nuisance: objectData[7] },
+            version: 2,
+        };
+    }
+
     const nextData = objectData[1].map((playerNextData: string) => playerNextData.split("").map((word) => blockKinds[parseInt(word)]));
     const nuisanceBlockData = objectData[5].map((playerNuisanceData: string) => playerNuisanceData.split("").map((word) => numbers.indexOf(word)));
 

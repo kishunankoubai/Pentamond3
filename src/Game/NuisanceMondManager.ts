@@ -4,6 +4,7 @@ import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { Monoiamond } from "../BlockOperate/Monoiamond";
 import * as Setting from "../Settings";
 import { gameEvents } from "./GameMode";
+import { SeededRandom } from "../Utilities/Random/SeededRandom";
 
 /**
  * じゃまモンドに関連する処理を行う
@@ -28,6 +29,7 @@ export class NuisanceMondManager extends MyEventListener {
     private progressCount = 0;
     private spawnCoordinates: number[] = [];
     private spawnCoordinateMemory: number[] = [];
+    private random: SeededRandom;
 
     /**
      * @param startDamage ダメージ処理開始
@@ -35,9 +37,10 @@ export class NuisanceMondManager extends MyEventListener {
      * @param damageBoard 盤面へのダメージ
      * @param finishDamage ダメージ処理終了
      */
-    constructor(blockManager: BlockManager) {
+    constructor(blockManager: BlockManager, seed: number) {
         super();
         this.blockManager = blockManager;
+        this.random = new SeededRandom(seed);
         gameEvents.push(
             this.loop.addHandler("loop", () => {
                 this.damageProcess();
@@ -232,7 +235,7 @@ export class NuisanceMondManager extends MyEventListener {
             //指定されたtaskの量の生成が完了していないとき
             if (this.taskCount < this.task) {
                 this.progress();
-                const x = this.spawnCoordinates.length ? this.spawnCoordinates.shift()! : Math.floor(Math.random() * Setting.playWidth);
+                const x = this.spawnCoordinates.length ? this.spawnCoordinates.shift()! : this.random.nextInt(Setting.playWidth);
                 this.createNuisanceBlock(x, 0);
                 this.progressCount++;
                 this.taskCount++;

@@ -1,8 +1,6 @@
 import { BlockKind } from "../BlockOperate/Block";
 import { AutoInputData } from "../Utilities/Interaction/AutoInputObserver";
 import * as Setting from "../Settings";
-import { GamePlayer } from "../Game/GamePlayer";
-import { GameMode } from "../Game/GameMode";
 
 import { ReplayDom } from "./ReplayDom";
 import { ReplayDataHandler } from "./ReplayDataHandler";
@@ -10,15 +8,25 @@ import { ReplayEventSetter } from "./ReplayEventSetter";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { qsAll } from "../Utils";
 import { sceneManager } from "../Utilities/SceneManager";
+import type { DisposableGame } from "../GameProcessing/DisposableGame";
 
 //リプレイ
+export type ReplayRandomSeeds = {
+    next: number[];
+    nuisance: number[];
+};
+
 export type ReplayData = {
     inputData: AutoInputData[][];
-    nextData: BlockKind[][];
+    /** version 1のリプレイとの後方互換用。version 2以降はseedを使用する。 */
+    nextData?: BlockKind[][];
     playSetting: PlaySetting;
     finishTime: number;
     finishPlayers: number[];
-    nuisanceBlockData: number[][];
+    /** version 1のリプレイとの後方互換用。version 2以降はseedを使用する。 */
+    nuisanceBlockData?: number[][];
+    randomSeeds?: ReplayRandomSeeds;
+    version?: 2;
     date: number;
 };
 
@@ -49,14 +57,16 @@ export class Replay {
         ReplayEventSetter.setSavedReplayPageEvent(replayDataList, buttons);
     }
 
-    static addTempData({ players, game, playSetting }: { players: GamePlayer[]; game: GameMode; playSetting: PlaySetting }) {
-        const replayData = ReplayDataHandler.createReplayData(players, game, playSetting);
+    static setupTempReplayPage() {
+        const buttons = ReplayDom.setupTempReplayPage(ReplayDataHandler.tempDataList);
+        buttons.forEach(({ replayButton, saveButton }) => ReplayEventSetter.setTempReplayPageEvent(ReplayDataHandler.tempDataList, { replayButton, saveButton }));
+        this.updateTempReplaySaveButton();
+    }
+
+    static addTempData(disposableGame: DisposableGame) {
+        const replayData = ReplayDataHandler.createReplayData(disposableGame);
 
         ReplayDataHandler.addTempData(replayData, Setting.maximumTemporaryReplaySavable);
-
-        //後で修正
-        // const buttons = ReplayDom.createTempReplayButton(replayData.date);
-        // ReplayEventSetter.setTempReplayPageEvent(ReplayDataHandler.tempDataList, buttons);
     }
 
     static save(replayData: ReplayData) {

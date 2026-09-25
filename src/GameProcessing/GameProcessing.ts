@@ -14,6 +14,8 @@ import { SceneResult } from "../Scenes/SceneResult";
 import { SceneReplay } from "../Scenes/SceneReplay";
 import { ScenePlay } from "../Scenes/ScenePlay";
 import { MusicManager } from "../Utilities/Music/MusicManager";
+import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
+import * as Setting from "../Settings";
 
 //ゲーム開始
 export class GameProcessing {
@@ -111,6 +113,10 @@ export class GameProcessing {
         inputManager.removeVirtualInputs();
         inputManager.resetRegister();
         inputManager.s$maxInputNumber = replayData.playSetting.playerNumber;
+        ControllerRegisterer.gamepadConfigs = Array.from(
+            { length: replayData.playSetting.playerNumber },
+            () => structuredClone(Setting.gamepadConfigPresets[0])
+        );
 
         const playerNumber = replayData.playSetting.playerNumber;
         for (let i = 0; i < playerNumber; i++) {

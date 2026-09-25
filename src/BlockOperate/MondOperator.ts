@@ -13,12 +13,13 @@ export class MondOperator extends MyEventListener {
     private hand: Pentiamond = new Pentiamond();
     private prevPosition: [number, number] | null = null;
     private prevDirection: number | null = null;
-    private next: NextManager = new NextManager();
+    private next: NextManager;
     private pausing: boolean = true;
     private lastTrick: TrickInfo | null = null;
 
-    constructor() {
+    constructor(seed: number) {
         super();
+        this.next = new NextManager(seed);
     }
 
     get g$graphicData(): GraphicData {
