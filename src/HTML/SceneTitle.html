@@ -1,0 +1,481 @@
+<div class="pageBundle">
+    <div id="invalidPanel">
+        <div class="label">読み込み中……</div>
+        <div id="loadingCircle">▲</div>
+    </div>
+
+    <div class="page" id="pageStart">
+        <!-- prettier-ignore -->
+        <div class="label autoDynamicText" id="pageStartLabel">クリックしてスタート！</div>
+        <div class="label">(音が出ます)</div>
+    </div>
+
+    <div class="page" id="title">
+        <div class="label headingLabel">Pentamond</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="soloStageSelect" data-xy="[0,0]">ひとりで</div>
+                <div class="button" data-page="multiStageSelect" data-xy="[0,1]">みんなで</div>
+                <div class="button" data-page="tutorial" data-xy="[0,2]">養成所</div>
+                <div class="button" data-page="statistics" data-xy="[0,3]">統計</div>
+                <div class="button" data-page="others" data-xy="[0,4]">その他</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div>
+                    <div class="text">ひとりでとことん遊べるよ！</div>
+                </div>
+                <div>
+                    <div class="text">みんなで対戦しよう！</div>
+                </div>
+                <div>
+                    <div class="text">まずは遊び方を覚えよう！</div>
+                </div>
+                <div>
+                    <div class="text">今までどれだけプレイしたか覗いてみよう！</div>
+                </div>
+                <div>
+                    <div class="text">
+                        分からないことがあるときのヘルプ、<br />
+                        リプレイやランキングが見られる統計は<br />
+                        こちらから！
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="others">
+        <div class="label headingLabel">その他</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="help" data-xy="[0,0]">ヘルプ</div>
+                <div class="button" data-page="settings" data-xy="[0,1]">設定</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div>
+                    <div class="text">
+                        困ったときはここを読んでね！<br />
+                        役一覧、操作方法、ゲームやルールの説明など。
+                    </div>
+                </div>
+                <div>
+                    <div class="text">音楽、コントローラー、ゲームルールなどを変更できるよ！</div>
+                </div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page" id="soloStageSelect">
+        <div class="label headingLabel">ひとりで</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="playerRegister" data-xy="[0,0]" data-mode="1" data-player="1">サバイバル</div>
+                <div class="button" data-page="playerRegister" data-xy="[0,1]" data-mode="2" data-player="1">十五列揃え</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div>
+                    <div class="text">
+                        基本的なモード。<br />
+                        タイムがなくなるまで役を揃え続けよう！
+                    </div>
+                </div>
+                <div>
+                    <div class="text">
+                        一列揃えのタイムアタック。<br />
+                        自分の限界に挑戦しよう！
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page" id="multiStageSelect">
+        <div class="label headingLabel">みんなで</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="playerNumberSelect" data-xy="[0,0]" data-mode="1">サバイバル</div>
+                <div class="button" data-page="playerNumberSelect" data-xy="[0,1]" data-mode="2">十五列揃え</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div>
+                    <div class="text">
+                        基本的な対戦モード。<br />
+                        役を揃えて最後まで生き残り続けよう！
+                    </div>
+                </div>
+                <div>
+                    <div class="text">
+                        一列揃えのタイムアタック。<br />
+                        相手よりも速く揃えよう！
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page" id="playerNumberSelect">
+        <div class="label headingLabel">人数選択</div>
+        <div class="text">プレイする人数を選択してください</div>
+        <div class="options" data-direction="row">
+            <div class="button" data-page="playerRegister" data-xy="[0,0]" data-player="2">2人</div>
+            <div class="button" data-page="playerRegister" data-xy="[1,0]" data-player="3">3人</div>
+            <div class="button" data-page="playerRegister" data-xy="[2,0]" data-player="4">4人</div>
+        </div>
+        <div class="back button" data-xy="[-1,1]">戻る</div>
+    </div>
+
+    <div class="page" id="playPrepare">
+        <div class="label headingLabel">プレイ準備</div>
+        <div class="options">
+            <div class="playStart button" data-xy="[0,0]">スタート!</div>
+        </div>
+        <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
+    <div class="page" id="playerRegister">
+        <div class="label headingLabel">コントローラー登録</div>
+        <div class="text" id="registerText">登録したいコントローラーのボタンを押してください</div>
+        <div id="connectionLabel"></div>
+        <div class="options">
+            <div class="button" id="registerButton" data-xy="[1,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
+    <div class="page" id="tutorial">
+        <div class="label headingLabel">養成所</div>
+        <div class="text">ステージ形式でPentamondの遊び方を覚えよう！</div>
+        <div class="text">教習項目を選んでね！</div>
+        <div class="options" data-direction="row">
+            <div class="button" data-xy="[1,0]" data-page="operateTutorial">操作方法</div>
+            <div class="button" data-xy="[2,0]" data-page="BasicRule">基本ルール</div>
+            <div class="button" data-xy="[3,0]" data-page="advancedRule">応用など</div>
+            <div class="button" data-xy="[4,0]" data-page="trickTutorial">役の揃え方</div>
+        </div>
+        <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
+    <div class="page" id="help">
+        <div class="label headingLabel">ヘルプ</div>
+        <div class="options">
+            <div class="button" data-page="trickList" data-xy="[0,0]">役一覧</div>
+            <div class="button" data-page="howToPlayBasic" data-xy="[0,1]">基本編</div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page" id="howToPlayBasic">
+        <div class="label headingLabel">基本編</div>
+        <div class="subPage">
+            <div class="text">ここでは、Pentamondの基本的な遊び方を説明します</div>
+        </div>
+        <div class="subPage">
+            <div class="text">
+                Pentamondは盤面の上に出現するブロック（モンドという）を操作してどんどん積み上げていくゲームです<br />
+                モンドは左右に移動したり、回転したりすることができます<br /><br />
+                モンドは下に移動させることもできます<br />
+                真下に移動できないときには斜め下に移動する、"<b>滑り移動</b>"をすることができます<br />
+                （ただし、これらの移動により設置されることはありません）
+            </div>
+        </div>
+        <div class="subPage">
+            <div class="text">
+                今操作しているモンドの下には影（ゴーストという）が表示されます<br />
+                モンドを"<b>設置</b>"するとこのゴーストの位置に設置されます<br /><br />
+                このとき、盤面の上に新しく次のモンドが出現します<br />
+                それを操作して設置するとさらに新しいモンドが出現します<br />
+                これを繰り返すことで自由にモンドを積み上げることができます
+            </div>
+        </div>
+        <div class="subPage">
+            <div class="text">
+                しかし、ただ積み上げても意味はありません<br />
+                Pentamondでは、モンドを使って、"<b>役</b>"という決まった形を作ると<br />
+                たくさんのスコアが貰えたり、相手に攻撃できたり……<br />
+                いいことがたくさんあるので、どんどん役を揃えていきましょう<br /><br />
+                役は一列ごとに判定されます<br />
+                役の形はモード選択→ヘルプ→役一覧などから確認できます<br />
+            </div>
+        </div>
+        <div class="subPage">
+            <div class="text">
+                "<b>消去</b>"を行うと、盤面の一番下の列を消すことができます<br />
+                揃えたブロックの形が役として認められるにはその役を消去する必要があります<br />
+                役が成立している列を連続して消去するとChainというボーナスが貰えます<br />
+                モンドをたくさん積み上げて一気に消すとより高いスコアを目指すことができます
+            </div>
+        </div>
+        <div class="subPage">
+            <div class="text">
+                Pentamondの基本的なモードでは制限時間があります<br />
+                この残り時間がなくなるとゲームオーバーです<br />
+                ただし、役を揃えることで残り時間を回復することができます<br />
+                消去はいつでも行うことができますが、役が成立していない列を連続して<br />
+                消去すると残り時間が減らされてしまうので注意しましょう
+            </div>
+        </div>
+        <div class="subPage">
+            <div class="text">
+                まとめとしては、モンドを操作して役を揃えそれを消去するゲームです<br /><br />
+                もっと詳しく知りたい場合は応用編をご覧ください<br />
+                各モードの遊び方についてはソロモード編、マルチモード編をご覧ください<br />
+                モンドの操作、設置、消去などの操作方法については<br />
+                モード選択→ヘルプ→操作方法をご覧ください
+            </div>
+        </div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
+    <div class="page" id="statistics">
+        <div class="label headingLabel">統計</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="replay" data-xy="[0,0]">直近のリプレイ</div>
+                <div class="button" data-page="savedReplay" data-xy="[0,1]">保存したリプレイ</div>
+                <div class="button" data-page="statistics" data-xy="[0,2]">情報</div>
+                <div class="button" data-page="ranking" data-xy="[0,3]">ランキング</div>
+                <div class="button" data-page="mission" data-xy="[0,4]">ミッション</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div>
+                    <div class="text">
+                        最近のプレイを最大で10件まで見れるよ！<br />
+                        保存しないと消えちゃうので注意！
+                    </div>
+                </div>
+                <div>
+                    <div class="text">お気に入りのプレイを最大で10件まで保存できるよ！</div>
+                </div>
+                <div>
+                    <div class="text">今までのこのゲームの意外な記録が見れるよ！</div>
+                </div>
+                <div>
+                    <div class="text">自分が世界で何番目か確認してみよう！</div>
+                </div>
+                <div>
+                    <div class="text">決められたお題に挑戦してみよう！</div>
+                </div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="replay">
+        <div class="label headingLabel">直近のリプレイ</div>
+        <div class="text">最新10件まで閲覧することができます。</div>
+        <div class="options"></div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
+    <div class="page" id="replaySaveAlert" data-layer="1">
+        <div class="popup">
+            <div class="label headingLabel">保存できません</div>
+            <div class="text">
+                すでに10件保存されているため<br />
+                このリプレイを保存できません。<br />
+                保存したリプレイでいずれかを削除してください。
+            </div>
+            <div class="back button" data-xy="[0,0]">戻る</div>
+        </div>
+    </div>
+
+    <div class="page" id="replaySaveAlert2" data-layer="1">
+        <div class="popup">
+            <div class="label headingLabel">保存失敗</div>
+            <div class="text">
+                何らかの理由により保存に失敗しました。<br />
+                ・保存したリプレイのデータサイズが極端に大きい<br />
+                ・シークレットブラウザを使用している<br />
+                などの理由が考えられます。
+            </div>
+            <div class="back button" data-xy="[0,0]">戻る</div>
+        </div>
+    </div>
+
+    <div class="page" id="savedReplay">
+        <div class="label headingLabel">保存したリプレイ</div>
+        <div class="text">最大10件まで保存することができます。</div>
+        <div class="options"></div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
+    <div class="page" id="replayDeleteAlert" data-layer="1">
+        <div class="popup">
+            <div class="label headingLabel">削除確認</div>
+            <div class="text">このリプレイを削除します。<br /></div>
+            <div class="back button" data-xy="[0,1]">戻る</div>
+            <div class="options">
+                <div class="button" data-xy="[1,0]" id="replayDeleteConfirmButton">OK！</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="settings">
+        <div class="label headingLabel">設定</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="musicSetting" data-xy="[0,0]">音楽設定</div>
+                <div class="button" data-page="dataSetting" data-xy="[0,1]">データ管理</div>
+                <div class="button" data-page="gameSetting" data-xy="[0,2]">ゲーム設定</div>
+                <div class="button" data-page="graphicSetting" data-xy="[0,3]">グラフィック</div>
+                <div class="button" data-page="controllerSetting" data-xy="[0,4]">コントローラー</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div>
+                    <div class="text">音量や流れるBGMを変更できるよ！</div>
+                </div>
+                <div>
+                    <div class="text">保存されているデータの消去ができるよ！</div>
+                </div>
+                <div>
+                    <div class="text">各ゲームモードのゲームルールを設定できるよ！</div>
+                </div>
+                <div>
+                    <div class="text">一部演出をOFFにして低負荷にできるよ！</div>
+                </div>
+                <div>
+                    <div class="text">コントローラーのボタン割り当てを変更できるよ！</div>
+                </div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="musicSetting">
+        <div class="label headingLabel">音楽設定</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="volumeSetting" data-xy="[0,0]">音量設定</div>
+                <div class="button" data-page="bgmSetting" data-xy="[0,1]">BGM設定</div>
+                <div class="button" data-page="soundTest" data-xy="[0,2]">サウンドテスト</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div>
+                    <div class="text">BGM・SE音量を変更できるよ！</div>
+                </div>
+                <div>
+                    <div class="text">プレイ中に流れるBGMを変更できるよ！</div>
+                </div>
+                <div>
+                    <div class="text">Pentamondで使用されているBGMたちを聴けるよ！</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="back button" data-xy="[0,3]">戻る</div>
+    </div>
+
+    <div class="page" id="volumeSetting">
+        <div class="headingLabel">音量設定</div>
+        <div class="container">
+            <div class="container">
+                <div class="label">BGM</div>
+                <div class="button" class="div" data-xy="[0,0]"><p>-</p></div>
+                <div class="label">10</div>
+                <div class="button" class="div" data-xy="[1,0]"><p>+</p></div>
+            </div>
+            <div class="container">
+                <div class="label">SE</div>
+                <div class="button" class="div" data-xy="[0,1]"><p>-</p></div>
+                <div class="label">10</div>
+                <div class="button" class="div" data-xy="[1,1]"><p>+</p></div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page" id="bgmSetting">
+        <div class="label headingLabel">BGM設定</div>
+        <div class="options" data-direction="row">
+            <div class="label">プレイ時BGM：</div>
+            <div class="selector" data-page="bgmSelector1" data-xy="[0,0]"></div>
+        </div>
+        <div class="back button" data-xy="[-1,1]">戻る</div>
+    </div>
+
+    <div class="page" id="bgmSelector1">
+        <div class="label headingLabel">BGMを選択してください</div>
+        <div class="scrollableContainer">
+            <div class="button" data-xy="[0,0]">つみきのおしろ</div>
+            <div class="selectedValue button" data-xy="[0,1]">ならべてトライアングル</div>
+            <div class="button" data-xy="[0,2]">おかたづけ</div>
+            <div class="button" data-xy="[0,3]">さよならさんかく</div>
+            <div class="button" data-xy="[0,4]">Top of the Pyramid</div>
+        </div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="graphicSetting">
+        <div class="label headingLabel">グラフィック設定</div>
+        <div class="options" data-direction="row">
+            <div class="label">設置時演出</div>
+            <div class="button" id="putShakeOn" data-xy="[0,0]">ON</div>
+            <div class="button" id="putShakeOff" data-xy="[1,0]">OFF</div>
+        </div>
+        <div class="options" data-direction="row">
+            <div class="label">消去時演出</div>
+            <div class="button" id="removeShakeOn" data-xy="[0,1]">ON</div>
+            <div class="button" id="removeShakeOff" data-xy="[1,1]">OFF</div>
+        </div>
+        <div class="options" data-direction="row">
+            <div class="label">プレイ時背景</div>
+            <div class="button" id="playBackgroundOn" data-xy="[0,2]">ON</div>
+            <div class="button" id="playBackgroundOff" data-xy="[1,2]">OFF</div>
+        </div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
+    </div>
+
+    <div class="page" id="dataSetting">
+        <div class="label headingLabel">データ管理</div>
+        <div class="label" id="dataInformation"></div>
+        <div class="options" data-direction="row">
+            <div class="button" data-page="allDataDeleteAlert" data-xy="[0,0]">全データを削除する</div>
+        </div>
+        <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
+    <div class="page" id="allDataDeleteAlert" data-layer="1">
+        <div class="popup">
+            <div class="label headingLabel">削除確認</div>
+            <div class="text">全てのデータを削除します。<br /></div>
+            <div class="back button" data-xy="[0,1]">戻る</div>
+            <div class="options">
+                <div class="button" data-xy="[1,0]" id="allDataDeleteConfirmButton">OK！</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page" id="playDataWarning" data-layer="1">
+        <div class="headingLabel">確認</div>
+        <div class="div back button" data-xy="[0,1]">戻る</div>
+        <div class="container">
+            <div class="text">
+                プレイデータを消去します<br />
+                クリア状態は取り消され、最初からになります<br />
+                本当によろしいですか？
+            </div>
+            <div class="button" data-xy="[0,0]">削除する</div>
+        </div>
+    </div>
+
+    <div class="page" id="allDataWarning" data-layer="1">
+        <div class="headingLabel">確認</div>
+        <div class="button back" data-xy="[0,1]">戻る</div>
+        <div class="container">
+            <div class="text">
+                プレイデータ及び音量設定を消去します<br />
+                クリア状態は取り消され、最初からになります<br />
+                本当によろしいですか？
+            </div>
+            <div class="button" data-xy="[0,0]">削除する</div>
+        </div>
+    </div>
+</div>

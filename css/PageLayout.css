@@ -1,177 +1,7 @@
-@import url("https://fonts.googleapis.com/css2?family=RocknRoll+One&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap");
-* {
-    /* min-height: fit-content;
-    min-width: fit-content; */
-    font-family: "Mochiy Pop P One", Arial;
-    font-size: 6vh;
-    align-items: center;
-    justify-content: center;
-    /* color: #6bd; */
-    color: #5ac;
-    text-wrap: nowrap;
-    /* box-sizing: border-box; */
-}
-
-html {
-    min-height: 0;
-    min-width: 0;
-    background-color: #eaeaee;
-}
-
-body {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: auto;
-    height: 100%;
-    aspect-ratio: 14/9;
-    max-width: 100%;
-    max-height: 100%;
-    min-width: 0;
-    min-height: 0;
-    background-color: #ddeeee44;
-    border: 1vh white solid;
-    border-radius: 1vh;
-    &::before {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        content: "";
-        inset: 0;
-        background-image: url("../assets/images/backgrounds/背景1.png");
-        background-repeat: no-repeat;
-        background-size: cover;
-        z-index: -1;
-        opacity: 0.05;
-    }
-}
-
-.page {
-    width: 100%;
-    height: 100%;
-    gap: 3vh;
-}
-
-.options {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 3vh;
-    &[data-direction="row"] {
-        flex-direction: row;
-    }
-}
-
-.label {
-    text-align: center;
-}
-
-.headingLabel {
-    background-color: #aee5;
-    position: absolute;
-    padding: 0.5vh;
-    padding-left: 7vh;
-    padding-right: 140vh;
-    top: 2vh;
-    left: 5vh;
-    font-size: 8vh;
-    border: 1vh double #8aba;
-    border-radius: 0.5vh;
-    color: #289;
-}
-
-button {
-    cursor: pointer;
-    border: none;
-    padding: 1vh;
-    background-color: #0000;
-}
-
-[data-mapping] {
-    cursor: pointer;
-    &:active {
-        scale: 0.95;
-        filter: brightness(0.8);
-        transition: scale 100ms ease-out;
-    }
-    &:focus {
-        outline: none;
-        border: none;
-        border-radius: 1vh;
-        background-color: #e803;
-        box-shadow: #e805 0 0 1.5vh;
-        transition:
-            scale 200ms ease-in-out,
-            background-color 150ms ease-in-out,
-            box-shadow 150ms ease-in-out;
-        scale: 1.2;
-    }
-}
-
-.back {
-    position: absolute;
-    bottom: 3vh;
-    left: 6vh;
-    padding: 1.5vh;
-}
-
 #title {
     /* background-color: #eea; */
     & .options {
         margin-top: 10vh;
-    }
-}
-
-#talk {
-    & #talkPanelBase {
-        scale: 0.9;
-        display: flex;
-        flex-direction: column;
-        align-items: start;
-        justify-content: center;
-        position: absolute;
-        bottom: 5vh;
-        height: 44vh;
-        width: 121vh;
-        min-height: 0;
-        min-width: 0;
-        & #namePanel {
-            height: 20%;
-            aspect-ratio: 5 / 1;
-            border: #cb6 0.4vh solid;
-            background-color: #eb6;
-            font-size: 6vh;
-            box-shadow: 1vh 1vh 2vh #33333366;
-        }
-        & #talkPanel {
-            display: block;
-            height: 80%;
-            width: 100%;
-            border: #cb6 0.4vh solid;
-            background-color: #eb6;
-            text-align: left;
-            align-items: start;
-            justify-content: left;
-            overflow-wrap: anywhere;
-            padding-top: 2vh;
-            padding-left: 3vh;
-            padding-right: 3vh;
-            font-size: 6vh;
-            line-height: 1.6;
-            text-wrap: wrap;
-            & * {
-                text-wrap: wrap;
-            }
-            box-shadow: 1vh 1vh 2vh #33333366;
-            & ruby {
-                & rt {
-                    font-size: 2.5vh;
-                }
-            }
-        }
     }
 }
 
@@ -349,6 +179,9 @@ button {
     & .text {
         font-size: 5vh;
     }
+    & .options {
+        gap: 8vh;
+    }
 }
 
 #startEffect {
@@ -439,7 +272,7 @@ button {
     & .options {
         margin-top: 10vh;
     }
-    & button {
+    & .button {
         font-size: 5vh;
     }
 }
@@ -692,7 +525,7 @@ button {
 #graphicSetting {
     align-items: end;
     & .options {
-        & button {
+        & .button {
             font-size: 4vh;
             color: #888;
             transition: color 100ms ease-in-out;
@@ -749,6 +582,38 @@ button {
         }
         & .selector {
             color: #ee8888;
+        }
+    }
+}
+
+#volumeSetting {
+    & .container {
+        flex-direction: column;
+        & .container {
+            flex-direction: row;
+            & .label:first-child {
+                left: 40vh;
+                position: absolute;
+            }
+            & .button {
+                height: 8vh;
+                aspect-ratio: 1/1;
+                font-size: 8vh;
+                box-sizing: border-box;
+                border: #22222200 0.2vh solid;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0;
+                margin-left: 0vh;
+                &::before {
+                    content: "";
+                }
+                &:focus {
+                    outline: none;
+                    border: #ff90be 0.5vh solid;
+                }
+            }
         }
     }
 }

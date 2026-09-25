@@ -1,0 +1,22 @@
+<div class="pageBundle">
+    <div class="page" id="play">
+        <div id="playBackground"></div>
+    </div>
+
+    <div class="page" id="pause" data-layer="1">
+        <div class="label headingLabel">ポーズ</div>
+        <div class="container" data-direction="row">
+            <div class="button" data-back="1" id="resumeButton" data-xy="[0,0]">再開する</div>
+            <div class="restart button" data-xy="[1,0]">もう一度</div>
+            <div class="button" data-xy="[2,0]" data-back="2">プレイ準備</div>
+        </div>
+        <div class="container" data-direction="row">
+            <div class="button" data-xy="[0,1]" data-back="3">モード選択</div>
+            <div class="button" data-xy="[1,1]" data-back="-1" data-page="title">タイトルへ</div>
+        </div>
+    </div>
+
+    <div class="page" id="startEffect" data-layer="1">
+        <div id="startEffectBase"></div>
+    </div>
+</div>

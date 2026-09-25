@@ -1,12 +1,12 @@
 import { EventManager } from "../../UtilManagers/EventManager";
 import { gameEvents, GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
-import { pageManager } from "../../UtilManagers/PageManager";
 import * as Setting from "../../Settings";
 import { qsAll, removeMousePointerTemporary } from "../../Utils";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { ControllerRegisterer } from "../../BeforePlaying/ControllerRegisterer";
+import { sceneManager } from "../../Utilities/SceneManager";
 
 export class Mode2 extends GameMode {
     constructor(players: GamePlayer[]) {
@@ -71,6 +71,9 @@ export class Mode2 extends GameMode {
     }
 
     addPlayerBehavior(index: number): void {
+        let pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
+
         const p = this.players[index];
         const input = p.input.g$manager;
         const operate = (keyCode: string) => {
@@ -93,11 +96,11 @@ export class Mode2 extends GameMode {
             } else if (["Enter", ...ControllerRegisterer.gamepadConfigs[index].removeLine].includes(keyCode)) {
                 p.operator.removeLine();
             } else if (["KeyP", ...ControllerRegisterer.gamepadConfigs[index].pause].includes(keyCode)) {
-                if (!p.loop.g$isLooping || this.state.hasFinished) {
+                if (p.loop.g$isStopping || this.state.hasFinished) {
                     return;
                 }
                 this.stop();
-                pageManager.setPage("pause");
+                pageManager.openPage("pause");
             } else {
                 return;
             }
@@ -120,13 +123,13 @@ export class Mode2 extends GameMode {
         p.canvas.guideBorder = true;
         gameEvents.push(
             input.addEvent(["onKeydown", "onButtondown", "onStickActive"], () => {
-                if (!p.loop.g$isLooping) {
+                if (p.loop.g$isStopping) {
                     return;
                 }
                 operate(input.g$latestPressingKey);
             }),
 
-            p.loop.addEvent(["loop"], () => {
+            p.loop.addHandler(["loop"], () => {
                 const moveKeys = [
                     "ArrowLeft",
                     "ArrowRight",

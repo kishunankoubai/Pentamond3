@@ -9,43 +9,44 @@
 .selectWithDescriptionOptions {
     display: flex;
     justify-content: center;
-    align-items: end;
+    align-items: start;
     flex-direction: column;
     gap: 3vh;
     flex: 1;
-    margin-right: 10vh;
+    /* margin-right: 10vh; */
+    margin-left: 25vh;
     & * {
         font-size: 5vh;
     }
 
-    &:has(button:nth-child(1):focus) ~ .selectOptionDescriptions :nth-child(1) {
+    &:has(.button:nth-child(1):focus) ~ .selectOptionDescriptions :nth-child(1) {
         display: flex;
     }
-    &:has(button:nth-child(2):focus) ~ .selectOptionDescriptions :nth-child(2) {
+    &:has(.button:nth-child(2):focus) ~ .selectOptionDescriptions :nth-child(2) {
         display: flex;
     }
-    &:has(button:nth-child(3):focus) ~ .selectOptionDescriptions :nth-child(3) {
+    &:has(.button:nth-child(3):focus) ~ .selectOptionDescriptions :nth-child(3) {
         display: flex;
     }
-    &:has(button:nth-child(4):focus) ~ .selectOptionDescriptions :nth-child(4) {
+    &:has(.button:nth-child(4):focus) ~ .selectOptionDescriptions :nth-child(4) {
         display: flex;
     }
-    &:has(button:nth-child(5):focus) ~ .selectOptionDescriptions :nth-child(5) {
+    &:has(.button:nth-child(5):focus) ~ .selectOptionDescriptions :nth-child(5) {
         display: flex;
     }
-    &:has(button:nth-child(6):focus) ~ .selectOptionDescriptions :nth-child(6) {
+    &:has(.button:nth-child(6):focus) ~ .selectOptionDescriptions :nth-child(6) {
         display: flex;
     }
-    &:has(button:nth-child(7):focus) ~ .selectOptionDescriptions :nth-child(6) {
+    &:has(.button:nth-child(7):focus) ~ .selectOptionDescriptions :nth-child(6) {
         display: flex;
     }
-    &:has(button:nth-child(8):focus) ~ .selectOptionDescriptions :nth-child(6) {
+    &:has(.button:nth-child(8):focus) ~ .selectOptionDescriptions :nth-child(6) {
         display: flex;
     }
 }
 
 .selectOptionDescriptions {
-    flex: 1.5;
+    flex: 2.4;
     & > * {
         display: none;
         width: 100%;
@@ -55,7 +56,7 @@
         margin-left: 5vh;
         margin-right: auto;
         /* text-wrap: nowrap; */
-        font-size: 4vh;
+        font-size: 4.5vh;
     }
 }
 

@@ -1,6 +1,6 @@
 import { BlockManager } from "../BlockOperate/BlockManager";
 import { EventId, EventManager, MyEventListener } from "../UtilManagers/EventManager";
-import { LoopManager } from "../UtilManagers/LoopManager";
+import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { Monoiamond } from "../BlockOperate/Monoiamond";
 import * as Setting from "../Settings";
 import { gameEvents } from "./GameMode";
@@ -46,7 +46,7 @@ export class NuisanceMondManager implements MyEventListener {
     constructor(blockManager: BlockManager) {
         this.blockManager = blockManager;
         gameEvents.push(
-            this.loop.addEvent(["loop"], () => {
+            this.loop.addHandler("loop", () => {
                 this.damageProcess();
             })
         );
@@ -55,9 +55,7 @@ export class NuisanceMondManager implements MyEventListener {
     //damage処理中でないときは前回のdamageによるpenaltyを返す
     //damage処理中のときは-1を返す
     get g$penalty(): number {
-        if (this.damaging) {
-            return -1;
-        }
+        if (this.damaging) return -1;
         return this.penalty;
     }
 
@@ -72,11 +70,8 @@ export class NuisanceMondManager implements MyEventListener {
     //damageProgressを呼び出す頻度を取得する
     private get g$progressFrequency(): number {
         const frequency = Math.floor(Setting.damageTime / (Setting.damageGrace * (this.task - 1) + Setting.playHeight));
-        if (frequency < 5) {
-            return 5;
-        } else {
-            return frequency;
-        }
+        if (frequency < 5) return 5;
+        else return frequency;
     }
 
     //指定した座標でNuisanceBlockを生成する

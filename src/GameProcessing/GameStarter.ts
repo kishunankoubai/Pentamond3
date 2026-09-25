@@ -1,24 +1,24 @@
-import { pageManager } from "../UtilManagers/PageManager";
 import { qsAddEvent } from "../Utils";
 import { GameProcessing } from "./GameProcessing";
 import { inputManager } from "../Interaction/InputManager";
 import { PlaySettingSetter } from "../BeforePlaying/PlaySettingSetter";
+import { sceneManager } from "../Utilities/SceneManager";
+import { ScenePlay } from "../Scenes/ScenePlay";
+import { PageManager } from "../Utilities/Page/PageManager";
 
 export class GameStartEventSetter {
-    static setEvents() {
-        this.normal();
-        this.replay();
-    }
-
-    private static normal() {
+    static normal() {
+        let pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
         // 「スタート!」
-        qsAddEvent(".playStart", "click", () => {
+        qsAddEvent(".playStart", "click", async () => {
+            await sceneManager.change(ScenePlay);
             GameProcessing.startNormal(PlaySettingSetter.getPlaySetting());
         });
 
         // ポーズ画面の「もう一度」・リザルト画面の「もう一度」
         qsAddEvent(".restart", "click", () => {
-            pageManager.backLatestPage("playPrepare", { eventIgnore: true });
+            pageManager.backPage(PageManager.getBackIndex("playPrepare"), true);
             GameProcessing.restartNormal();
         });
 
@@ -28,7 +28,18 @@ export class GameStartEventSetter {
         });
     }
 
-    private static replay() {
+    static result() {
+        let pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
+        qsAddEvent(".restart", "click", () => {
+            pageManager.backPage(PageManager.getBackIndex("playPrepare"), true);
+            GameProcessing.restartNormal();
+        });
+    }
+
+    static replay() {
+        let pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
         // replayを終了する
         qsAddEvent("#replayPause button:not(#replayResumeButton)", "click", () => {
             inputManager.removeVirtualInputs();
@@ -41,7 +52,7 @@ export class GameStartEventSetter {
 
         // ポーズ画面の「もう一度」・リザルト画面の「もう一度」
         qsAddEvent(".replayStart", "click", async () => {
-            pageManager.backPages(2, { eventIgnore: true });
+            pageManager.backPage(2, true);
             GameProcessing.restartReplay();
         });
     }

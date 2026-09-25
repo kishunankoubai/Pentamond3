@@ -1,4 +1,4 @@
-import { screenInteraction } from "../ScreenInteraction/ScreenInteraction";
+import { ElementManager } from "../Utilities/Element/ElementManager";
 import { qs, qsAll } from "../Utils";
 import { ReplayData } from "./Replay";
 
@@ -24,7 +24,7 @@ export class ReplayDom {
         }
 
         container.querySelectorAll("button").forEach((button) => {
-            screenInteraction.setHoverHighlight(button);
+            ElementManager.scrollToCenter(button);
         });
 
         //座標の割り振り
@@ -125,15 +125,15 @@ export class ReplayDom {
 
         //座標の割り振り直し
         qsAll("#replay .replayButton").forEach((button, i) => {
-            button.dataset.mapping = `[0,${i}]`;
+            button.dataset.xy = `[0,${i}]`;
             tempDataListLength++;
         });
 
         qsAll("#replay .replaySaveButton").forEach((button, i) => {
-            button.dataset.mapping = `[1,${i}]`;
+            button.dataset.xy = `[1,${i}]`;
         });
 
-        qs("#replay .back").dataset.mapping = `[0,${tempDataListLength}]`;
+        qs("#replay .back").dataset.xy = `[0,${tempDataListLength}]`;
 
         return { replayButton, saveButton };
     }

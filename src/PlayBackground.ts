@@ -1,12 +1,42 @@
-import { LoopManager } from "./UtilManagers/LoopManager";
+import { LoopManager } from "./Utilities/Loop/LoopManager";
 import { qs } from "./Utils";
 import { Vector } from "./Vector";
 
-const element = qs("#playBackground");
+export function setupPlayBackground() {
+    const element = qs("#playBackground");
+
+    colorAnimation = element.animate(
+        [
+            {
+                backgroundColor: "#88aaee",
+            },
+            {
+                backgroundColor: "#aa88ee",
+            },
+            {
+                backgroundColor: "#aaeeaa",
+            },
+            {
+                backgroundColor: "#eeeeaa",
+            },
+            {
+                backgroundColor: "#88aaee",
+            },
+        ],
+        {
+            duration: 25000,
+            direction: "normal",
+            iterations: Infinity,
+        }
+    );
+    element.appendChild(canvas);
+}
+
+let colorAnimation: Animation | null;
+
 const canvas = document.createElement("canvas");
 const ctx = canvas.getContext("2d")!;
 
-element.appendChild(canvas);
 canvas.width = 14 * 40;
 canvas.height = 9 * 40;
 
@@ -54,43 +84,20 @@ class Triangle {
     }
 }
 
-const colorAnimation = element.animate(
-    [
-        {
-            backgroundColor: "#88aaee",
-        },
-        {
-            backgroundColor: "#aa88ee",
-        },
-        {
-            backgroundColor: "#aaeeaa",
-        },
-        {
-            backgroundColor: "#eeeeaa",
-        },
-        {
-            backgroundColor: "#88aaee",
-        },
-    ],
-    {
-        duration: 25000,
-        direction: "normal",
-        iterations: Infinity,
-    }
-);
-
 const triangles = Array.from({ length: 40 }, () => new Triangle());
 const playBackgroundLoop = new LoopManager();
-playBackgroundLoop.addEvent(["loop"], () => {
+playBackgroundLoop.addHandler("loop", () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     triangles.forEach((tri) => {
         tri.update();
         tri.draw(ctx);
     });
 });
+playBackgroundLoop.s$onTime = false;
 
 export const playBackground = {
     reset: () => {
+        if (!colorAnimation) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         triangles.forEach((tri) => {
             tri.reset();
@@ -99,12 +106,12 @@ export const playBackground = {
         colorAnimation.cancel();
     },
     start: () => {
+        if (!colorAnimation) return;
         playBackgroundLoop.start();
-        if (colorAnimation.playState != "running") {
-            colorAnimation.play();
-        }
+        if (colorAnimation.playState != "running") colorAnimation.play();
     },
     stop: () => {
+        if (!colorAnimation) return;
         playBackgroundLoop.stop();
         colorAnimation.pause();
     },

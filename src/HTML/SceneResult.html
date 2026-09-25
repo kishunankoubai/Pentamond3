@@ -1,0 +1,39 @@
+<div class="pageBundle">
+    <div class="page" id="result">
+        <div class="label headingLabel">結果画面</div>
+        <div class="resultLabel label"></div>
+        <div class="options" data-direction="row">
+            <div class="restart button" data-xy="[0,0]">もう一度</div>
+            <div class="button" data-xy="[1,0]" data-back="2">プレイ準備</div>
+            <div class="button" data-xy="[2,0]" data-back="3">モード選択</div>
+            <div class="button" data-xy="[3,0]" data-page="detailedResult">詳細結果</div>
+        </div>
+        <div class="options" data-direction="row">
+            <div class="saveReplayButton button" data-xy="[1,1]"></div>
+        </div>
+        <div class="options" data-direction="row">
+            <div class="button" data-xy="[1,2]" data-back="-2">タイトルへ</div>
+        </div>
+    </div>
+
+    <div class="page" id="replayResult">
+        <div class="label headingLabel">結果画面</div>
+        <div class="resultLabel label"></div>
+        <div class="options" data-direction="row">
+            <div class="replayStart button" data-xy="[0,0]">もう一度</div>
+            <div class="button" data-xy="[1,0]" data-back="2">リプレイ一覧へ</div>
+            <div class="button" data-xy="[2,0]" data-back="-1" data-page="title">タイトルへ</div>
+            <div class="button" data-xy="[3,0]" data-page="detailedResult">詳細結果</div>
+        </div>
+    </div>
+
+    <div class="page" id="detailedResult">
+        <div class="label headingLabel">詳細結果</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+</div>

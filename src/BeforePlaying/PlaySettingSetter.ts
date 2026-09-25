@@ -30,14 +30,14 @@ export class PlaySettingSetter {
 
     static setEvents() {
         // モードを決める
-        qsAddEvent("button[data-mode]", "click", (element) => {
+        qsAddEvent(".button[data-mode]", "click", (element) => {
             // 一人プレイの時は聞かれないので1にしておく
             this.playSetting.playerNumber = 1;
             this.playSetting.mode = Number(element.dataset.mode);
         });
 
         // 人数を決める
-        qsAddEvent("button[data-player]", "click", (element) => {
+        qsAddEvent(".button[data-player]", "click", (element) => {
             this.playSetting.playerNumber = Number(element.dataset.player);
         });
     }

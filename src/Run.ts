@@ -1,16 +1,15 @@
-import { pageManager } from "./UtilManagers/PageManager";
 import { qs, qsAddEvent, qsAll, sleep } from "./Utils";
 import { inputManager } from "./Interaction/InputManager";
-import "./ScreenInteraction/ScreenInteraction";
 import { Replay } from "./Replay/Replay";
 import { GraphicSetting } from "./GraphicSetting";
-import { soundsInit } from "./SoundProcessing";
 import { ControllerRegisterer } from "./BeforePlaying/ControllerRegisterer";
 import { DeleteDataHandler } from "./DeleteDataHandler";
 import { GameStartEventSetter } from "./GameProcessing/GameStarter";
 import { PlaySettingSetter } from "./BeforePlaying/PlaySettingSetter";
 import { ResultPageHandler } from "./ResultPageHandler";
-import { elementManager } from "./UtilManagers/ElementManager";
+import { sceneManager } from "./Utilities/SceneManager";
+import { globalValues } from "./Global";
+import { SceneTitle } from "./Scenes/SceneTitle";
 
 //不正なページ遷移の防止
 setupInputBehavior();
@@ -29,40 +28,23 @@ function setupInputBehavior() {
         button.tabIndex = -1;
     });
 
-    qsAll("div[data-mapping]").forEach((button) => {
+    qsAll("div[data-xy]").forEach((button) => {
         button.tabIndex = 0;
     });
 }
 
-//クリックによる開始
-qsAddEvent("#pageStart", "click", () => {
-    pageManager.setPage("title");
-    // se[0].play();
-});
-
 //起動時処理
 document.addEventListener("DOMContentLoaded", async () => {
-    soundsInit();
-    pageManager.init();
-    elementManager.init();
-    inputManager.s$maxInputNumber = 1;
+    // pageManager.init();
+    // elementManager.init();
+    // inputManager.s$maxInputNumber = 1;
 
-    ResultPageHandler.setEvents();
-    GameStartEventSetter.setEvents();
-
-    // BeforePlaying
-    PlaySettingSetter.setEvents();
-    ControllerRegisterer.setEvents();
-
-    // グラフィック設定
-    GraphicSetting.init();
-
-    // データ消去イベントの設定
-    DeleteDataHandler.setEvents();
-
-    // リプレイのイベントの設定と、リプレイページの設定
-    Replay.setupSavedReplayPage();
     console.log(`The sum of size of replayData is ${Replay.getDataSize()}byte`);
+    const searchParams = new URLSearchParams(new URL(window.location.href).search);
+    if (searchParams.get("nosave")) globalValues.nosave = true;
+
+    // DataManager.read();
+    await sceneManager.change(SceneTitle);
 });
 
 export const debug = false;

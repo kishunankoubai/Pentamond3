@@ -1,4 +1,4 @@
-import { LoopManager } from "../UtilManagers/LoopManager";
+import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { MondOperator } from "../BlockOperate/MondOperator";
 import { NuisanceMondManager } from "./NuisanceMondManager";
 import { Input } from "../Interaction/Input";
@@ -217,7 +217,7 @@ export class GamePlayer {
 
     constructor(input: Input) {
         this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager);
-
+        this.loop.s$onTime = false;
         gameEvents.push(
             this.nuisanceMondManager.addEvent(["finishDamage"], () => {
                 this.state.damaging = false;
@@ -226,7 +226,7 @@ export class GamePlayer {
                 this.animations.caution.cancel();
                 this.animations.warning.cancel();
                 this.proceedTemporaryDamageTask();
-                if (this.loop.g$isLooping) {
+                if (!this.loop.g$isStopping) {
                     this.operator.start();
                 }
                 this.updateCanvas();

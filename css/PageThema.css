@@ -1,0 +1,201 @@
+@import url("https://fonts.googleapis.com/css2?family=RocknRoll+One&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap");
+* {
+    /* min-height: fit-content;
+    min-width: fit-content; */
+    font-family: "Mochiy Pop P One", Arial;
+    font-size: 6vh;
+    align-items: center;
+    justify-content: center;
+    /* color: #6bd; */
+    color: #6bd;
+    text-wrap: nowrap;
+    /* box-sizing: border-box; */
+}
+
+.cursorHidden,
+.cursorHidden * {
+    cursor: none !important;
+}
+
+html {
+    background-color: #9ce;
+}
+
+body {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: auto;
+    height: 100%;
+    aspect-ratio: 14/9;
+    max-width: 100%;
+    max-height: 100%;
+    min-width: 0;
+    min-height: 0;
+    background-color: #ffffff;
+    border: 1vh white solid;
+    border-radius: 1vh;
+    &::before {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        content: "";
+        inset: 0;
+        background-image: url("../assets/images/backgrounds/背景1.png");
+        background-repeat: no-repeat;
+        background-size: cover;
+        z-index: -1;
+        opacity: 0.05;
+    }
+}
+
+.texture {
+    left: -66%;
+    top: -66%;
+    width: 166%;
+    height: 166%;
+    position: absolute;
+    /* background-image: url("../assets/images/backgrounds/washi-pattern-03.jpg"); */
+    opacity: 0.1;
+    z-index: 10;
+    background-repeat: repeat;
+    background-size: 16.6% 16.6%;
+    pointer-events: none;
+    /* display: none; */
+}
+
+.page {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3vh;
+}
+
+.options {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 3vh;
+    &[data-direction="row"] {
+        flex-direction: row;
+    }
+}
+
+.button {
+    color: #ffca3e;
+    cursor: pointer;
+    /* padding: 2vh; */
+    border-bottom: #22222200 0.5vh solid;
+    margin-left: -6vh;
+    &:active {
+        scale: 0.98;
+    }
+    &::before {
+        content: "★ ";
+        font-size: 6vh;
+        opacity: 0;
+        transition: opacity 100ms ease-in-out;
+        color: #ff90be;
+    }
+
+    &:focus {
+        outline: none;
+        border: none;
+        border-bottom: #ff90be 0.5vh solid;
+        &::before {
+            opacity: 1;
+            transition: opacity 200ms ease-in-out;
+        }
+        color: #ff90be;
+    }
+    transition:
+        border-color 150ms ease-in-out,
+        color 150ms ease-in-out;
+}
+
+.headingLabel {
+    background-color: #aee5;
+    position: absolute;
+    padding: 0.5vh;
+    padding-left: 7vh;
+    padding-right: 140vh;
+    top: 2vh;
+    left: 5vh;
+    font-size: 8vh;
+    border: 1vh double #8aba;
+    border-radius: 0.5vh;
+    color: #289;
+}
+
+.back {
+    position: absolute;
+    bottom: 3vh;
+    left: 8vh;
+    padding: 1.5vh;
+    font-size: 5vh;
+    color: #ff9c40;
+}
+
+.label,
+p {
+    text-align: center;
+    justify-content: center;
+}
+
+#talk {
+    & .namePanel {
+        top: 49vh;
+        left: 17.5vh;
+        height: 9vh;
+        aspect-ratio: 4 / 1;
+        border: #222244 0.6vh solid;
+        border-radius: 3vh;
+        background-color: #8888aa;
+        font-size: 6vh;
+        box-shadow: 1vh 1vh 2vh #33333366;
+        text-align: center;
+        line-height: 7vh;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+    }
+    & .talkPanel {
+        top: 60vh;
+        display: block;
+        aspect-ratio: 14 / 4;
+        height: 35vh;
+        border: #222244 0.8vh solid;
+        border-radius: 4vh;
+        background-color: #8888aa;
+        text-align: left;
+        align-items: start;
+        justify-content: left;
+        overflow-wrap: anywhere;
+        text-wrap: wrap;
+        padding-top: 2vh;
+        padding-left: 3vh;
+        padding-right: 3vh;
+        font-size: 6vh;
+        line-height: 1.6;
+        outline: none;
+        & * {
+            text-wrap: wrap;
+        }
+        box-shadow: 1vh 1vh 2vh #33333366;
+        & ruby {
+            & rt {
+                font-size: 2.5vh;
+            }
+        }
+        position: absolute;
+    }
+}

@@ -2,7 +2,6 @@ import { Mode1 } from "../Game/Modes/Mode1";
 import { Mode2 } from "../Game/Modes/Mode2";
 import { Input } from "../Interaction/Input";
 import { inputManager } from "../Interaction/InputManager";
-import { pageManager } from "../UtilManagers/PageManager";
 import { playBackground } from "../PlayBackground";
 import { Replay, ReplayData } from "../Replay/Replay";
 import { DisposableGame } from "./DisposableGame";
@@ -10,6 +9,8 @@ import { ResultPageHandler } from "../ResultPageHandler";
 import { countDown } from "./countDown";
 import { qs } from "../Utils";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
+import { sceneManager } from "../Utilities/SceneManager";
+import { SceneResult } from "../Scenes/SceneResult";
 
 //ゲーム開始
 export class GameProcessing {
@@ -95,7 +96,7 @@ export class GameProcessing {
         for (let i = 0; i < playerNumber; i++) {
             const input = new Input("autoKeyboard");
 
-            if (!input.isAuto()) throw new Error("あ");
+            if (!input.isAuto()) throw new Error("inputが自動ではありません");
 
             input.g$manager.s$inputData = replayData.inputData[i];
             inputManager.register(input);
@@ -104,15 +105,16 @@ export class GameProcessing {
 
     private static startAutoPlay() {
         inputManager.g$registeredInputs.forEach((input) => {
-            if (!input.isAuto()) throw new Error("あ");
+            if (!input.isAuto()) throw new Error("inputが自動ではありません");
 
             input.g$manager.playReset();
             input.g$manager.playStart();
         });
     }
 
-    private static onFinishNormal() {
-        pageManager.setPage("result");
+    private static async onFinishNormal() {
+        // pageManager.setPage("result");
+        await sceneManager.change(SceneResult);
         inputManager.removeVirtualInputs();
 
         Replay.addTempData(this.currentGame!);
@@ -121,7 +123,8 @@ export class GameProcessing {
     }
 
     private static onFinishReplay() {
-        pageManager.setPage("replayResult");
+        //後で修正
+        // pageManager.setPage("replayResult");
         inputManager.removeVirtualInputs();
 
         ResultPageHandler.OverWriteTime(this.currentGame!.replayData!.finishTime);
@@ -129,24 +132,27 @@ export class GameProcessing {
     }
 
     private static async countDownAndStart() {
+        let pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
         //開始演出
         await countDown(["", "3", "2", "1", "START!"]);
 
         this.currentGame!.start();
 
-        pageManager.backPages(1);
+        pageManager.backPage(1);
     }
 
     private static beforeStart() {
-        if (this.currentGame) {
-            this.currentGame.quit();
-        }
+        let pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
+
+        if (this.currentGame) this.currentGame.quit();
 
         // 背景をリセット
         playBackground.reset();
 
         // ページ移動
-        pageManager.setPage("play", { eventIgnore: true });
-        pageManager.setPage("startEffect");
+        pageManager.openPage("play", true);
+        pageManager.openPage("startEffect");
     }
 }

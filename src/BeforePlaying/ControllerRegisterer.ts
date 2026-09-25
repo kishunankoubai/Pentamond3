@@ -1,10 +1,10 @@
 import { inputManager } from "../Interaction/InputManager";
-import { pageManager } from "../UtilManagers/PageManager";
 import { qs, qsAddEvent, qsAll, sleep } from "../Utils";
 
 import * as Setting from "../Settings";
 import { debug } from "../Run";
 import { PlaySettingSetter } from "./PlaySettingSetter";
+import { sceneManager } from "../Utilities/SceneManager";
 
 /**
  * コントローラーの登録をしたりする
@@ -13,18 +13,17 @@ export class ControllerRegisterer {
     static gamepadConfigs: Setting.GamepadConfig[] = [];
 
     static setEvents() {
+        let pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
         // closure
         let currentPlayerNumber = 1;
 
         // コントローラーの登録の準備
-        pageManager.addEvent(["setPage-playerRegister"], async () => {
+        pageManager.addHandler(["openPage-playerRegister"], async () => {
             // なぜかPlaySettingSetterよりもこっちが早く反応するから遅らせる
             await sleep(1);
-
             const { playerNumber } = PlaySettingSetter.getPlaySetting();
-
             currentPlayerNumber = playerNumber;
-
             this.startControllerRegistration(currentPlayerNumber);
         });
 
@@ -54,26 +53,26 @@ export class ControllerRegisterer {
     }
 
     private static async onClickOk(playerNumber: number) {
+        const pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
+
         // まだ全員登録し終わっていないならリターン
         if (inputManager.g$registering) {
             if (debug) {
                 inputManager.finishRegister();
-            } else {
-                return;
-            }
+            } else return;
         }
 
-        // ここまで来たらタイトルには戻れない
         inputManager.stop();
 
         this.enablePlayerRegisterButtons(false);
 
         // 何のため?
-        await sleep(500);
+        // await sleep(500);
 
         const backDepth = playerNumber == 1 ? 1 : 2;
-        pageManager.backPages(backDepth, { eventIgnore: true });
-        pageManager.setPage("playPrepare");
+        pageManager.backPage(backDepth, true);
+        pageManager.openPage("playPrepare");
 
         this.enablePlayerRegisterButtons(true);
 

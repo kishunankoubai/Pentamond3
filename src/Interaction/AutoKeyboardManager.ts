@@ -1,5 +1,5 @@
 import { MyEventListener, EventId, EventManager } from "../UtilManagers/EventManager";
-import { LoopManager } from "../UtilManagers/LoopManager";
+import { LoopManager } from "../Utilities/Loop/LoopManager";
 
 export type AutoKeyboardInputData = {
     time: number;
@@ -54,7 +54,7 @@ export class AutoKeyboardManager implements MyEventListener {
     }
 
     set s$inputData(inputData: AutoKeyboardInputData[]) {
-        if (this.loop.g$isLooping) {
+        if (!this.loop.g$isStopping) {
             return;
         }
         this.inputData = inputData;
@@ -80,8 +80,8 @@ export class AutoKeyboardManager implements MyEventListener {
             EventManager.executeListeningEvents("onKeyup", this.eventIds);
         };
 
-        EventManager.removeEvents(this.loop.eventIds);
-        this.loop.addEvent(["loop"], () => {
+        this.loop.removeAllEvent();
+        this.loop.addHandler(["loop"], () => {
             while (true) {
                 if (this.inputDataTask.length) {
                     if (this.inputDataTask[0].time <= this.loop.g$elapsedTime) {

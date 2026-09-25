@@ -19,9 +19,7 @@ export class ScreenInteractionInputHandler {
         inputManager.addEvent(["inputAdded"], () => {
             const addedInput = inputManager.g$inputs.at(-1)!;
 
-            if (addedInput.isAuto()) {
-                return;
-            }
+            if (addedInput.isAuto()) return;
 
             this.registerInput(addedInput);
         });

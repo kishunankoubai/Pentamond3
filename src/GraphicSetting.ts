@@ -1,3 +1,5 @@
+import { DataManager } from "./DataManager";
+import { globalValues } from "./Global";
 import { qs, qsAddEvent } from "./Utils";
 
 export class GraphicSetting {
@@ -10,19 +12,8 @@ export class GraphicSetting {
         this.setupEvents();
     }
 
-    static saveGraphicSetting() {
-        const data = this.getEncodedSetting();
-
-        try {
-            localStorage.setItem("Pentamond3-graphicSetting", data);
-        } catch (error) {
-            console.error("何らかの理由により設定の保存に失敗しました");
-        }
-
-        this.updateButtonStyle();
-    }
-
     private static updateButtonStyle() {
+        if (!qs("#putShakeOn")) return;
         qs("#putShakeOn").style.color = this.putShake ? "#ee8888" : "";
         qs("#putShakeOff").style.color = this.putShake ? "" : "#ee8888";
         qs("#removeShakeOn").style.color = this.removeShake ? "#ee8888" : "";
@@ -32,79 +23,42 @@ export class GraphicSetting {
     }
 
     private static loadData() {
-        const json = localStorage.getItem("Pentamond3-graphicSetting");
-
-        if (!json) {
-            this.saveGraphicSetting();
-            return;
-        }
-
-        const data = this.decode(json);
-
-        this.putShake = data[0];
-        this.removeShake = data[1];
-        this.playBackground = data[2];
+        this.putShake = globalValues.graphic.putShake;
+        this.removeShake = globalValues.graphic.removeShake;
+        this.playBackground = globalValues.graphic.playBackground;
 
         this.updateButtonStyle();
     }
 
     private static setupEvents() {
         qsAddEvent("#putShakeOn", "click", () => {
-            if (this.putShake) {
-                return;
-            }
-            this.putShake = true;
+            if (this.putShake) return;
+            globalValues.graphic.putShake = true;
         });
         qsAddEvent("#putShakeOff", "click", () => {
-            if (!this.putShake) {
-                return;
-            }
-            this.putShake = false;
+            if (!this.putShake) return;
+            globalValues.graphic.putShake = false;
         });
         qsAddEvent("#removeShakeOn", "click", () => {
-            if (this.removeShake) {
-                return;
-            }
-            this.removeShake = true;
+            if (this.removeShake) return;
+            globalValues.graphic.removeShake = true;
         });
         qsAddEvent("#removeShakeOff", "click", () => {
-            if (!this.removeShake) {
-                return;
-            }
-            this.removeShake = false;
+            if (!this.removeShake) return;
+            globalValues.graphic.removeShake = false;
         });
         qsAddEvent("#playBackgroundOn", "click", () => {
-            if (this.playBackground) {
-                return;
-            }
-            this.playBackground = true;
+            if (this.playBackground) return;
+            globalValues.graphic.playBackground = true;
         });
         qsAddEvent("#playBackgroundOff", "click", () => {
-            if (!this.playBackground) {
-                return;
-            }
-            this.playBackground = false;
+            if (!this.playBackground) return;
+            globalValues.graphic.playBackground = false;
         });
 
         qsAddEvent("#graphicSetting button", "click", () => {
-            this.saveGraphicSetting();
+            DataManager.save();
+            this.loadData();
         });
-    }
-
-    private static getEncodedSetting() {
-        return Number.parseInt([this.putShake ? "1" : "0", this.removeShake ? "1" : "0", this.playBackground ? "1" : "0"].join(""), 2) + "";
-    }
-
-    private static decode(json: string) {
-        const data = Number.parseInt(json, 10)
-            .toString(2)
-            .split("")
-            .map((word) => (word == "0" ? false : true));
-
-        for (let i = 0; 3 - data.length; i++) {
-            data.unshift(false);
-        }
-
-        return data;
     }
 }

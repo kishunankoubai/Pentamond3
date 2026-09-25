@@ -6,10 +6,10 @@ import { GameMode } from "../Game/GameMode";
 
 import { ReplayDom } from "./ReplayDom";
 import { ReplayDataHandler } from "./ReplayDataHandler";
-import { pageManager } from "../UtilManagers/PageManager";
 import { ReplayEventSetter } from "./ReplayEventSetter";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { qsAll } from "../Utils";
+import { sceneManager } from "../Utilities/SceneManager";
 
 //リプレイ
 export type ReplayData = {
@@ -54,17 +54,21 @@ export class Replay {
 
         ReplayDataHandler.addTempData(replayData, Setting.maximumTemporaryReplaySavable);
 
-        const buttons = ReplayDom.createTempReplayButton(replayData.date);
-        ReplayEventSetter.setTempReplayPageEvent(ReplayDataHandler.tempDataList, buttons);
+        //後で修正
+        // const buttons = ReplayDom.createTempReplayButton(replayData.date);
+        // ReplayEventSetter.setTempReplayPageEvent(ReplayDataHandler.tempDataList, buttons);
     }
 
     static save(replayData: ReplayData) {
+        const pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) throw Error("sceneが設定されていません");
+
         return ReplayDataHandler.saveReplayData(replayData, {
             onOverMax: () => {
-                pageManager.setPage("replaySaveAlert");
+                pageManager.openPage("replaySaveAlert");
             },
             onError: () => {
-                pageManager.setPage("replaySaveAlert2");
+                pageManager.openPage("replaySaveAlert2");
             },
         });
     }

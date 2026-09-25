@@ -1,4 +1,4 @@
-import { LoopManager } from "../UtilManagers/LoopManager";
+import { LoopManager } from "../Utilities/Loop/LoopManager";
 
 export interface GamepadButtonEvent {
     /**
@@ -61,7 +61,7 @@ export class GamepadInput {
             this.processGamepad(gamepad);
         };
 
-        this.loop.addEvent(["loop"], loop.bind(this));
+        this.loop.addHandler(["loop"], loop.bind(this));
     }
 
     get g$connecting(): boolean {

@@ -1,7 +1,8 @@
+import { MyEvent } from "../Utilities/MyEventListener";
 import { EventId, EventManager, MyEventListener } from "../UtilManagers/EventManager";
 import { GamePlayer } from "./GamePlayer";
 
-export const gameEvents: EventId[] = [];
+export const gameEvents: (EventId | MyEvent)[] = [];
 export type OperateName = "put" | "move-left" | "move-right" | "move-down" | "spin-left" | "spin-right" | "unput" | "hold" | "removeLine";
 export type OperateData = {
     time: number;
@@ -45,7 +46,7 @@ export abstract class GameMode implements MyEventListener {
         return this.state.hasFinished;
     }
     get g$isPlaying() {
-        return this.players.some((player) => player.loop.g$isLooping);
+        return this.players.some((player) => !player.loop.g$isStopping);
     }
 
     abstract start(): void;
@@ -54,7 +55,7 @@ export abstract class GameMode implements MyEventListener {
     protected abstract addPlayerBehavior(index: number): void;
 
     remove() {
-        EventManager.removeEvents(gameEvents);
+        EventManager.removeEvents(gameEvents.filter((id) => typeof id != "object"));
         this.players.forEach((player) => {
             player.g$element.remove();
         });
