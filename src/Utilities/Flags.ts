@@ -11,7 +11,7 @@ export class LifeCounter {
     }
 
     get g$count(): number {
-        return this.life;
+        return this.count;
     }
 
     get g$finished(): boolean {

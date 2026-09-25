@@ -10,6 +10,7 @@ import { ResultPageHandler } from "./ResultPageHandler";
 import { sceneManager } from "./Utilities/SceneManager";
 import { globalValues } from "./Global";
 import { SceneTitle } from "./Scenes/SceneTitle";
+import { DataManager } from "./DataManager";
 
 //不正なページ遷移の防止
 setupInputBehavior();
@@ -43,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const searchParams = new URLSearchParams(new URL(window.location.href).search);
     if (searchParams.get("nosave")) globalValues.nosave = true;
 
-    // DataManager.read();
+    DataManager.read();
     await sceneManager.change(SceneTitle);
 });
 

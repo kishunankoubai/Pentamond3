@@ -2,7 +2,7 @@ import { GamePlayer } from "./Game/GamePlayer";
 import { qsAll, qs, sleep } from "./Utils";
 import { Replay } from "./Replay/Replay";
 import { PlaySetting } from "./BeforePlaying/PlaySettingSetter";
-import { pageManager } from "./UtilManagers/PageManager";
+import { sceneManager } from "./Utilities/SceneManager";
 
 /**
  * ResultPageに関する、状態を持たない関数群
@@ -11,9 +11,11 @@ export class ResultPageHandler {
     private static readonly parser = new DOMParser();
 
     static setEvents() {
+        const pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
         const saveButton = qs("#result .saveReplayButton");
 
-        pageManager.addEvent(["pageChanged-result"], () => {
+        pageManager.addHandler("changePage-result", () => {
             saveButton.innerText = "リプレイを保存する";
         });
     }

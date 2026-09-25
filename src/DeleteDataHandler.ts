@@ -1,28 +1,31 @@
-import { pageManager } from "./UtilManagers/PageManager";
 import { qs, sleep, qsAddEvent } from "./Utils";
+import { sceneManager } from "./Utilities/SceneManager";
 
 export class DeleteDataHandler {
     static setEvents() {
-        pageManager.addEvent(["setPage-dataSetting"], () => {
+        const pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
+
+        pageManager.addHandler("openPage-dataSetting", () => {
             const dataSize = this.getAllDataSize();
             qs("#dataInformation").innerHTML = `全データの容量：${dataSize} B`;
         });
 
-        pageManager.addEvent(["setPage-allDataDeleteAlert"], async () => {
-            const confirmButton = qs("#allDataDeleteConfirmButton") as HTMLButtonElement;
-            confirmButton.disabled = true;
+        pageManager.addHandler("openPage-allDataDeleteAlert", async () => {
+            const confirmButton = qs("#allDataDeleteConfirmButton");
+            confirmButton.style.pointerEvents = "none";
             confirmButton.style.opacity = "0";
 
             await sleep(1500);
 
-            confirmButton.disabled = false;
+            confirmButton.style.pointerEvents = "";
             confirmButton.style.opacity = "1";
         });
 
         qsAddEvent("#allDataDeleteConfirmButton", "click", async () => {
             this.removeAllData();
-            pageManager.backPages(2, { eventIgnore: true });
-            pageManager.setPage("dataSetting");
+            await pageManager.backPage(2, true);
+            pageManager.openPage("dataSetting");
         });
     }
 
@@ -31,6 +34,7 @@ export class DeleteDataHandler {
             localStorage.getItem("Pentamond3-replayData") ?? "",
             localStorage.getItem("Pentamond3-graphicSetting") ?? "",
             localStorage.getItem("Pentamond3-volumeSetting") ?? "",
+            localStorage.getItem("contemporary") ?? "",
             //
         ]).size;
     }
@@ -39,5 +43,6 @@ export class DeleteDataHandler {
         localStorage.removeItem("Pentamond3-replayData");
         localStorage.removeItem("Pentamond3-graphicSetting");
         localStorage.removeItem("Pentamond3-volumeSetting");
+        localStorage.removeItem("contemporary");
     }
 }

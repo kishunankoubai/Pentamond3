@@ -38,29 +38,37 @@ export class ElementEventSetter extends SceneSetter {
 
         //selector
         document.querySelectorAll<HTMLElement>(".selector").forEach((selector) => {
-            const page = document.getElementById(`#${selector.dataset.page}`);
-            if (!page) return;
+            // シーンHTMLがDOMに反映された後に、選択肢側の要素も含めて初期化する
+            setTimeout(() => {
+                const page = document.getElementById(selector.dataset.page || "");
+                if (!page) return;
 
-            //初期設定
-            const options = Array.from(page.querySelectorAll<HTMLElement>(`.scrollableContainer .option`));
-            selector.innerText = options.find((option) => option.classList.contains("selectedOption"))?.innerText || "未選択";
+                //初期設定
+                const options = Array.from(page.querySelectorAll<HTMLElement>(`.scrollableContainer .button`));
+                const updateSelectorLabel = () => {
+                    selector.innerText = options.find((option) => option.classList.contains("selectedValue"))?.textContent?.trim() || "未選択";
+                };
+                updateSelectorLabel();
+                const selectorPageId = selector.closest<HTMLElement>(".page")?.id;
+                if (selectorPageId) this.scene.g$pageManager.addHandler(`changePage-${selectorPageId}`, updateSelectorLabel);
 
-            //選択肢の選択時
-            options.forEach((option) => {
-                option.addEventListener("click", () => {
-                    selector.innerText = option.innerText;
-                    options.forEach((opt) => opt.classList.remove("selectedOption"));
-                    option.classList.add("selectedOption");
-                    this.scene.g$pageManager.backPage(1);
-                    this.executeEvent("selectorChanged", selector);
-                    this.executeEvent(`selectorChanged-${page.id}`, selector);
+                //選択肢の選択時
+                options.forEach((option) => {
+                    option.addEventListener("click", () => {
+                        selector.innerText = option.innerText;
+                        options.forEach((opt) => opt.classList.remove("selectedValue"));
+                        option.classList.add("selectedValue");
+                        this.scene.g$pageManager.backPage(1);
+                        this.executeEvent("selectorChanged", selector);
+                        this.executeEvent(`selectorChanged-${page.id}`, selector);
+                    });
                 });
-            });
 
-            //selectorの選択ページにおいて、選択済みのものがあるならそれにfocusする
-            this.scene.g$pageManager.addHandler(`changePage-${page.id}`, () => {
-                options.find((option) => option.classList.contains("selectedOption"))?.focus();
-            });
+                //selectorの選択ページにおいて、選択済みのものがあるならそれにfocusする
+                this.scene.g$pageManager.addHandler(`changePage-${page.id}`, () => {
+                    options.find((option) => option.classList.contains("selectedValue"))?.focus();
+                });
+            }, 0);
         });
     }
 }

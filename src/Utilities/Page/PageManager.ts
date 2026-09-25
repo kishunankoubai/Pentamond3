@@ -55,6 +55,19 @@ export class PageManager extends MyEventListener {
     sceneInitialize(): void {
         if (this.initializeFlag.g$finished) return;
         this.pages = Array.from(document.querySelectorAll(".page")).map((element) => new Page(element.id));
+        this.initializeFlag.countUp();
+    }
+
+    /**
+     * シーン初期化後に動的に追加されたページを登録する
+     */
+    addPage(pageId: string): Page {
+        const registeredPage = this.getPage(pageId);
+        if (registeredPage) return registeredPage;
+
+        const page = new Page(pageId);
+        this.pages.push(page);
+        return page;
     }
 
     /**
@@ -112,7 +125,7 @@ export class PageManager extends MyEventListener {
             if (prevPageId) {
                 this.executeEvent(["closePage", `closePage-${prevPageId}`], prevPageId);
                 this.executeEvent(["openSameLayerPage", `openSameLayerPage-${pageId}`, "trueChangePage", `trueChangePage-${pageId}`], pageId);
-            } else if (PageManager.pageMemories.length && PageManager.pageMemories.at(-1)!.scene === PageManager.currentSceneClass) {
+            } else if (PageManager.pageMemories.length > 1 && PageManager.pageMemories.at(-2)!.scene === PageManager.currentSceneClass) {
                 this.executeEvent(["openUpperLayerPage", `openUpperLayerPage-${pageId}`], pageId);
             } else this.executeEvent("openSceneFirstPage", pageId);
         }
@@ -150,12 +163,16 @@ export class PageManager extends MyEventListener {
      */
     async backPage(back: number, eventIgnore: boolean = false): Promise<void> {
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
+        if (back <= 0) return;
 
-        const fixedBack = (((back + 1) % PageManager.pageMemories.length) + PageManager.pageMemories.length) % PageManager.pageMemories.length;
+        const targetIndex = PageManager.pageMemories.length - 1 - back;
+        if (targetIndex < 0) {
+            console.warn("戻るページ数が遷移記録を超えています");
+            return;
+        }
         const currentMemory = PageManager.pageMemories.at(-1)!;
-        const memory = PageManager.pageMemories.at(-fixedBack)!;
-        PageManager.pageMemories = PageManager.pageMemories.slice(0, -fixedBack);
-        if (currentMemory === memory) return;
+        const memory = PageManager.pageMemories[targetIndex];
+        PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
 
         const layer = this.g$currentPage?.g$layer ?? 0;
         let pageManager: PageManager = this;
@@ -174,7 +191,7 @@ export class PageManager extends MyEventListener {
         if (!eventIgnore) {
             pageManager.executeEvent(["changePage", `changePage-${memory.principlePageId}`], memory.principlePageId);
             const closePageIds = getFilteredArray(currentMemory.displayingPageIds, memory.displayingPageIds);
-            if (closePageIds) this.executeEvent("closePage");
+            if (closePageIds.length) this.executeEvent("closePage");
             closePageIds.forEach((pageId) => {
                 this.executeEvent(`closePage-${pageId}`);
             });
@@ -190,11 +207,16 @@ export class PageManager extends MyEventListener {
      */
     async backPageImmediately(back: number): Promise<void> {
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
+        if (back <= 0) return;
 
-        const fixedBack = (((back + 1) % PageManager.pageMemories.length) + PageManager.pageMemories.length) % PageManager.pageMemories.length;
+        const targetIndex = PageManager.pageMemories.length - 1 - back;
+        if (targetIndex < 0) {
+            console.warn("戻るページ数が遷移記録を超えています");
+            return;
+        }
         const currentMemory = PageManager.pageMemories.at(-1)!;
-        const memory = PageManager.pageMemories.at(-fixedBack)!;
-        PageManager.pageMemories = PageManager.pageMemories.slice(0, -fixedBack);
+        const memory = PageManager.pageMemories[targetIndex];
+        PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
         if (memory.scene !== currentMemory.scene) await sceneManager.change(memory.scene, false);
         this.setPagesVisibility(memory.displayingPageIds, true);
     }

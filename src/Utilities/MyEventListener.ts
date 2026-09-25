@@ -90,7 +90,7 @@ export abstract class MyEventListener {
         if (Array.isArray(event)) {
             this.registeredEvents = this.registeredEvents.filter((e) => !event.includes(e));
         } else {
-            this.registeredEvents = this.registeredEvents.filter((e) => e === event);
+            this.registeredEvents = this.registeredEvents.filter((e) => e !== event);
         }
     }
 

@@ -16,26 +16,26 @@ export class ElementManager extends MyEventListener {
 
     getSelectedIndex(selectorName: string): number {
         const page = document.getElementById(selectorName);
-        const selector = document.querySelector<HTMLElement>(`.selector[data-page=${selectorName}`);
+        const selector = document.querySelector<HTMLElement>(`.selector[data-page="${CSS.escape(selectorName)}"]`);
         if (!page || !selector) return -1;
 
-        const values = Array.from(page.querySelectorAll<HTMLElement>(".scrollableContainer button"));
+        const values = Array.from(page.querySelectorAll<HTMLElement>(".scrollableContainer .button"));
         return values.findIndex((value) => value.classList.contains("selectedValue"));
     }
 
     selectByIndex(selectorName: string, index: number) {
         const page = document.getElementById(selectorName);
-        const selector = document.querySelector<HTMLElement>(`.selector[data-page=${selectorName}`);
+        const selector = document.querySelector<HTMLElement>(`.selector[data-page="${CSS.escape(selectorName)}"]`);
         if (!page || !selector) return;
 
-        const values = Array.from(page.querySelectorAll<HTMLElement>(".scrollableContainer button"));
+        const values = Array.from(page.querySelectorAll<HTMLElement>(".scrollableContainer .button"));
         if (index < 0 || values.length <= index) return;
 
         values.forEach((value) => {
             value.classList.remove("selectedValue");
         });
         values[index].classList.add("selectedValue");
-        selector.innerText = values[index].innerText;
+        selector.innerText = values[index].textContent?.trim() || "";
     }
 
     /**

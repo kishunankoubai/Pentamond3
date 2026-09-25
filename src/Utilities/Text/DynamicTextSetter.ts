@@ -31,11 +31,13 @@ export class DynamicTextSetter extends SceneSetter {
             talkPage = document.createElement("div");
             talkPage.classList.add("page");
             talkPage.id = "talk";
+            talkPage.dataset.layer = "1";
             const pages = this.scene.g$pageManager.g$pages;
             if (pages.length) pages[0].g$element.after(talkPage);
             else document.querySelector<HTMLElement>(".sceneContainer")!.appendChild(talkPage);
         }
         talkPage = talkPage!;
+        this.scene.g$pageManager.addPage(talkPage.id);
         talkPage.appendChild(this.talkManager.talkPanel.g$element);
         talkPage.appendChild(this.talkManager.talkPanel.g$namePanel);
         this.talkManager.talkPanel.g$element.dataset.xy = "[0,0]";

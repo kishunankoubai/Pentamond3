@@ -68,7 +68,7 @@ export function setupMusics() {
         type: "SE",
     });
 
-    Music.s$masterBGMVolume = globalValues.bgmVolume;
-    Music.s$masterSEVolume = globalValues.seVolume;
+    Music.s$masterBGMVolume = globalValues.bgmVolume / 10;
+    Music.s$masterSEVolume = globalValues.seVolume / 10;
     MusicManager.updateAllGain();
 }

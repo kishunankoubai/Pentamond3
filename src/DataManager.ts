@@ -5,7 +5,7 @@ import { PageManager } from "./Utilities/Page/PageManager";
 import { sceneManager } from "./Utilities/SceneManager";
 
 export class DataManager {
-    private static key = [7, 11, 11];
+    private static key = [11, 11];
     private static saveName = "contemporary";
 
     static save() {
@@ -24,8 +24,10 @@ export class DataManager {
         const compressedData = localStorage.getItem(DataManager.saveName);
         if (!compressedData) return;
         const data = DataCompressor.decompressArray(compressedData, this.key);
-        globalValues.bgmVolume = data[1];
-        globalValues.seVolume = data[2];
+        if (data.length >= 2 && data.every((value) => Number.isInteger(value) && value >= 0 && value <= 10)) {
+            globalValues.bgmVolume = data[0];
+            globalValues.seVolume = data[1];
+        }
     }
 
     static deletePlayData() {
