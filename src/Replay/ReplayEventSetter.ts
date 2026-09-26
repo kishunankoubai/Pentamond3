@@ -2,7 +2,6 @@ import { GameProcessing } from "../GameProcessing/GameProcessing";
 import { qsAll, qs, sleep } from "../Utils";
 import { ReplayData, Replay } from "./Replay";
 import { ReplayDataHandler } from "./ReplayDataHandler";
-import { MusicManager } from "../Utilities/Music/MusicManager";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 import { sceneManager } from "../Utilities/SceneManager";
 
@@ -11,11 +10,9 @@ export class ReplayEventSetter {
         replayButton.addEventListener("click", () => {
             const replayButtons = qsAll("#replay .replayButton");
             const index = replayButtons.findIndex((button) => button == replayButton);
-            MusicManager.get("ボタン")?.play();
             GameProcessing.startReplay(tempDataList.at(-index - 1)!);
         });
         replayButton.addEventListener("focus", () => {
-            MusicManager.get("フォーカス")?.play();
             ElementManager.scrollToCenter(replayButton.parentElement!);
         });
 
@@ -25,13 +22,11 @@ export class ReplayEventSetter {
 
             const succeed = await Replay.save(tempDataList.at(-index - 1)!);
             if (succeed) {
-                MusicManager.get("ボタン")?.play();
                 Replay.setupSavedReplayPage();
                 saveButton.classList.add("replaySavedButton");
             }
         });
         saveButton.addEventListener("focus", async () => {
-            MusicManager.get("フォーカス")?.play();
             ElementManager.scrollToCenter(saveButton.parentElement!);
         });
     }
@@ -39,11 +34,9 @@ export class ReplayEventSetter {
     static setSavedReplayPageEvent(replayDataList: ReplayData[], { replayButtons, deleteButtons }: { replayButtons: HTMLButtonElement[]; deleteButtons: HTMLButtonElement[] }) {
         replayButtons.forEach((replayButton, i) => {
             replayButton.addEventListener("click", () => {
-                MusicManager.get("ボタン")?.play();
                 GameProcessing.startReplay(replayDataList[i]);
             });
             replayButton.addEventListener("focus", () => {
-                MusicManager.get("フォーカス")?.play();
                 ElementManager.scrollToCenter(replayButton.parentElement!);
             });
         });
@@ -51,10 +44,8 @@ export class ReplayEventSetter {
         deleteButtons.forEach((deleteButton, i) => {
             deleteButton.addEventListener("click", () => {
                 this.onClickDeleteButton(replayDataList[i]);
-                MusicManager.get("ボタン")?.play();
             });
             deleteButton.addEventListener("focus", () => {
-                MusicManager.get("フォーカス")?.play();
                 ElementManager.scrollToCenter(deleteButton.parentElement!);
             });
         });

@@ -34,6 +34,7 @@ export class DeleteDataHandler {
             localStorage.getItem("Pentamond3-replayData") ?? "",
             localStorage.getItem("Pentamond3-graphicSetting") ?? "",
             localStorage.getItem("Pentamond3-volumeSetting") ?? "",
+            localStorage.getItem("Pentamond3-soloBGM") ?? "",
             localStorage.getItem("contemporary") ?? "",
             //
         ]).size;
@@ -43,6 +44,7 @@ export class DeleteDataHandler {
         localStorage.removeItem("Pentamond3-replayData");
         localStorage.removeItem("Pentamond3-graphicSetting");
         localStorage.removeItem("Pentamond3-volumeSetting");
+        localStorage.removeItem("Pentamond3-soloBGM");
         localStorage.removeItem("contemporary");
     }
 }

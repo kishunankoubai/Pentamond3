@@ -19,14 +19,9 @@ export class InputManager extends MyEventListener {
 
         this.addInput(new KeyboardObserver());
         window.addEventListener("gamepadconnected", (event) => {
-            const exists = this.inputs.some((input) => input instanceof GamepadObserver && input.g$index === event.gamepad.index);
-            if (exists) return;
-
-            const input = new GamepadObserver(event.gamepad.index);
-            this.addInput(input);
-            if (this.registering) this.addRegisterEvent(input);
-            this.executeEvent("addedNewInput", input);
+            this.addGamepad(event.gamepad.index);
         });
+        this.discoverGamepads();
     }
 
     get g$inputs(): InputObserver[] {
@@ -54,6 +49,7 @@ export class InputManager extends MyEventListener {
     }
 
     start(): void {
+        this.discoverGamepads();
         this.inputs.forEach((input) => input.start());
     }
 
@@ -64,6 +60,7 @@ export class InputManager extends MyEventListener {
     startRegister(): void {
         this.resetRegister();
         this.registering = true;
+        this.discoverGamepads();
         this.inputs.filter((input) => !(input instanceof AutoInputObserver)).forEach((input) => this.addRegisterEvent(input));
         this.start();
     }
@@ -107,6 +104,22 @@ export class InputManager extends MyEventListener {
         input.addHandler("inputValid", (info: unknown) => this.executeEvent("inputValid", [input, info]));
         input.addHandler("inputInvalid", (info: unknown) => this.executeEvent("inputInvalid", [input, info]));
         if (start) input.start();
+    }
+
+    private discoverGamepads(): void {
+        navigator.getGamepads?.().forEach((gamepad) => {
+            if (gamepad) this.addGamepad(gamepad.index);
+        });
+    }
+
+    private addGamepad(index: number): void {
+        const exists = this.inputs.some((input) => input instanceof GamepadObserver && input.g$index === index);
+        if (exists) return;
+
+        const input = new GamepadObserver(index);
+        this.addInput(input);
+        if (this.registering) this.addRegisterEvent(input);
+        this.executeEvent("addedNewInput", input);
     }
 
     private addRegisterEvent(input: InputObserver): void {

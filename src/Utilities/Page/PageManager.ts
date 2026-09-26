@@ -91,6 +91,8 @@ export class PageManager extends MyEventListener {
      * @param displayPageIds 表示するページのidの配列
      */
     private setPagesVisibility(displayPageIds: string[], closeImmediately: boolean = false): void {
+        // 同じページを複数回開いても履歴上は一つとして扱う。
+        displayPageIds = [...new Set(displayPageIds)];
         this.pages.forEach((page) => {
             if (displayPageIds.includes(page.g$id)) page.s$visible = true;
             else if (closeImmediately) page.closeImmediately();
@@ -115,9 +117,12 @@ export class PageManager extends MyEventListener {
      * @param prevPageId 表示を消すページのid
      */
     private openPageHandler(eventIgnore: boolean, pageId: string, prevPageId?: string, closeImmediately: boolean = false): void {
-        let displayPageIds = PageManager.pageMemories.filter((memory) => memory.scene === PageManager.currentSceneClass).at(-1)?.displayingPageIds || [];
+        const latestMemory = PageManager.pageMemories.at(-1);
+        // Sceneを新しく開いた場合、同じSceneクラスの古い表示状態を引き継がない。
+        // 履歴から戻す場合はbackPage側が明示的に表示状態を復元する。
+        let displayPageIds = latestMemory?.scene === PageManager.currentSceneClass ? latestMemory.displayingPageIds : [];
         displayPageIds = prevPageId ? getFilteredArray(displayPageIds, [prevPageId]) : window.structuredClone(displayPageIds);
-        displayPageIds.push(pageId);
+        if (!displayPageIds.includes(pageId)) displayPageIds.push(pageId);
         this.setPagesVisibility(displayPageIds, closeImmediately);
 
         if (!eventIgnore) {

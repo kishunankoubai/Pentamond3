@@ -23,6 +23,16 @@ export class TimeManager extends MyEventListener {
         return this.speedMagnification;
     }
 
+    set s$speedMagnification(speedMagnification: number) {
+        if (!Number.isFinite(speedMagnification) || speedMagnification <= 0) return;
+
+        if (!this.g$isStopping) {
+            this.lastElapsedTime = this.g$elapsedTime;
+            this.intervalStartTime = Date.now();
+        }
+        this.speedMagnification = speedMagnification;
+    }
+
     reset() {
         this.lastElapsedTime = 0;
         this.intervalStartTime = null;
@@ -34,7 +44,7 @@ export class TimeManager extends MyEventListener {
     start(speedMagnification: number = 1) {
         if (this.lastStopTime == null) this.lastElapsedTime = this.g$elapsedTime;
         this.intervalStartTime = Date.now();
-        this.speedMagnification = speedMagnification;
+        this.s$speedMagnification = speedMagnification;
         this.lastStopTime = null;
         this.executeEvent("start", this);
     }

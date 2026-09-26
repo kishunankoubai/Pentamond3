@@ -1,17 +1,22 @@
 <div class="pageBundle">
     <div class="page" id="play">
         <div id="playBackground"></div>
+        <div id="replayControls">
+            <span id="replayPlaybackStatus">停止中</span>
+            <span id="replayPlaybackSpeed">×1</span>
+            <span class="replayControlHelp">← → 速度変更　決定 再生／停止</span>
+        </div>
     </div>
 
     <div class="page" id="replayPause" data-layer="1">
         <div class="label headingLabel">ポーズ</div>
         <div class="options" data-direction="row">
-            <div class="button" data-back="1" id="replayResumeButton" data-xy="[0,0]">再開する</div>
-            <div class="replayStart button" data-xy="[1,0]">もう一度</div>
+            <div class="button" id="replayResumeButton" data-xy="[0,0]">再開する</div>
+            <div class="button" id="replayRestartButton" data-xy="[1,0]">もう一度</div>
         </div>
         <div class="options" data-direction="row">
-            <div class="button" data-xy="[0,1]" data-back="2">リプレイ一覧へ</div>
-            <div class="button" data-xy="[1,1]" data-back="-1" data-page="title">タイトルへ</div>
+            <div class="button" id="replayListButton" data-xy="[0,1]">リプレイ一覧へ</div>
+            <div class="button" id="replayTitleButton" data-xy="[1,1]">タイトルへ</div>
         </div>
     </div>
 

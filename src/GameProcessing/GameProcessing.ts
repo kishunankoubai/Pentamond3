@@ -16,12 +16,24 @@ import { ScenePlay } from "../Scenes/ScenePlay";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
 import * as Setting from "../Settings";
+import { globalValues } from "../Global";
 
 //ゲーム開始
 export class GameProcessing {
     private static readonly ModeClassList = [Mode1, Mode2];
+    static readonly replaySpeeds = [0.25, 0.5, 0.75, 1, 1.5, 2, 4] as const;
+    private static replaySpeedIndex = 3;
+    private static replayControlsEnabled = false;
 
     static currentGame: DisposableGame | null = null;
+
+    static get g$replaySpeed(): number {
+        return this.replaySpeeds[this.replaySpeedIndex];
+    }
+
+    static get g$replayControlsEnabled(): boolean {
+        return this.replayControlsEnabled;
+    }
 
     static resume() {
         if (!this.currentGame) throw new Error("プレイ中ではない");
@@ -36,7 +48,38 @@ export class GameProcessing {
     static quit() {
         this.currentGame?.quit();
         this.currentGame = null;
+        this.resetReplayPlaybackState();
         inputManager.removeVirtualInputs();
+    }
+
+    static changeReplaySpeed(direction: -1 | 1): void {
+        if (!this.canOperateReplay()) return;
+        const nextIndex = Math.max(0, Math.min(this.replaySpeeds.length - 1, this.replaySpeedIndex + direction));
+        if (nextIndex === this.replaySpeedIndex) return;
+        this.replaySpeedIndex = nextIndex;
+        this.currentGame.setPlaybackSpeed(this.g$replaySpeed);
+        this.updateReplayControlDisplay();
+    }
+
+    static toggleReplayPlayback(): void {
+        if (!this.canOperateReplay()) return;
+        if (this.currentGame.g$isPlaying) this.currentGame.game.stop();
+        else this.currentGame.game.start();
+        this.currentGame.setPlaybackSpeed(this.g$replaySpeed);
+        this.updateReplayControlDisplay();
+    }
+
+    static pauseReplay(): void {
+        if (!this.isReplaying() || this.currentGame.g$hasFinished) return;
+        this.currentGame.game.stop();
+        this.updateReplayControlDisplay();
+    }
+
+    static resumeReplay(): void {
+        if (!this.canOperateReplay()) return;
+        this.currentGame.game.start();
+        this.currentGame.setPlaybackSpeed(this.g$replaySpeed);
+        this.updateReplayControlDisplay();
     }
 
     static isReplaying(): this is GameProcessing & { currentGame: DisposableGame & { replayData: ReplayData } } {
@@ -48,8 +91,9 @@ export class GameProcessing {
      */
     static async restartNormal() {
         if (!this.currentGame) throw new Error("一度もプレイされていない");
-        if (!(sceneManager.g$currentScene instanceof ScenePlay) || sceneManager.g$currentScene instanceof SceneReplay) await sceneManager.change(ScenePlay);
-        await this.startNormal(this.currentGame.playSetting);
+        const playSetting = this.currentGame.playSetting;
+        if (!(sceneManager.g$currentScene instanceof ScenePlay) || sceneManager.g$currentScene instanceof SceneReplay) await sceneManager.change(ScenePlay, false);
+        await this.startNormal(playSetting);
     }
 
     /**
@@ -83,7 +127,8 @@ export class GameProcessing {
     }
 
     static async startReplay(replayData: ReplayData) {
-        if (!(sceneManager.g$currentScene instanceof SceneReplay)) await sceneManager.change(SceneReplay);
+        if (!(sceneManager.g$currentScene instanceof SceneReplay)) await sceneManager.change(SceneReplay, false);
+        this.resetReplayPlaybackState();
         await this.beforeStart();
 
         this.setupReplayInputs(replayData);
@@ -99,14 +144,15 @@ export class GameProcessing {
         this.currentGame.onFinished = () => {
             this.onFinishReplay();
         };
+        this.currentGame.onEnding = () => this.lockReplayControls();
 
         this.currentGame.appendPlayersTo(qs("#play"));
 
         await this.playGameBGM(replayData.playSetting.playerNumber);
 
-        await this.countDownAndStart();
-
-        this.startAutoPlay();
+        await this.countDownAndStart(() => this.prepareAutoPlay());
+        this.replayControlsEnabled = true;
+        this.updateReplayControlDisplay();
     }
 
     private static setupReplayInputs(replayData: ReplayData) {
@@ -125,12 +171,11 @@ export class GameProcessing {
         }
     }
 
-    private static startAutoPlay() {
+    private static prepareAutoPlay() {
         inputManager.g$registeredInputs.forEach((input) => {
             if (!(input instanceof AutoInputObserver)) throw new Error("inputが自動ではありません");
 
             input.playReset();
-            input.playStart();
         });
     }
 
@@ -145,6 +190,7 @@ export class GameProcessing {
     }
 
     private static async onFinishReplay() {
+        this.lockReplayControls();
         await MusicManager.fadeOutBGM(300);
         await sceneManager.change(SceneResult, false);
         sceneManager.g$currentPageManager?.openPage("replayResult");
@@ -154,15 +200,16 @@ export class GameProcessing {
         ResultPageHandler.updateDetailedResultPage(this.currentGame!);
     }
 
-    private static async countDownAndStart() {
+    private static async countDownAndStart(beforeGameStart?: () => void) {
         let pageManager = sceneManager.g$currentPageManager;
         if (!pageManager) return;
         //開始演出
         await countDown(["", "3", "2", "1", "START!"]);
 
+        beforeGameStart?.();
         this.currentGame!.start();
 
-        pageManager.backPage(1);
+        await pageManager.backPage(1);
     }
 
     private static async beforeStart() {
@@ -182,6 +229,33 @@ export class GameProcessing {
     }
 
     private static playGameBGM(playerNumber: number) {
-        return MusicManager.playExclusiveBGM(playerNumber === 1 ? "ならべてトライアングル" : "Top of the Pyramid");
+        return MusicManager.playExclusiveBGM(playerNumber === 1 ? globalValues.soloBGM : "Top of the Pyramid");
+    }
+
+    private static canOperateReplay(): this is GameProcessing & { currentGame: DisposableGame & { replayData: ReplayData } } {
+        return this.replayControlsEnabled && this.isReplaying() && !this.currentGame.g$hasFinished;
+    }
+
+    private static lockReplayControls(): void {
+        this.replayControlsEnabled = false;
+        this.replaySpeedIndex = 3;
+        this.currentGame?.setPlaybackSpeed(1);
+        this.updateReplayControlDisplay();
+    }
+
+    private static resetReplayPlaybackState(): void {
+        this.replayControlsEnabled = false;
+        this.replaySpeedIndex = 3;
+        this.updateReplayControlDisplay();
+    }
+
+    private static updateReplayControlDisplay(): void {
+        const status = document.getElementById("replayPlaybackStatus");
+        const speed = document.getElementById("replayPlaybackSpeed");
+        if (status) status.textContent = this.currentGame?.g$isPlaying && this.replayControlsEnabled ? "再生中" : "停止中";
+        if (speed) speed.textContent = `×${this.g$replaySpeed}`;
+
+        const controls = document.getElementById("replayControls");
+        controls?.classList.toggle("disabled", !this.replayControlsEnabled);
     }
 }

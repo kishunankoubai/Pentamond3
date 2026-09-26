@@ -90,8 +90,11 @@ export class MondOperator extends MyEventListener {
         if (!this.isOperable()) {
             return;
         }
+        const previousX = this.hand.g$x;
         if (this.blockManager.move(this.hand, moveDirection)) {
-            this.executeEvent(["move", "move-" + moveDirection]);
+            const events = ["move", "move-" + moveDirection];
+            if (moveDirection === "down") events.push(this.hand.g$x === previousX ? "move-down-direct" : "slide-down");
+            this.executeEvent(events);
         }
     }
 

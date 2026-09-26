@@ -18,13 +18,16 @@ import { ScenePlay } from "./ScenePlay";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
+    private elementEventSetter: ElementEventSetter;
     private pageInteraction: PageInteraction;
+    private bgmPreviewActive = false;
     constructor() {
         super("src/HTML/SceneTitle.html");
         this.elementManager = new ElementManager(this);
+        this.elementEventSetter = new ElementEventSetter(this.elementManager);
         this.pageInteraction = new PageInteraction(this);
         this.sceneSetters.push(
-            new ElementEventSetter(this.elementManager),
+            this.elementEventSetter,
             new PageInteractionSetter(this.pageInteraction)
             //
         );
@@ -34,6 +37,7 @@ export class SceneTitle extends Scene {
         this.setPageAnimation();
         this.setPageStart();
         this.setSettingButton();
+        this.setupBGMSetting();
         this.setStageButton();
         this.pageInteraction.start();
         // BeforePlaying
@@ -242,6 +246,35 @@ export class SceneTitle extends Scene {
         });
         document.querySelector<HTMLElement>("#allDataWarning .container .button")!.addEventListener("click", () => {
             DataManager.delete();
+        });
+    }
+
+    private setupBGMSetting() {
+        const options = Array.from(document.querySelectorAll<HTMLElement>("#bgmSelector1 .scrollableContainer .button"));
+        options.forEach((option) => option.classList.toggle("selectedValue", option.textContent?.trim() === globalValues.soloBGM));
+
+        this.elementEventSetter.addHandler("selectorChanged-bgmSelector1", (selector: HTMLElement) => {
+            const selectedBGM = selector.textContent?.trim();
+            if (!selectedBGM || !MusicManager.get(selectedBGM)) return;
+            globalValues.soloBGM = selectedBGM;
+            DataManager.save();
+            this.bgmPreviewActive = true;
+            MusicManager.playExclusiveBGM(selectedBGM);
+        });
+
+        this.pageManager.addHandler("changePage", (pageId: string) => {
+            if (pageId === "bgmSetting") {
+                this.bgmPreviewActive = true;
+                MusicManager.playExclusiveBGM(globalValues.soloBGM);
+                return;
+            }
+            if (pageId === "bgmSelector1") {
+                this.bgmPreviewActive = true;
+                return;
+            }
+            if (!this.bgmPreviewActive) return;
+            this.bgmPreviewActive = false;
+            MusicManager.playExclusiveBGM("つみきのおしろ");
         });
     }
 }

@@ -51,12 +51,16 @@ export class LoopManager extends TimeManager {
     }
 
     private loop() {
+        // コールバック内でstop/reset/startされた場合、古いフレームの処理を継続しない。
+        const executingFrame = this.loopAnimationFrame;
         const goalCount = this.getGoalCount(this.loopFrequency);
         //goalCountが正常値ではないとき(loopFrequencyが0のときなど)
         if (!Number.isFinite(goalCount) || Number.isNaN(goalCount)) {
             this.executeEvent("loop", this);
+            if (this.loopAnimationFrame !== executingFrame) return;
             this.loopCount++;
             this.executeEvent("latestFrameLoop", this);
+            if (this.loopAnimationFrame !== executingFrame) return;
         } else if (goalCount > this.loopCount) {
             //onTimeがtrueなら遅れている場合追いつこうとする
             const maxCount = Math.round(((this.loopFrequency * 60) / 1000) * (this.onTime ? 4 : 1));
@@ -64,17 +68,20 @@ export class LoopManager extends TimeManager {
                 this.lastElapsedTime -= Math.ceil((goalCount - this.loopCount - 1) * this.loopFrequency);
                 // console.log(`1frameあたりのループ回数が多すぎます：${goalCount - this.loopCount}`);
                 this.executeEvent("loop", this);
+                if (this.loopAnimationFrame !== executingFrame) return;
                 this.loopCount++;
             } else {
                 while (goalCount > this.loopCount) {
                     this.executeEvent("loop", this);
+                    if (this.loopAnimationFrame !== executingFrame) return;
                     this.loopCount++;
                 }
             }
             this.executeEvent("latestFrameLoop", this);
+            if (this.loopAnimationFrame !== executingFrame) return;
         }
 
-        if (this.loopAnimationFrame != null) this.loopAnimationFrame = requestAnimationFrame(this.loop.bind(this));
+        if (this.loopAnimationFrame === executingFrame) this.loopAnimationFrame = requestAnimationFrame(this.loop.bind(this));
     }
 
     getGoalCount(goalTime: number): number {

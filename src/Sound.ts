@@ -55,17 +55,27 @@ export function setupMusics() {
     MusicManager.add({
         name: "フォーカス",
         src: "assets/sounds/Pentamond3-フォーカス.mp3",
-        srcVolume: 0.15,
+        srcVolume: 0.25,
         loop: false,
         type: "SE",
     });
 
-    MusicManager.add({
-        name: "モンド設置音",
-        src: "assets/sounds/モンド設置音.m4a",
-        srcVolume: 0.5,
-        loop: false,
-        type: "SE",
+    const pentamondSounds = [
+        ["移動音", "Pentamond3-移動音.mp3", 0.7],
+        ["右回転音", "Pentamond3-右回転音.mp3", 0.7],
+        ["滑り移動音", "Pentamond3-滑り移動音.mp3", 0.7],
+        ["左回転音", "Pentamond3-左回転音.mp3", 0.7],
+        ["設置音", "Pentamond3-設置音.mp3", 0.85],
+        ...Array.from({ length: 7 }, (_, i) => [`消去音${i}`, `Pentamond3-消去音${i}.mp3`, 7] as [string, string, number]),
+    ] as [string, string, number][];
+    pentamondSounds.forEach(([name, fileName, srcVolume]) => {
+        MusicManager.add({
+            name,
+            src: `assets/sounds/${fileName}`,
+            srcVolume,
+            loop: false,
+            type: "SE",
+        });
     });
 
     Music.s$masterBGMVolume = globalValues.bgmVolume / 10;

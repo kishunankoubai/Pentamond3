@@ -244,6 +244,43 @@
     background-color: #dddddddd;
 }
 
+#replayControls {
+    position: absolute;
+    z-index: 2;
+    top: 2vh;
+    right: 2vh;
+    display: flex;
+    align-items: center;
+    gap: 2vh;
+    padding: 1vh 2vh;
+    border: 0.4vh solid #2898;
+    border-radius: 2vh;
+    background-color: #eefc;
+    pointer-events: none;
+
+    & span {
+        font-size: 3vh;
+    }
+
+    & #replayPlaybackStatus {
+        color: #e86;
+    }
+
+    & #replayPlaybackSpeed {
+        min-width: 7vh;
+        color: #289;
+    }
+
+    & .replayControlHelp {
+        color: #678;
+        font-size: 2.2vh;
+    }
+
+    &.disabled {
+        opacity: 0.5;
+    }
+}
+
 .subPage {
     width: 100%;
     display: flex;

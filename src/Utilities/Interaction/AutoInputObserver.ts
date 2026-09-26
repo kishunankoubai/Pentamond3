@@ -50,6 +50,10 @@ export class AutoInputObserver extends InputObserver {
         this.pendingInputData = structuredClone(this.inputData);
     }
 
+    setPlaybackSpeed(speed: number): void {
+        this.loop.s$speedMagnification = speed;
+    }
+
     private processInput(): void {
         while (this.pendingInputData.length && this.pendingInputData[0].time <= this.loop.g$elapsedTime) {
             const input = this.pendingInputData.shift()!;

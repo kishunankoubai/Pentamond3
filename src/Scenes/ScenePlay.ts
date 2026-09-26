@@ -18,11 +18,11 @@ export class ScenePlay extends Scene {
     private elementManager: ElementManager;
     private pageInteraction: PageInteraction;
     private talkManager: TalkManager;
-    private controller = new AbortController();
-    private pauseInputEvent: MyEvent | null = null;
+    protected controller = new AbortController();
+    protected pauseInputEvent: MyEvent | null = null;
 
-    constructor() {
-        super("src/HTML/ScenePlay.html");
+    constructor(htmlPath: string = "src/HTML/ScenePlay.html") {
+        super(htmlPath);
         this.elementManager = new ElementManager(this);
         this.pageInteraction = new PageInteraction(this);
         this.talkManager = new TalkManager(this);

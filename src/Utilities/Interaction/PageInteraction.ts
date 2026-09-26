@@ -3,6 +3,7 @@ import { Scene } from "../SceneManager";
 import { inputManager } from "./InputManager";
 import { InputInfo, InputObserver } from "./InputObserver";
 import { MyEvent } from "../MyEventListener";
+import { MusicManager } from "../Music/MusicManager";
 
 type InteractionElement = {
     element: HTMLElement;
@@ -20,6 +21,16 @@ export class PageInteraction {
     private interactionElements: InteractionElement[] = [];
     private backElement: InteractionElement | undefined = undefined;
     private inputEvents: MyEvent[] = [];
+    private readonly focusHandler = (event: FocusEvent) => {
+        if (event.target instanceof HTMLElement && event.target.matches("[data-xy]")) {
+            MusicManager.get("フォーカス")?.play();
+        }
+    };
+    private readonly clickHandler = (event: MouseEvent) => {
+        if (event.target instanceof HTMLElement && event.target.closest("[data-xy]")) {
+            MusicManager.get("ボタン")?.play();
+        }
+    };
 
     constructor(scene: Scene) {
         this.scene = scene;
@@ -36,11 +47,15 @@ export class PageInteraction {
     start() {
         if (this.isValid) return;
         this.isValid = true;
+        document.addEventListener("focusin", this.focusHandler);
+        document.addEventListener("click", this.clickHandler);
     }
 
     stop() {
         if (!this.isValid) return;
         this.isValid = false;
+        document.removeEventListener("focusin", this.focusHandler);
+        document.removeEventListener("click", this.clickHandler);
         inputManager.removeEvent(this.inputEvents);
         this.inputEvents = [];
     }

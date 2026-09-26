@@ -12,8 +12,8 @@ export class GameStartEventSetter {
         if (!pageManager) return;
         // 「スタート!」
         qsAddEvent(".playStart", "click", async () => {
-            await sceneManager.change(ScenePlay);
-            GameProcessing.startNormal(PlaySettingSetter.getPlaySetting());
+            await sceneManager.change(ScenePlay, false);
+            await GameProcessing.startNormal(PlaySettingSetter.getPlaySetting());
         });
 
         // ポーズ画面の「もう一度」・リザルト画面の「もう一度」

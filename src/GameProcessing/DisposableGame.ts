@@ -39,6 +39,7 @@ export class DisposableGame {
     }
 
     onFinished = () => {};
+    onEnding = () => {};
 
     constructor(gameModeList: (typeof GameMode)[], inputs: InputObserver[], inputCount: number, { playSetting, replayData }: { playSetting?: PlaySetting; replayData?: ReplayData }) {
         if (replayData) {
@@ -89,7 +90,12 @@ export class DisposableGame {
         this.hasStarted = true;
     }
 
+    setPlaybackSpeed(speed: number) {
+        this.players.forEach((player) => player.setPlaybackSpeed(speed));
+    }
+
     private async onGameFinish() {
+        this.onEnding();
         if (this.isReplay()) {
             this.onFinishReplay();
         }

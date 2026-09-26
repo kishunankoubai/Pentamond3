@@ -34,6 +34,8 @@ export class ResultPageHandler {
                 Replay.updateTempReplaySaveButton();
                 saveButton.innerText = "保存しました";
                 saveButton.onclick = () => {};
+            } else {
+                saveButton.innerText = "リプレイを保存する";
             }
         };
     }

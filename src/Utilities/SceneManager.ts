@@ -48,7 +48,7 @@ export abstract class Scene extends MyEventListener {
     protected abstract initialize(): void;
     protected abstract close(): void;
 
-    abstract defaultStart(): void;
+    abstract defaultStart(): void | Promise<void>;
 }
 
 export type SceneClass = new () => Scene;
@@ -108,7 +108,7 @@ export class SceneManager extends MyEventListener {
         this.currentScene = new scene();
         await this.loadSceneHTML(this.currentScene.g$htmlPath);
         this.currentScene.executeEvent("sceneStart");
-        if (defaultStart) this.currentScene.defaultStart();
+        if (defaultStart) await this.currentScene.defaultStart();
         this.executeEvent("sceneChange");
     }
 

@@ -5,6 +5,7 @@ import { qsAll, removeMousePointerTemporary } from "../../Utils";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { ControllerRegisterer } from "../../BeforePlaying/ControllerRegisterer";
+import { MusicManager } from "../../Utilities/Music/MusicManager";
 
 export class Mode2 extends GameMode {
     constructor(players: GamePlayer[]) {
@@ -161,6 +162,8 @@ export class Mode2 extends GameMode {
 
             p.operator.addHandler("removeLine", () => {
                 const lastTrick = p.operator.g$lastTrick;
+                const continuesChain = !!lastTrick && ["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name);
+                const removeSoundIndex = continuesChain ? Math.min(6, p.playInfo.chain) : 0;
                 if (lastTrick) {
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {
                         p.playInfo.line += 1;
@@ -187,6 +190,7 @@ export class Mode2 extends GameMode {
                 }
                 p.playInfo.lastTrick = p.operator.g$lastTrick;
                 p.playInfo.remove += 1;
+                MusicManager.get(`消去音${removeSoundIndex}`)?.play();
 
                 if (p.playInfo.line >= 15) {
                     p.finish();

@@ -9,6 +9,7 @@ import { TrickInfo } from "../Trick";
 import * as Setting from "../Settings";
 import { gameEvents } from "./GameMode";
 import { GraphicSetting } from "../GraphicSetting";
+import { MusicManager } from "../Utilities/Music/MusicManager";
 
 export class GamePlayer {
     operator: MondOperator;
@@ -245,7 +246,12 @@ export class GamePlayer {
                 if (GraphicSetting.putShake) {
                     this.animations.put.play();
                 }
-            })
+                MusicManager.get("設置音")?.play();
+            }),
+            this.operator.addHandler(["move-left", "move-right", "move-down-direct"], () => MusicManager.get("移動音")?.play()),
+            this.operator.addHandler("slide-down", () => MusicManager.get("滑り移動音")?.play()),
+            this.operator.addHandler("spin-left", () => MusicManager.get("左回転音")?.play()),
+            this.operator.addHandler("spin-right", () => MusicManager.get("右回転音")?.play())
         );
         this.input = input;
         this.playField.classList.add("playField");
@@ -294,6 +300,13 @@ export class GamePlayer {
             animation.pause();
         });
         if (this.input instanceof AutoInputObserver) this.input.stop();
+    }
+
+    setPlaybackSpeed(speed: number) {
+        this.loop.s$speedMagnification = speed;
+        this.nuisanceMondManager.setPlaybackSpeed(speed);
+        if (this.input instanceof AutoInputObserver) this.input.setPlaybackSpeed(speed);
+        Object.values(this.animations).forEach((animation) => (animation.playbackRate = speed));
     }
 
     finish() {

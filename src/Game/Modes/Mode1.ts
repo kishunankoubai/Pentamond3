@@ -238,7 +238,6 @@ export class Mode1 extends GameMode {
                     p.damageInfo.totalAttack += p.damageInfo.attackTask;
                     p.damageInfo.attackTask = 0;
                 }
-                MusicManager.get("モンド設置音")?.play();
             }),
 
             p.operator.addHandler("unput", () => {
@@ -254,6 +253,7 @@ export class Mode1 extends GameMode {
 
             p.operator.addHandler("removeLine", () => {
                 const lastTrick = p.operator.g$lastTrick;
+                const removeSoundIndex = lastTrick ? Math.min(6, p.playInfo.chain) : 0;
                 if (lastTrick) {
                     p.playInfo.penaltyTask = 0;
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {
@@ -279,6 +279,7 @@ export class Mode1 extends GameMode {
                 }
                 p.playInfo.lastTrick = p.operator.g$lastTrick;
                 p.playInfo.remove += 1;
+                MusicManager.get(`消去音${removeSoundIndex}`)?.play();
             })
         );
     }

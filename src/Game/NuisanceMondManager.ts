@@ -30,6 +30,7 @@ export class NuisanceMondManager extends MyEventListener {
     private spawnCoordinates: number[] = [];
     private spawnCoordinateMemory: number[] = [];
     private random: SeededRandom;
+    private playbackSpeed = 1;
 
     /**
      * @param startDamage ダメージ処理開始
@@ -41,6 +42,8 @@ export class NuisanceMondManager extends MyEventListener {
         super();
         this.blockManager = blockManager;
         this.random = new SeededRandom(seed);
+        // タブ復帰や重い描画後にダメージ処理を1フレームで大量消化しない。
+        this.loop.s$onTime = false;
         gameEvents.push(
             this.loop.addHandler("loop", () => {
                 this.damageProcess();
@@ -95,6 +98,7 @@ export class NuisanceMondManager extends MyEventListener {
             this.task += task;
             this.loop.reset();
             this.loop.s$loopFrequency = this.g$progressFrequency;
+            this.loop.start(this.playbackSpeed);
             return;
         }
 
@@ -104,6 +108,7 @@ export class NuisanceMondManager extends MyEventListener {
         this.progressCount = 0;
         this.loop.reset();
         this.loop.s$loopFrequency = this.g$progressFrequency;
+        this.loop.s$speedMagnification = this.playbackSpeed;
         this.executeEvent("startDamage");
     }
 
@@ -268,8 +273,8 @@ export class NuisanceMondManager extends MyEventListener {
         this.task = 0;
         this.progressCount = 0;
         this.taskCount = 0;
-        this.executeEvent("finishDamage");
         this.damaging = false;
+        this.executeEvent("finishDamage");
     }
 
     //damage処理を中止する
@@ -301,6 +306,11 @@ export class NuisanceMondManager extends MyEventListener {
         if (!this.damaging) {
             return;
         }
-        this.loop.start();
+        this.loop.start(this.playbackSpeed);
+    }
+
+    setPlaybackSpeed(speed: number): void {
+        this.playbackSpeed = speed;
+        this.loop.s$speedMagnification = speed;
     }
 }
