@@ -704,6 +704,11 @@
             margin-left: 0;
             font-size: 4vh;
 
+            &[aria-disabled="true"] {
+                opacity: 0.35;
+                pointer-events: none;
+            }
+
             &.waitingInput {
                 color: #ff90be;
             }
@@ -742,11 +747,6 @@
                 }
             }
         }
-    }
-
-    & #playerControllerSettingConfirm {
-        margin: 4vh 0 0;
-        font-size: 4vh;
     }
 }
 

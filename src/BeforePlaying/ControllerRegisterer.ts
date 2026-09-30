@@ -60,8 +60,9 @@ export class ControllerRegisterer {
             const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
             pageManager.openPage(playerNumber === 1 ? "controllerSetting" : "playerControllerSetting");
         });
-        qsAddEvent("#playerControllerSettingConfirm", "click", () => {
-            this.finishMultiControllerSelection(PlaySettingSetter.getPlaySetting().playerNumber);
+        qsAddEvent("#playerControllerSetting .back", "click", () => {
+            const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
+            this.gamepadConfigs = ControllerSettingManager.getPlayerConfigs(playerNumber);
         });
     }
 
@@ -89,14 +90,6 @@ export class ControllerRegisterer {
         }
 
         await this.openPlayPrepare("soloStageSelect");
-    }
-
-    private static async finishMultiControllerSelection(playerNumber: number) {
-        this.gamepadConfigs = ControllerSettingManager.getPlayerConfigs(playerNumber);
-        const pageManager = sceneManager.g$currentPageManager;
-        if (!pageManager) return;
-        const backDepth = PageManager.getBackIndex("playPrepare");
-        if (backDepth > 0) await pageManager.backPage(backDepth);
     }
 
     private static async openPlayPrepare(returnPageId: string) {

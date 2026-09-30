@@ -1,4 +1,3 @@
-import { getMaxElements } from "../Common";
 import { Scene } from "../SceneManager";
 import { inputManager } from "./InputManager";
 import { InputInfo, InputObserver } from "./InputObserver";
@@ -43,7 +42,11 @@ export class PageInteraction {
 
     private get g$validElements(): InteractionElement[] {
         return this.interactionElements.filter(
-            ({ element }) => !element.classList.contains("closing") && element.getClientRects().length > 0 && (!(element instanceof HTMLButtonElement) || !element.disabled)
+            ({ element }) =>
+                !element.classList.contains("closing") &&
+                element.getClientRects().length > 0 &&
+                element.getAttribute("aria-disabled") !== "true" &&
+                (!(element instanceof HTMLButtonElement) || !element.disabled)
         );
     }
 
@@ -66,9 +69,11 @@ export class PageInteraction {
     setInteraction() {
         inputManager.removeEvent(this.inputEvents);
         this.inputEvents = [];
-        this.inputEvents.push(inputManager.addHandler("inputValid", () => {
-            document.body.classList.add("cursorHidden");
-        }));
+        this.inputEvents.push(
+            inputManager.addHandler("inputValid", () => {
+                document.body.classList.add("cursorHidden");
+            })
+        );
 
         this.getInteractionElements();
         if (!this.interactionElements.length) return;
@@ -118,49 +123,42 @@ export class PageInteraction {
 
     private getInteractionElementRelatively(activeElement: InteractionElement, [dx, dy]: [number, number]) {
         const [nowX, nowY] = activeElement.coordinate;
-        const interactionElements = this.g$validElements;
+        const horizontal = dx !== 0;
+        const direction = horizontal ? dx : dy;
+        const currentPrimary = horizontal ? nowX : nowY;
+        const currentSecondary = horizontal ? nowY : nowX;
+        const candidates = this.g$validElements
+            .filter(({ element }) => element !== activeElement.element)
+            .map((candidate) => {
+                const [x, y] = candidate.coordinate;
+                const primary = horizontal ? x : y;
+                const secondary = horizontal ? y : x;
+                return {
+                    candidate,
+                    directionalDistance: (primary - currentPrimary) * direction,
+                    secondaryDistance: Math.abs(secondary - currentSecondary),
+                };
+            })
+            // 同じ列・行だけしかない場合に、別方向へ移動してしまうのを防ぐ。
+            .filter(({ directionalDistance }) => directionalDistance !== 0);
 
-        let focusElement = getMaxElements(
-            interactionElements.filter(({ coordinate: [x, y] }) => x == nowX + (dx ?? x - nowX) && y == nowY + (dy ?? y - nowY)),
-            ({ coordinate: [x, y] }) => -Math.hypot(x - nowX, y - nowY)
-        );
+        if (!candidates.length) return activeElement;
 
-        // if (!focusElement.length) {
-        //     focusElement = getMaxElements(
-        //         this.interactionElements.filter(({ coordinate: [x, y] }) => (x == nowX + (dx ?? x - nowX) || y == nowY + (dy ?? y - nowY)) && x != nowX && y != nowY),
-        //         ({ coordinate: [x, y] }) => -Math.max(Math.abs(x - nowX - dx), Math.abs(y - nowY - dy))
-        //     );
-        // }
-        if (!focusElement.length) {
-            if (!interactionElements.some(({ coordinate: [x, y] }) => (dx && x != nowX) || (dy && y != nowY)))
-                focusElement = [interactionElements.find(({ coordinate: [x, y] }) => x == nowX && y == nowY)!];
+        const forwardCandidates = candidates.filter(({ directionalDistance }) => directionalDistance > 0);
+        const wrapAlignedCandidates = candidates.filter(({ directionalDistance, secondaryDistance }) => directionalDistance < 0 && secondaryDistance === 0);
+        let movementCandidates = forwardCandidates.length ? forwardCandidates : candidates;
+        let targetDirectionalDistance = Math.min(...movementCandidates.map(({ directionalDistance }) => directionalDistance));
+        const nearestForwardCandidates = movementCandidates.filter(({ directionalDistance }) => directionalDistance === targetDirectionalDistance);
+
+        // 次の列・行に現在位置と一直線の要素がない場合は、一直線上の折り返しを優先する。
+        if (wrapAlignedCandidates.length && (!forwardCandidates.length || !nearestForwardCandidates.some(({ secondaryDistance }) => secondaryDistance === 0))) {
+            movementCandidates = wrapAlignedCandidates;
+            targetDirectionalDistance = Math.min(...movementCandidates.map(({ directionalDistance }) => directionalDistance));
         }
 
-        // if (!focusElement.length) {
-        //     focusElement = getMaxElements(
-        //         this.interactionElements.filter(({ coordinate: [x, y] }) => x == (dx ? x : nowX) && y == (dy ? y : nowY) && (x != nowX || y != nowY)),
-        //         ({ coordinate: [x, y] }) => -(dx ? 0 : Math.min(Math.sign(dy ?? 0) * y, nowY - y)) - (dy ? 0 : Math.min(Math.sign(dx ?? 0) * x, nowX - x))
-        //     );
-        // }
-
-        if (!focusElement.length) {
-            focusElement = getMaxElements(
-                interactionElements.filter(({ coordinate: [x, y] }) => {
-                    return x != nowX || y != nowY;
-                }),
-                ({ coordinate: [x, y] }) => -(dx ? 0 : Math.min(Math.sign(dy ?? 0) * y, nowY - y)) - (dy ? 0 : Math.min(Math.sign(dx ?? 0) * x, nowX - x))
-            );
-            focusElement = getMaxElements(
-                focusElement.filter(({ coordinate: [x, y] }) => {
-                    return x != nowX || y != nowY;
-                }),
-                ({ coordinate: [x, y] }) => -Math.hypot(x - nowX, y - nowY)
-            );
-        }
-
-        // console.log(activeElement.coordinate, focusElement[0]?.coordinate);
-
-        return focusElement.length ? focusElement[0] : activeElement;
+        return movementCandidates
+            .filter(({ directionalDistance }) => directionalDistance === targetDirectionalDistance)
+            .sort((a, b) => a.secondaryDistance - b.secondaryDistance)[0].candidate;
     }
 
     private proceedInteraction(activeElement: InteractionElement, inputName: string) {

@@ -23,6 +23,7 @@ const actionLabels: Record<ControllerAction, string> = {
 };
 
 const actions = Object.keys(actionLabels) as ControllerAction[];
+const maxBindingsPerAction = 3;
 
 type StoredControllerSettings = {
     version: 1;
@@ -177,6 +178,7 @@ export class ControllerSettingManager {
         if (addButton) {
             addButton.dataset.xy = `[0,${inputs.length}]`;
             addButton.tabIndex = 0;
+            addButton.setAttribute("aria-disabled", String(inputs.length >= maxBindingsPerAction));
         }
         if (backButton) {
             backButton.dataset.xy = `[0,${inputs.length + 1}]`;
@@ -186,6 +188,11 @@ export class ControllerSettingManager {
 
     private static beginAssignment(): void {
         if (!this.openedAction || this.selectedSlot === 0) return;
+        if (this.customConfigs[this.selectedSlot - 1][this.openedAction].length >= maxBindingsPerAction) {
+            const status = document.getElementById("controllerBindingStatus");
+            if (status) status.textContent = `同じ操作に登録できる入力は${maxBindingsPerAction}つまでです。`;
+            return;
+        }
         this.waitingAction = this.openedAction;
         this.waitingSince = Date.now();
         PageInteraction.inputBlocked = true;
@@ -200,6 +207,12 @@ export class ControllerSettingManager {
 
         const action = this.waitingAction;
         const config = this.customConfigs[this.selectedSlot - 1];
+        if (!config[action].includes(info.name) && config[action].length >= maxBindingsPerAction) {
+            this.cancelAssignment();
+            const status = document.getElementById("controllerBindingStatus");
+            if (status) status.textContent = `同じ操作に登録できる入力は${maxBindingsPerAction}つまでです。`;
+            return;
+        }
         actions.forEach((registeredAction) => {
             config[registeredAction] = config[registeredAction].filter((registeredInput) => registeredInput !== info.name);
         });
@@ -288,11 +301,13 @@ export class ControllerSettingManager {
         const normalized = structuredClone(config);
         const usedInputs = new Set<string>();
         actions.forEach((action) => {
-            normalized[action] = normalized[action].filter((input) => {
-                if (usedInputs.has(input)) return false;
+            const inputs: string[] = [];
+            normalized[action].forEach((input) => {
+                if (usedInputs.has(input) || inputs.length >= maxBindingsPerAction) return;
                 usedInputs.add(input);
-                return true;
+                inputs.push(input);
             });
+            normalized[action] = inputs;
         });
         return normalized;
     }

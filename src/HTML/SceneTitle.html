@@ -353,10 +353,10 @@
     <div class="page" id="controllerSetting">
         <div class="label headingLabel">コントローラー設定</div>
         <div class="controllerPresetRow">
-            <div class="button" data-controller-slot="0" data-xy="[0,0]">初期配置</div>
-            <div class="button" data-controller-slot="1" data-xy="[1,0]">編集用1</div>
-            <div class="button" data-controller-slot="2" data-xy="[2,0]">編集用2</div>
-            <div class="button" data-controller-slot="3" data-xy="[3,0]">編集用3</div>
+            <div class="button" data-controller-slot="0" data-xy="[-1,0]">初期配置</div>
+            <div class="button" data-controller-slot="1" data-xy="[0,0]">編集用1</div>
+            <div class="button" data-controller-slot="2" data-xy="[1,0]">編集用2</div>
+            <div class="button" data-controller-slot="3" data-xy="[2,0]">編集用3</div>
         </div>
         <div class="text" id="controllerSettingStatus">使用する配置を選択してください。</div>
         <div class="controllerMappingGrid">
@@ -377,8 +377,8 @@
             </div>
             <div class="button controllerMappingButton" data-controller-action="pause" data-xy="[1,5]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
         </div>
-        <div class="button" id="controllerSettingReset" data-xy="[1,6]">選択中の配置を初期化</div>
-        <div class="back button" data-xy="[0,6]">戻る</div>
+        <div class="button" id="controllerSettingReset" data-xy="[0,6]">選択中の配置を初期化</div>
+        <div class="back button" data-xy="[0,7]">戻る</div>
     </div>
 
     <div class="page" id="controllerBindingSetting" data-layer="1">
@@ -424,7 +424,6 @@
                 <div class="button" data-player-index="3" data-controller-slot="3" data-xy="[3,3]">編集3</div>
             </div>
         </div>
-        <div class="button" id="playerControllerSettingConfirm" data-xy="[1,4]">この配置で進む</div>
         <div class="back button" data-xy="[0,4]">戻る</div>
     </div>
 

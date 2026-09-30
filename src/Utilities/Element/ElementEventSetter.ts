@@ -30,7 +30,8 @@ export class ElementEventSetter extends SceneSetter {
         document.querySelectorAll<HTMLElement>(".subPageNext").forEach((next) => {
             next.addEventListener("click", () => this.elementManager.openSubPageRelatively(1));
         });
-        document.querySelectorAll<HTMLElement>(".page:has(.subPage)").forEach((page) => {
+        // subPageが後から生成されるページもあるため、全ページに初期化処理を登録する。
+        document.querySelectorAll<HTMLElement>(".page").forEach((page) => {
             this.scene.g$pageManager.addHandler(`changePage-${page.id}`, () => {
                 this.elementManager.initializeSubPage();
             });

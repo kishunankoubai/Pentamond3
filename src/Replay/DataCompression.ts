@@ -62,11 +62,15 @@ export async function replayDataDecryption(encryptedData: string): Promise<Repla
             return playerInputData.match(/[0-4]+[^0-4]*|[^0-4]+/g) ?? [];
         })
         .map((playerInputData: string[]) => {
-            return playerInputData.map((_, i) => ({
-                time: sum(playerInputData.filter((_, j) => j <= i).map((filteredInputNumber) => Number.parseInt(filteredInputNumber.slice(0, -1), 5))),
-                keyCode: keyCodes[Number.parseInt(playerInputData[i].slice(-1), 36) - 5],
-                type: "downup",
-            }));
+            let elapsedTime = 0;
+            return playerInputData.map((encodedInput) => {
+                elapsedTime += Number.parseInt(encodedInput.slice(0, -1), 5);
+                return {
+                    time: elapsedTime,
+                    keyCode: keyCodes[Number.parseInt(encodedInput.slice(-1), 36) - 5],
+                    type: "downup",
+                };
+            });
         });
     if (version2) {
         return {
