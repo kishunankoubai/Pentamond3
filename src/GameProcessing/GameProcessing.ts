@@ -184,6 +184,7 @@ export class GameProcessing {
         await sceneManager.change(SceneResult);
         inputManager.removeVirtualInputs();
 
+        ResultPageHandler.updateResultLabels(this.currentGame!.game.g$resultText);
         Replay.addTempData(this.currentGame!);
         ResultPageHandler.setSaveButton();
         ResultPageHandler.updateDetailedResultPage(this.currentGame!);
@@ -196,6 +197,7 @@ export class GameProcessing {
         sceneManager.g$currentPageManager?.openPage("replayResult");
         inputManager.removeVirtualInputs();
 
+        ResultPageHandler.updateResultLabels(this.currentGame!.game.g$resultText);
         ResultPageHandler.OverWriteTime(this.currentGame!.replayData!.finishTime);
         ResultPageHandler.updateDetailedResultPage(this.currentGame!);
     }

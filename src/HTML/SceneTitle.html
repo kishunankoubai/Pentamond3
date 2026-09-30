@@ -129,8 +129,9 @@
 
     <div class="page" id="playPrepare">
         <div class="label headingLabel">プレイ準備</div>
-        <div class="options">
+        <div class="options" data-direction="row">
             <div class="playStart button" data-xy="[0,0]">スタート!</div>
+            <div class="button" id="playPrepareControllerButton" data-xy="[1,0]">コントローラー</div>
         </div>
         <div class="back button" data-xy="[0,1]">戻る</div>
     </div>
@@ -347,6 +348,84 @@
             </div>
         </div>
         <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="controllerSetting">
+        <div class="label headingLabel">コントローラー設定</div>
+        <div class="controllerPresetRow">
+            <div class="button" data-controller-slot="0" data-xy="[0,0]">初期配置</div>
+            <div class="button" data-controller-slot="1" data-xy="[1,0]">編集用1</div>
+            <div class="button" data-controller-slot="2" data-xy="[2,0]">編集用2</div>
+            <div class="button" data-controller-slot="3" data-xy="[3,0]">編集用3</div>
+        </div>
+        <div class="text" id="controllerSettingStatus">使用する配置を選択してください。</div>
+        <div class="controllerMappingGrid">
+            <div class="button controllerMappingButton" data-controller-action="moveLeft" data-xy="[0,1]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
+            <div class="button controllerMappingButton" data-controller-action="moveRight" data-xy="[1,1]">
+                <span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span>
+            </div>
+            <div class="button controllerMappingButton" data-controller-action="moveDown" data-xy="[0,2]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
+            <div class="button controllerMappingButton" data-controller-action="put" data-xy="[1,2]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
+            <div class="button controllerMappingButton" data-controller-action="spinLeft" data-xy="[0,3]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
+            <div class="button controllerMappingButton" data-controller-action="spinRight" data-xy="[1,3]">
+                <span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span>
+            </div>
+            <div class="button controllerMappingButton" data-controller-action="unput" data-xy="[0,4]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
+            <div class="button controllerMappingButton" data-controller-action="hold" data-xy="[1,4]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
+            <div class="button controllerMappingButton" data-controller-action="removeLine" data-xy="[0,5]">
+                <span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span>
+            </div>
+            <div class="button controllerMappingButton" data-controller-action="pause" data-xy="[1,5]"><span class="controllerMappingLabel"></span><span class="controllerMappingValue"></span></div>
+        </div>
+        <div class="button" id="controllerSettingReset" data-xy="[1,6]">選択中の配置を初期化</div>
+        <div class="back button" data-xy="[0,6]">戻る</div>
+    </div>
+
+    <div class="page" id="controllerBindingSetting" data-layer="1">
+        <div class="popup controllerBindingPopup">
+            <div class="label headingLabel" id="controllerBindingTitle">割り当て編集</div>
+            <div class="text" id="controllerBindingStatus">現在の割り当てを削除するか、新しい入力を追加できます。</div>
+            <div class="options" id="controllerBindingList"></div>
+            <div class="button" id="controllerBindingAdd" data-xy="[0,0]">入力を追加</div>
+            <div class="back button" data-xy="[0,1]">戻る</div>
+        </div>
+    </div>
+
+    <div class="page" id="playerControllerSetting">
+        <div class="label headingLabel">プレイヤー別配置</div>
+        <div class="text">今回使用する配置をプレイヤーごとに選択してください。</div>
+        <div class="playerControllerRows">
+            <div class="playerControllerRow" data-player-index="0">
+                <div class="label">P1</div>
+                <div class="button" data-player-index="0" data-controller-slot="0" data-xy="[0,0]">初期</div>
+                <div class="button" data-player-index="0" data-controller-slot="1" data-xy="[1,0]">編集1</div>
+                <div class="button" data-player-index="0" data-controller-slot="2" data-xy="[2,0]">編集2</div>
+                <div class="button" data-player-index="0" data-controller-slot="3" data-xy="[3,0]">編集3</div>
+            </div>
+            <div class="playerControllerRow" data-player-index="1">
+                <div class="label">P2</div>
+                <div class="button" data-player-index="1" data-controller-slot="0" data-xy="[0,1]">初期</div>
+                <div class="button" data-player-index="1" data-controller-slot="1" data-xy="[1,1]">編集1</div>
+                <div class="button" data-player-index="1" data-controller-slot="2" data-xy="[2,1]">編集2</div>
+                <div class="button" data-player-index="1" data-controller-slot="3" data-xy="[3,1]">編集3</div>
+            </div>
+            <div class="playerControllerRow" data-player-index="2">
+                <div class="label">P3</div>
+                <div class="button" data-player-index="2" data-controller-slot="0" data-xy="[0,2]">初期</div>
+                <div class="button" data-player-index="2" data-controller-slot="1" data-xy="[1,2]">編集1</div>
+                <div class="button" data-player-index="2" data-controller-slot="2" data-xy="[2,2]">編集2</div>
+                <div class="button" data-player-index="2" data-controller-slot="3" data-xy="[3,2]">編集3</div>
+            </div>
+            <div class="playerControllerRow" data-player-index="3">
+                <div class="label">P4</div>
+                <div class="button" data-player-index="3" data-controller-slot="0" data-xy="[0,3]">初期</div>
+                <div class="button" data-player-index="3" data-controller-slot="1" data-xy="[1,3]">編集1</div>
+                <div class="button" data-player-index="3" data-controller-slot="2" data-xy="[2,3]">編集2</div>
+                <div class="button" data-player-index="3" data-controller-slot="3" data-xy="[3,3]">編集3</div>
+            </div>
+        </div>
+        <div class="button" id="playerControllerSettingConfirm" data-xy="[1,4]">この配置で進む</div>
+        <div class="back button" data-xy="[0,4]">戻る</div>
     </div>
 
     <div class="page" id="musicSetting">

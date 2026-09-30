@@ -1,5 +1,6 @@
 import { qs, sleep, qsAddEvent } from "./Utils";
 import { sceneManager } from "./Utilities/SceneManager";
+import { ControllerSettingManager } from "./ControllerSettingManager";
 
 export class DeleteDataHandler {
     static setEvents() {
@@ -36,6 +37,7 @@ export class DeleteDataHandler {
             localStorage.getItem("Pentamond3-volumeSetting") ?? "",
             localStorage.getItem("Pentamond3-soloBGM") ?? "",
             localStorage.getItem("contemporary") ?? "",
+            localStorage.getItem(ControllerSettingManager.storageKey) ?? "",
             //
         ]).size;
     }
@@ -46,5 +48,6 @@ export class DeleteDataHandler {
         localStorage.removeItem("Pentamond3-volumeSetting");
         localStorage.removeItem("Pentamond3-soloBGM");
         localStorage.removeItem("contemporary");
+        ControllerSettingManager.reset();
     }
 }

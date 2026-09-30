@@ -6,6 +6,8 @@ import { debug } from "../Run";
 import { PlaySettingSetter } from "./PlaySettingSetter";
 import { sceneManager } from "../Utilities/SceneManager";
 import { MyEvent } from "../Utilities/MyEventListener";
+import { ControllerSettingManager } from "../ControllerSettingManager";
+import { PageManager } from "../Utilities/Page/PageManager";
 
 /**
  * コントローラーの登録をしたりする
@@ -54,6 +56,13 @@ export class ControllerRegisterer {
         qsAddEvent("#registerButton", "click", () => {
             this.onClickOk(currentPlayerNumber);
         });
+        qsAddEvent("#playPrepareControllerButton", "click", () => {
+            const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
+            pageManager.openPage(playerNumber === 1 ? "controllerSetting" : "playerControllerSetting");
+        });
+        qsAddEvent("#playerControllerSettingConfirm", "click", () => {
+            this.finishMultiControllerSelection(PlaySettingSetter.getPlaySetting().playerNumber);
+        });
     }
 
     static clearEvents() {
@@ -72,19 +81,37 @@ export class ControllerRegisterer {
             } else return;
         }
 
+        if (playerNumber > 1) {
+            ControllerSettingManager.startPlayerSelection(playerNumber);
+            this.gamepadConfigs = ControllerSettingManager.getPlayerConfigs(playerNumber);
+            await this.openPlayPrepare("multiStageSelect");
+            return;
+        }
+
+        await this.openPlayPrepare("soloStageSelect");
+    }
+
+    private static async finishMultiControllerSelection(playerNumber: number) {
+        this.gamepadConfigs = ControllerSettingManager.getPlayerConfigs(playerNumber);
+        const pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
+        const backDepth = PageManager.getBackIndex("playPrepare");
+        if (backDepth > 0) await pageManager.backPage(backDepth);
+    }
+
+    private static async openPlayPrepare(returnPageId: string) {
+        const pageManager = sceneManager.g$currentPageManager;
+        if (!pageManager) return;
+
+        const backDepth = PageManager.getBackIndex(returnPageId);
+        if (backDepth <= 0) return;
+
         inputManager.stop();
 
         this.enablePlayerRegisterButtons(false);
-
-        // 何のため?
-        // await sleep(500);
-
-        const backDepth = playerNumber == 1 ? 1 : 2;
-        pageManager.backPage(backDepth, true);
+        await pageManager.backPage(backDepth, true);
         pageManager.openPage("playPrepare");
-
         this.enablePlayerRegisterButtons(true);
-
         inputManager.start();
     }
 
@@ -132,6 +159,6 @@ export class ControllerRegisterer {
 
         registerText.innerText = `登録したい入力機器のボタンを押してください：あと${playerNumber - inputManager.g$registeredInputNumber}人`;
 
-        this.gamepadConfigs.push(Setting.gamepadConfigPresets[0]);
+        this.gamepadConfigs.push(playerNumber === 1 ? ControllerSettingManager.getSelectedConfig() : structuredClone(Setting.gamepadConfigPresets[0]));
     }
 }

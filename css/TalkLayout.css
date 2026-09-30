@@ -1,4 +1,4 @@
-[data-speaker="モチャ"] {
+/* [data-speaker="モチャ"] {
     background-color: #6b6 !important;
     border-color: #aea !important;
 }
@@ -7,7 +7,7 @@
     &#namePanel {
         display: none !important;
     }
-}
+} */
 
 #namePanel,
 #talkPanel,

@@ -13,6 +13,7 @@ export class AutoInputObserver extends InputObserver {
     private readonly loop = new LoopManager();
     private inputData: AutoInputData[] = [];
     private pendingInputData: AutoInputData[] = [];
+    private inputGate: () => boolean = () => true;
 
     constructor(inputData: AutoInputData[] = []) {
         super();
@@ -54,8 +55,14 @@ export class AutoInputObserver extends InputObserver {
         this.loop.s$speedMagnification = speed;
     }
 
+    setInputGate(inputGate: () => boolean): void {
+        this.inputGate = inputGate;
+    }
+
     private processInput(): void {
         while (this.pendingInputData.length && this.pendingInputData[0].time <= this.loop.g$elapsedTime) {
+            // ダメージ硬直などで操作不能なら、入力を捨てずに次フレームまで待つ。
+            if (!this.inputGate()) return;
             const input = this.pendingInputData.shift()!;
             if (input.type === "keydown" || input.type === "downup") this.onValidInput(input.keyCode);
             if (input.type === "keyup" || input.type === "downup") this.onInvalidInput(input.keyCode);

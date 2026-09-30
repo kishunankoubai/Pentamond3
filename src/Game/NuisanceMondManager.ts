@@ -42,8 +42,6 @@ export class NuisanceMondManager extends MyEventListener {
         super();
         this.blockManager = blockManager;
         this.random = new SeededRandom(seed);
-        // タブ復帰や重い描画後にダメージ処理を1フレームで大量消化しない。
-        this.loop.s$onTime = false;
         gameEvents.push(
             this.loop.addHandler("loop", () => {
                 this.damageProcess();

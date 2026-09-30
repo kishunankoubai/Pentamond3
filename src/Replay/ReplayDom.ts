@@ -23,8 +23,12 @@ export class ReplayDom {
             deleteButtons.push(deleteButton);
         }
 
-        container.querySelectorAll("button").forEach((button) => {
-            ElementManager.scrollToCenter(button);
+        container.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
+            button.tabIndex = 0;
+            button.addEventListener("mouseover", () => button.focus());
+            button.addEventListener("mouseleave", () => {
+                if (document.activeElement === button) button.blur();
+            });
         });
 
         //座標の割り振り

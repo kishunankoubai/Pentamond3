@@ -14,6 +14,7 @@ export abstract class GameMode extends MyEventListener {
         hasFinished: false,
     };
     protected winners: GamePlayer[] = [];
+    protected resultText = "";
     operateMemories: OperateData[][];
     constructor(players: GamePlayer[]) {
         super();
@@ -38,6 +39,9 @@ export abstract class GameMode extends MyEventListener {
     }
     get g$isPlaying() {
         return this.players.some((player) => !player.loop.g$isStopping);
+    }
+    get g$resultText() {
+        return this.resultText;
     }
 
     abstract start(): void;

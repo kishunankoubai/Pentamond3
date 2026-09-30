@@ -1,7 +1,7 @@
 import { gameEvents, GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
 import * as Setting from "../../Settings";
-import { qsAll, removeMousePointerTemporary } from "../../Utils";
+import { removeMousePointerTemporary } from "../../Utils";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { ControllerRegisterer } from "../../BeforePlaying/ControllerRegisterer";
@@ -88,15 +88,13 @@ export class Mode1 extends GameMode {
                 });
                 p.playInfo.playTime = p.loop.g$elapsedTime;
             });
-            qsAll(".resultLabel").forEach((resultLabel) => {
-                if (this.winners.length < this.players.length) {
-                    resultLabel.innerHTML = `Player ${this.winners.map((player) => this.players.indexOf(player) + 1).toString()} won!`;
-                } else if (1 < this.players.length) {
-                    resultLabel.innerHTML = `Draw`;
-                } else {
-                    resultLabel.innerHTML = `Score : ${this.winners[0].playInfo.score}`;
-                }
-            });
+            if (this.winners.length < this.players.length) {
+                this.resultText = `Player ${this.winners.map((player) => this.players.indexOf(player) + 1).toString()} won!`;
+            } else if (1 < this.players.length) {
+                this.resultText = "Draw";
+            } else {
+                this.resultText = `Score : ${this.winners[0].playInfo.score}`;
+            }
 
             this.executeEvent("gameFinish");
         }
@@ -279,7 +277,7 @@ export class Mode1 extends GameMode {
                 }
                 p.playInfo.lastTrick = p.operator.g$lastTrick;
                 p.playInfo.remove += 1;
-                MusicManager.get(`消去音${removeSoundIndex}`)?.play();
+                if (lastTrick) MusicManager.get(`消去音${removeSoundIndex}`)?.play();
             })
         );
     }

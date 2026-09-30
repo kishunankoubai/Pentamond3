@@ -15,6 +15,7 @@ import { Music } from "../Utilities/Music/Music";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { Scene, sceneManager } from "../Utilities/SceneManager";
 import { ScenePlay } from "./ScenePlay";
+import { ControllerSettingManager } from "../ControllerSettingManager";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
@@ -43,6 +44,7 @@ export class SceneTitle extends Scene {
         // BeforePlaying
         PlaySettingSetter.setEvents();
         ControllerRegisterer.setEvents();
+        ControllerSettingManager.setup();
 
         // データ消去イベントの設定
         DeleteDataHandler.setEvents();
@@ -57,6 +59,7 @@ export class SceneTitle extends Scene {
 
     protected close(): void {
         ControllerRegisterer.clearEvents();
+        ControllerSettingManager.close();
         this.pageInteraction.stop();
     }
 

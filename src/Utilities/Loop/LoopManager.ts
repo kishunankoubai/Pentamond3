@@ -62,20 +62,19 @@ export class LoopManager extends TimeManager {
             this.executeEvent("latestFrameLoop", this);
             if (this.loopAnimationFrame !== executingFrame) return;
         } else if (goalCount > this.loopCount) {
-            //onTimeがtrueなら遅れている場合追いつこうとする
-            const maxCount = Math.round(((this.loopFrequency * 60) / 1000) * (this.onTime ? 4 : 1));
-            if (goalCount - this.loopCount > maxCount) {
-                this.lastElapsedTime -= Math.ceil((goalCount - this.loopCount - 1) * this.loopFrequency);
-                // console.log(`1frameあたりのループ回数が多すぎます：${goalCount - this.loopCount}`);
+            const remainingCount = goalCount - this.loopCount;
+            // 正確な時系列が必要なループではステップを捨てず、負荷だけを1フレーム64回に制限する。
+            // 描画などonTime=falseのループは、遅延分を破棄して現在時刻へ追いつく。
+            const normalFrameCount = Math.max(1, Math.ceil(1000 / 60 / this.loopFrequency));
+            const executeCount = this.onTime ? Math.min(remainingCount, 64) : Math.min(remainingCount, normalFrameCount);
+            if (!this.onTime && remainingCount > executeCount) {
+                this.lastElapsedTime -= Math.ceil((remainingCount - executeCount) * this.loopFrequency);
+            }
+
+            for (let i = 0; i < executeCount; i++) {
                 this.executeEvent("loop", this);
                 if (this.loopAnimationFrame !== executingFrame) return;
                 this.loopCount++;
-            } else {
-                while (goalCount > this.loopCount) {
-                    this.executeEvent("loop", this);
-                    if (this.loopAnimationFrame !== executingFrame) return;
-                    this.loopCount++;
-                }
             }
             this.executeEvent("latestFrameLoop", this);
             if (this.loopAnimationFrame !== executingFrame) return;

@@ -48,6 +48,12 @@ export class ResultPageHandler {
         });
     }
 
+    static updateResultLabels(resultText: string) {
+        qsAll(".resultLabel").forEach((resultLabel) => {
+            resultLabel.textContent = resultText;
+        });
+    }
+
     //詳細結果の中身を作成する
     static updateDetailedResultPage({ players, playSetting }: { players: GamePlayer[]; playSetting: PlaySetting }) {
         // 前の結果を消す

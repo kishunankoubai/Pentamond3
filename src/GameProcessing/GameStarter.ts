@@ -5,6 +5,8 @@ import { PlaySettingSetter } from "../BeforePlaying/PlaySettingSetter";
 import { sceneManager } from "../Utilities/SceneManager";
 import { ScenePlay } from "../Scenes/ScenePlay";
 import { PageManager } from "../Utilities/Page/PageManager";
+import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
+import { ControllerSettingManager } from "../ControllerSettingManager";
 
 export class GameStartEventSetter {
     static normal() {
@@ -12,8 +14,12 @@ export class GameStartEventSetter {
         if (!pageManager) return;
         // 「スタート!」
         qsAddEvent(".playStart", "click", async () => {
+            const playSetting = PlaySettingSetter.getPlaySetting();
+            if (playSetting.playerNumber === 1) {
+                ControllerRegisterer.gamepadConfigs = [ControllerSettingManager.getSelectedConfig()];
+            }
             await sceneManager.change(ScenePlay, false);
-            await GameProcessing.startNormal(PlaySettingSetter.getPlaySetting());
+            await GameProcessing.startNormal(playSetting);
         });
 
         // ポーズ画面の「もう一度」・リザルト画面の「もう一度」

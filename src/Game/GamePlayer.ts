@@ -220,7 +220,6 @@ export class GamePlayer {
         this.operator = new MondOperator(seeds.next);
         this.label = new InformationLabelManager(playerCount);
         this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance);
-        this.loop.s$onTime = false;
         gameEvents.push(
             this.nuisanceMondManager.addHandler("finishDamage", () => {
                 this.state.damaging = false;
@@ -254,6 +253,9 @@ export class GamePlayer {
             this.operator.addHandler("spin-right", () => MusicManager.get("右回転音")?.play())
         );
         this.input = input;
+        if (this.input instanceof AutoInputObserver) {
+            this.input.setInputGate(() => this.operator.isOperable());
+        }
         this.playField.classList.add("playField");
         this.playField.appendChild(this.canvas.g$playCanvas);
         this.playField.appendChild(this.canvas.g$nextCanvas);

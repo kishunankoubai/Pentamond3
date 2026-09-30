@@ -12,6 +12,7 @@ type InteractionElement = {
 
 export class PageInteraction {
     private static lastOperateTime: number = Date.now();
+    static inputBlocked = false;
     static operateDebounce: number = 300;
     private static firstFocus: boolean = false;
     private scene: Scene;
@@ -41,7 +42,9 @@ export class PageInteraction {
     }
 
     private get g$validElements(): InteractionElement[] {
-        return this.interactionElements.filter(({ element }) => !element.classList.contains("closing"));
+        return this.interactionElements.filter(
+            ({ element }) => !element.classList.contains("closing") && element.getClientRects().length > 0 && (!(element instanceof HTMLButtonElement) || !element.disabled)
+        );
     }
 
     start() {
@@ -78,7 +81,7 @@ export class PageInteraction {
         }
 
         const handler = (item: [InputObserver, InputInfo]) => {
-            if (!this.isValid) return;
+            if (!this.isValid || PageInteraction.inputBlocked) return;
             if (Date.now() - PageInteraction.lastOperateTime <= PageInteraction.operateDebounce) return;
 
             const elements = this.g$validElements;
@@ -115,9 +118,10 @@ export class PageInteraction {
 
     private getInteractionElementRelatively(activeElement: InteractionElement, [dx, dy]: [number, number]) {
         const [nowX, nowY] = activeElement.coordinate;
+        const interactionElements = this.g$validElements;
 
         let focusElement = getMaxElements(
-            this.interactionElements.filter(({ coordinate: [x, y] }) => x == nowX + (dx ?? x - nowX) && y == nowY + (dy ?? y - nowY)),
+            interactionElements.filter(({ coordinate: [x, y] }) => x == nowX + (dx ?? x - nowX) && y == nowY + (dy ?? y - nowY)),
             ({ coordinate: [x, y] }) => -Math.hypot(x - nowX, y - nowY)
         );
 
@@ -128,8 +132,8 @@ export class PageInteraction {
         //     );
         // }
         if (!focusElement.length) {
-            if (!this.interactionElements.some(({ coordinate: [x, y] }) => (dx && x != nowX) || (dy && y != nowY)))
-                focusElement = [this.interactionElements.find(({ coordinate: [x, y] }) => x == nowX && y == nowY)!];
+            if (!interactionElements.some(({ coordinate: [x, y] }) => (dx && x != nowX) || (dy && y != nowY)))
+                focusElement = [interactionElements.find(({ coordinate: [x, y] }) => x == nowX && y == nowY)!];
         }
 
         // if (!focusElement.length) {
@@ -141,7 +145,7 @@ export class PageInteraction {
 
         if (!focusElement.length) {
             focusElement = getMaxElements(
-                this.interactionElements.filter(({ coordinate: [x, y] }) => {
+                interactionElements.filter(({ coordinate: [x, y] }) => {
                     return x != nowX || y != nowY;
                 }),
                 ({ coordinate: [x, y] }) => -(dx ? 0 : Math.min(Math.sign(dy ?? 0) * y, nowY - y)) - (dy ? 0 : Math.min(Math.sign(dx ?? 0) * x, nowX - x))

@@ -1,7 +1,7 @@
 import { gameEvents, GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
 import * as Setting from "../../Settings";
-import { qsAll, removeMousePointerTemporary } from "../../Utils";
+import { removeMousePointerTemporary } from "../../Utils";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { ControllerRegisterer } from "../../BeforePlaying/ControllerRegisterer";
@@ -57,15 +57,13 @@ export class Mode2 extends GameMode {
             });
             p.playInfo.playTime = p.loop.g$elapsedTime;
         });
-        qsAll(".resultLabel").forEach((resultLabel) => {
-            if (this.winners.length < this.players.length) {
-                resultLabel.innerHTML = `Player ${this.winners.map((player) => this.players.indexOf(player) + 1).toString()} won! : ${this.winners[0].g$playTimeString}`;
-            } else if (1 < this.players.length) {
-                resultLabel.innerHTML = `Draw : ${this.winners[0].g$playTimeString}`;
-            } else {
-                resultLabel.innerHTML = `Time : ${this.winners[0].g$playTimeString}`;
-            }
-        });
+        if (this.winners.length < this.players.length) {
+            this.resultText = `Player ${this.winners.map((player) => this.players.indexOf(player) + 1).toString()} won! : ${this.winners[0].g$playTimeString}`;
+        } else if (1 < this.players.length) {
+            this.resultText = `Draw : ${this.winners[0].g$playTimeString}`;
+        } else {
+            this.resultText = `Time : ${this.winners[0].g$playTimeString}`;
+        }
         this.executeEvent("gameFinish");
     }
 
@@ -190,7 +188,7 @@ export class Mode2 extends GameMode {
                 }
                 p.playInfo.lastTrick = p.operator.g$lastTrick;
                 p.playInfo.remove += 1;
-                MusicManager.get(`消去音${removeSoundIndex}`)?.play();
+                if (lastTrick) MusicManager.get(`消去音${removeSoundIndex}`)?.play();
 
                 if (p.playInfo.line >= 15) {
                     p.finish();

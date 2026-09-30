@@ -184,6 +184,15 @@
     }
 }
 
+#playPrepare {
+    & .options {
+        gap: 8vh;
+        & .playStart {
+            color: #d76;
+        }
+    }
+}
+
 #startEffect {
     background-color: #00000000;
     & #startEffectBase {
@@ -216,12 +225,20 @@
         font-size: 10vh;
         font-family: "RocknRoll One", Arial;
     }
+    & .options:nth-child(3) {
+        gap: 8vh;
+        margin-bottom: 8vh;
+    }
 }
 #replayResult {
     & .resultLabel {
         color: #ee8888;
         font-size: 10vh;
         font-family: "RocknRoll One", Arial;
+    }
+    & .options:nth-child(3) {
+        gap: 8vh;
+        margin-right: -2vh;
     }
 }
 
@@ -238,10 +255,16 @@
 
 #pause {
     background-color: #dddddddd;
+    & .container {
+        gap: 8vh;
+    }
 }
 
 #replayPause {
     background-color: #dddddddd;
+    & .options {
+        gap: 8vh;
+    }
 }
 
 #replayControls {
@@ -253,8 +276,8 @@
     align-items: center;
     gap: 2vh;
     padding: 1vh 2vh;
-    border: 0.4vh solid #2898;
-    border-radius: 2vh;
+    border: 0.8vh solid #2898;
+    border-radius: 1vh;
     background-color: #eefc;
     pointer-events: none;
 
@@ -559,6 +582,174 @@
     }
 }
 
+#controllerSetting {
+    justify-content: flex-start;
+    padding-top: 14vh;
+    box-sizing: border-box;
+
+    & .controllerPresetRow {
+        display: flex;
+        gap: 3vh;
+
+        & .button {
+            margin-left: 0;
+            font-size: 3.2vh;
+        }
+
+        & .selectedValue {
+            color: #ee8888;
+            border-bottom-color: #ee8888;
+        }
+    }
+
+    & #controllerSettingStatus {
+        margin: 1.5vh 0;
+        min-height: 4vh;
+        font-size: 4vh;
+        /* color: #567; */
+        color: #6bd;
+    }
+
+    & .controllerMappingGrid {
+        display: grid;
+        grid-template-columns: repeat(2, 70vh);
+        gap: 1.2vh 4vh;
+
+        & .controllerMappingButton {
+            margin-left: 0;
+            height: 7vh;
+            display: grid;
+            grid-template-columns: 14vh 1fr;
+            align-items: center;
+            border: 0.35vh solid #6bd8;
+            border-radius: 1.2vh;
+            background-color: #eefb;
+
+            &::before {
+                display: none;
+            }
+
+            &:focus {
+                background-color: #ff90be88;
+            }
+
+            & span {
+                font-size: 2.8vh;
+            }
+
+            & .controllerMappingLabel {
+                color: #567;
+                text-align: left;
+                padding-left: 1.5vh;
+            }
+
+            & .controllerMappingValue {
+                color: #d76;
+                text-align: right;
+                padding-right: 1.5vh;
+            }
+
+            &.waitingInput {
+                border-color: #ff90be;
+                background-color: #fff0f6;
+            }
+
+            &.readOnlyMapping {
+                opacity: 0.75;
+            }
+        }
+    }
+
+    & #controllerSettingReset {
+        margin: 1.5vh 0 0;
+        font-size: 4vh;
+        background: none;
+        border-color: #22222200;
+        &:focus {
+            border-color: #ff90be;
+        }
+
+        &:disabled {
+            pointer-events: none;
+            opacity: 0.35;
+        }
+    }
+}
+
+#controllerBindingSetting {
+    & .controllerBindingPopup {
+        & #controllerBindingStatus {
+            font-size: 4vh;
+        }
+
+        & #controllerBindingList {
+            max-height: 42vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable;
+            gap: 0.5vh;
+
+            & .controllerBindingDelete {
+                margin-left: 0;
+                font-size: 4vh;
+            }
+
+            & .controllerBindingEmpty {
+                font-size: 4vh;
+                color: #888;
+            }
+        }
+
+        & #controllerBindingAdd {
+            margin-left: 0;
+            font-size: 4vh;
+
+            &.waitingInput {
+                color: #ff90be;
+            }
+        }
+    }
+}
+
+#playerControllerSetting {
+    & > .text {
+        margin-bottom: 3vh;
+        font-size: 3.2vh;
+    }
+
+    & .playerControllerRows {
+        display: flex;
+        flex-direction: column;
+        gap: 2vh;
+
+        & .playerControllerRow {
+            display: flex;
+            gap: 2vh;
+
+            & .label {
+                width: 8vh;
+                font-size: 3.5vh;
+                color: #567;
+            }
+
+            & .button {
+                margin-left: 0;
+                font-size: 3.2vh;
+
+                &.selectedValue {
+                    color: #ee8888;
+                    border-bottom-color: #ee8888;
+                }
+            }
+        }
+    }
+
+    & #playerControllerSettingConfirm {
+        margin: 4vh 0 0;
+        font-size: 4vh;
+    }
+}
+
 #graphicSetting {
     align-items: end;
     & .options {
@@ -566,6 +757,7 @@
             font-size: 4vh;
             color: #888;
             transition: color 100ms ease-in-out;
+            margin-left: 2vh;
         }
         margin-right: 45vh;
     }

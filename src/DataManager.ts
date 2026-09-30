@@ -3,6 +3,7 @@ import { SceneTitle } from "./Scenes/SceneTitle";
 import { DataCompressor } from "./Utilities/DataCompressor";
 import { PageManager } from "./Utilities/Page/PageManager";
 import { sceneManager } from "./Utilities/SceneManager";
+import { ControllerSettingManager } from "./ControllerSettingManager";
 
 export class DataManager {
     private static key = [11, 11];
@@ -24,12 +25,15 @@ export class DataManager {
     static read() {
         if (globalValues.nosave) return;
 
+        ControllerSettingManager.read();
+
         const compressedData = localStorage.getItem(DataManager.saveName);
-        if (!compressedData) return;
-        const data = DataCompressor.decompressArray(compressedData, this.key);
-        if (data.length >= 2 && data.every((value) => Number.isInteger(value) && value >= 0 && value <= 10)) {
-            globalValues.bgmVolume = data[0];
-            globalValues.seVolume = data[1];
+        if (compressedData) {
+            const data = DataCompressor.decompressArray(compressedData, this.key);
+            if (data.length >= 2 && data.every((value) => Number.isInteger(value) && value >= 0 && value <= 10)) {
+                globalValues.bgmVolume = data[0];
+                globalValues.seVolume = data[1];
+            }
         }
         const soloBGM = localStorage.getItem(DataManager.soloBGMKey);
         if (soloBGM && this.availableBGMs.has(soloBGM)) globalValues.soloBGM = soloBGM;
@@ -44,6 +48,7 @@ export class DataManager {
     static delete() {
         localStorage.removeItem(DataManager.saveName);
         localStorage.removeItem(DataManager.soloBGMKey);
+        ControllerSettingManager.reset();
         globalValues.bgmVolume = 10;
         globalValues.seVolume = 10;
         globalValues.soloBGM = "ならべてトライアングル";
