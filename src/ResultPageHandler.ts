@@ -78,7 +78,8 @@ export class ResultPageHandler {
                 <div class="text">
                     Player人数 : ${players.length}<br />
                     モード : ${playSetting.mode == 1 ? "サバイバル" : "十五列揃え"}<br />
-                    ${players.length != 1 ? `勝者 : ${qs(".resultLabel").innerHTML}<br />` : ""}
+                    ${playSetting.mode == 1 ? `持ち時間 : ${this.formatValue(playSetting.maxGameTime)}<br />` : `クリア列数 : ${playSetting.targetLines}<br />`}
+                    ${players.length != 1 ? `結果 : ${qs(".resultLabel").innerHTML}<br />` : ""}
                 </div>
             </div>    
         `;
@@ -91,8 +92,8 @@ export class ResultPageHandler {
             <div class="subPage">
                 <div class="text">
                     Player : ${i + 1}<br />
-                    ${[1].includes(playSetting.mode) ? `開始Time : ${p.playInfo.maxGameTime}<br />` : ""}
-                    ${[1].includes(playSetting.mode) ? `残りTime : ${p.playInfo.gameTime}<br />` : ""}
+                    ${playSetting.mode === 1 ? `開始Time : ${this.formatValue(p.playInfo.maxGameTime)}<br />` : ""}
+                    ${playSetting.mode === 1 ? `残りTime : ${this.formatValue(p.playInfo.gameTime)}<br />` : ""}
                     プレイ時間 : ${(p.playInfo.playTime / 1000).toFixed(2)}<br />
                     役の回数 : ${p.playInfo.trickCount}<br />
                     一列揃え : ${p.playInfo.line}<br />
@@ -100,22 +101,30 @@ export class ResultPageHandler {
                     Score : ${p.playInfo.score}<br />
                 </div>
                 <div class="text">
-                    ペナルティ : ${p.playInfo.penalty}<br />
-                    回復 : ${p.playInfo.recovery}<br />
-                    余剰回復 : ${p.playInfo.surplus}<br />
+                    ${playSetting.mode === 1 ? `ペナルティ : ${p.playInfo.penalty}<br />` : ""}
+                    ${playSetting.mode === 1 ? `回復 : ${p.playInfo.recovery}<br />` : ""}
+                    ${playSetting.mode === 1 ? `余剰回復 : ${p.playInfo.surplus}<br />` : ""}
                     設置 : ${p.playInfo.put}<br />
                     ホールド : ${p.playInfo.hold}<br />
                     一手戻し : ${p.playInfo.unput}<br />
                     消去 : ${p.playInfo.remove}<br />
                 </div>
-                <div class="text">
-                    合計ダメージ : ${p.damageInfo.totalDamage}<br />
-                    合計攻撃 : ${p.damageInfo.totalAttack}<br />
-                    ハンデ : ×${p.playInfo.handy}<br />
-                </div>
+                ${
+                    playSetting.mode === 1
+                        ? `<div class="text">
+                            合計ダメージ : ${p.damageInfo.totalDamage}<br />
+                            合計攻撃 : ${p.damageInfo.totalAttack}<br />
+                            ハンデ : ×${p.playInfo.handy.toFixed(1)}<br />
+                        </div>`
+                        : ""
+                }
             </div>
         `;
 
         return this.parser.parseFromString(html, "text/html").body.firstElementChild!;
+    }
+
+    private static formatValue(value: number): string {
+        return value === Infinity ? "∞" : String(value);
     }
 }

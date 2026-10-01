@@ -20,14 +20,6 @@ function setupInputBehavior() {
         }
     });
 
-    qsAll("button").forEach((button) => {
-        button.tabIndex = -1;
-    });
-
-    qsAll("input").forEach((button) => {
-        button.tabIndex = -1;
-    });
-
     qsAll("div[data-xy]").forEach((button) => {
         button.tabIndex = 0;
     });

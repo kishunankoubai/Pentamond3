@@ -117,6 +117,8 @@ export class ControllerSettingManager {
         this.playerSlots = [];
         if (removeStorage) localStorage.removeItem(this.storageKey);
         this.cancelAssignment();
+        this.render();
+        this.renderPlayerSlots();
     }
 
     private static selectSlot(slot: number): void {

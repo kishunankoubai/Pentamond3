@@ -259,9 +259,10 @@ export class Mode1 extends GameMode {
                     }
                     p.playInfo.score += p.playInfo.chain * 100;
                     p.playInfo.score += (lastTrick.time + lastTrick.attack) * 50;
-                    p.damageInfo.attackTask += lastTrick.attack + Math.ceil(p.playInfo.chain / 5);
+                    const attack = lastTrick.attack + Math.ceil(p.playInfo.chain / 5);
+                    p.damageInfo.attackTask += Math.round(attack * p.playInfo.handy);
                     p.playInfo.maxChain = Math.max(p.playInfo.maxChain, p.playInfo.chain);
-                    p.playInfo.recovery += lastTrick.time;
+                    p.playInfo.recovery += Math.round(lastTrick.time * p.playInfo.handy);
                     p.playInfo.chain += 1;
                     p.playInfo.trickCount += 1;
                     if (GraphicSetting.removeShake) {

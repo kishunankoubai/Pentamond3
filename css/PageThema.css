@@ -90,7 +90,8 @@ body {
     }
 }
 
-.button {
+.button,
+.selector {
     color: #ffca3e;
     cursor: pointer;
     /* padding: 2vh; */

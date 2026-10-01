@@ -8,6 +8,7 @@ import { replayDataDecryption, replayDataEncryption } from "./DataCompression";
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
 
 export class ReplayDataHandler {
+    static readonly storageKey = "Pentamond3-replayData";
     static tempDataList: ReplayData[] = [];
 
     static addTempData(data: ReplayData, max: number) {
@@ -20,7 +21,7 @@ export class ReplayDataHandler {
     }
 
     static getDataSize() {
-        return new Blob([localStorage.getItem("Pentamond3-replayData") ?? "[]"]).size;
+        return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size;
     }
 
     static createReplayData({ players, game, playSetting, randomSeeds }: DisposableGame) {
@@ -69,11 +70,11 @@ export class ReplayDataHandler {
         const encodedList = await Promise.all(removedList.map((d) => replayDataEncryption(d)));
         const json = JSON.stringify(encodedList);
 
-        localStorage.setItem("Pentamond3-replayData", json);
+        localStorage.setItem(this.storageKey, json);
     }
 
     static async getReplayDataList(): Promise<ReplayData[]> {
-        const json = localStorage.getItem("Pentamond3-replayData");
+        const json = localStorage.getItem(this.storageKey);
         const encodedList: string[] = json ? JSON.parse(json) : [];
         const replayData = await Promise.all(encodedList.map((encodedData) => replayDataDecryption(encodedData)));
 
@@ -81,7 +82,7 @@ export class ReplayDataHandler {
     }
 
     static getDateList(): number[] {
-        const json = localStorage.getItem("Pentamond3-replayData");
+        const json = localStorage.getItem(this.storageKey);
         const encodedList: string[] = json ? JSON.parse(json) : [];
 
         return encodedList.map((str) => {
@@ -127,7 +128,7 @@ export class ReplayDataHandler {
         // });
 
         try {
-            localStorage.setItem("Pentamond3-replayData", JSON.stringify(encodedList));
+            localStorage.setItem(this.storageKey, JSON.stringify(encodedList));
         } catch (error) {
             onError();
             return false;

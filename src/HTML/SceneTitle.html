@@ -132,6 +132,7 @@
         <div class="options" data-direction="row">
             <div class="playStart button" data-xy="[0,0]">スタート!</div>
             <div class="button" id="playPrepareControllerButton" data-xy="[1,0]">コントローラー</div>
+            <div class="button" id="playPrepareSettingButton" data-xy="[2,0]">プレイ設定</div>
         </div>
         <div class="back button" data-xy="[0,1]">戻る</div>
     </div>
@@ -350,6 +351,89 @@
         <div class="back button" data-xy="[0,5]">戻る</div>
     </div>
 
+    <div class="page" id="gameSetting">
+        <div class="label headingLabel">プレイ設定</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="survivalPlaySetting" data-xy="[0,0]">サバイバル</div>
+                <div class="button" data-page="linePlaySetting" data-xy="[0,1]">十五列揃え</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div><div class="text">制限時間とプレイヤーごとのハンデを設定します。</div></div>
+                <div><div class="text">クリアに必要な一列揃えの回数を設定します。</div></div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page" id="survivalPlaySetting">
+        <div class="label headingLabel">サバイバル設定</div>
+        <div class="playSettingPanel">
+            <div class="playSettingSection">
+                <div class="label playSettingSectionTitle">持ち時間</div>
+                <div class="options maxTimeOptions" data-direction="row">
+                    <div class="button" data-max-time="30" data-xy="[0,0]">30</div>
+                    <div class="button selectedValue" data-max-time="150" data-xy="[1,0]">150</div>
+                    <div class="button" data-max-time="300" data-xy="[2,0]">300</div>
+                    <div class="button" data-max-time="1000" data-xy="[3,0]">1000</div>
+                    <div class="button" data-max-time="Infinity" data-xy="[4,0]">Infinity</div>
+                </div>
+            </div>
+            <div class="playSettingSection handySettingSection">
+                <div class="label playSettingSectionTitle">ハンデ</div>
+                <div class="handyRow" data-handy-row="0">
+                    <div class="label playerSettingLabel">P1</div>
+                    <div class="button" data-handy-player="0" data-handy-delta="-1" data-xy="[0,1]">－1.0</div>
+                    <div class="button" data-handy-player="0" data-handy-delta="-0.1" data-xy="[1,1]">－0.1</div>
+                    <div class="label handyValue">×1.0</div>
+                    <div class="button" data-handy-player="0" data-handy-delta="0.1" data-xy="[2,1]">＋0.1</div>
+                    <div class="button" data-handy-player="0" data-handy-delta="1" data-xy="[3,1]">＋1.0</div>
+                </div>
+                <div class="handyRow" data-handy-row="1">
+                    <div class="label playerSettingLabel">P2</div>
+                    <div class="button" data-handy-player="1" data-handy-delta="-1" data-xy="[0,2]">－1.0</div>
+                    <div class="button" data-handy-player="1" data-handy-delta="-0.1" data-xy="[1,2]">－0.1</div>
+                    <div class="label handyValue">×1.0</div>
+                    <div class="button" data-handy-player="1" data-handy-delta="0.1" data-xy="[2,2]">＋0.1</div>
+                    <div class="button" data-handy-player="1" data-handy-delta="1" data-xy="[3,2]">＋1.0</div>
+                </div>
+                <div class="handyRow" data-handy-row="2">
+                    <div class="label playerSettingLabel">P3</div>
+                    <div class="button" data-handy-player="2" data-handy-delta="-1" data-xy="[0,3]">－1.0</div>
+                    <div class="button" data-handy-player="2" data-handy-delta="-0.1" data-xy="[1,3]">－0.1</div>
+                    <div class="label handyValue">×1.0</div>
+                    <div class="button" data-handy-player="2" data-handy-delta="0.1" data-xy="[2,3]">＋0.1</div>
+                    <div class="button" data-handy-player="2" data-handy-delta="1" data-xy="[3,3]">＋1.0</div>
+                </div>
+                <div class="handyRow" data-handy-row="3">
+                    <div class="label playerSettingLabel">P4</div>
+                    <div class="button" data-handy-player="3" data-handy-delta="-1" data-xy="[0,4]">－1.0</div>
+                    <div class="button" data-handy-player="3" data-handy-delta="-0.1" data-xy="[1,4]">－0.1</div>
+                    <div class="label handyValue">×1.0</div>
+                    <div class="button" data-handy-player="3" data-handy-delta="0.1" data-xy="[2,4]">＋0.1</div>
+                    <div class="button" data-handy-player="3" data-handy-delta="1" data-xy="[3,4]">＋1.0</div>
+                </div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="linePlaySetting">
+        <div class="label headingLabel">十五列揃え設定</div>
+        <div class="playSettingPanel lineTargetSetting">
+            <div class="label playSettingSectionTitle">クリアまでの列数</div>
+            <div class="options" data-direction="row">
+                <div class="button" data-target-lines-delta="-10" data-xy="[0,0]">－10</div>
+                <div class="button" data-target-lines-delta="-1" data-xy="[1,0]">－1</div>
+                <div class="label settingValue" id="targetLinesValue">15列</div>
+                <div class="button" data-target-lines-delta="1" data-xy="[2,0]">＋1</div>
+                <div class="button" data-target-lines-delta="10" data-xy="[3,0]">＋10</div>
+            </div>
+            <div class="text">1～30列の範囲で設定できます。</div>
+        </div>
+        <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
     <div class="page" id="controllerSetting">
         <div class="label headingLabel">コントローラー設定</div>
         <div class="controllerPresetRow">
@@ -491,6 +575,35 @@
         <div class="back button" data-xy="[0,5]">戻る</div>
     </div>
 
+    <div class="page" id="soundTest">
+        <div class="label headingLabel">サウンドテスト</div>
+        <div class="soundTestPanel">
+            <div class="text" id="soundTestStatus" aria-live="polite"></div>
+            <div class="options soundTestTrackSelection" data-direction="row">
+                <div class="label">曲選択：</div>
+                <div class="selector" data-page="soundTestSelector" data-xy="[0,0]"></div>
+            </div>
+            <div class="options soundTestControls" data-direction="row">
+                <div class="button" id="soundTestPlayback" data-xy="[0,1]">一時停止</div>
+                <div class="button" id="soundTestLoop" data-xy="[1,1]">ループ：ON</div>
+                <div class="button" id="soundTestShuffle" data-xy="[2,1]">シャッフル：OFF</div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page" id="soundTestSelector">
+        <div class="label headingLabel">曲を選択してください</div>
+        <div class="scrollableContainer">
+            <div class="selectedValue button" data-sound-track="つみきのおしろ" data-xy="[0,0]">つみきのおしろ</div>
+            <div class="button" data-sound-track="ならべてトライアングル" data-xy="[0,1]">ならべてトライアングル</div>
+            <div class="button" data-sound-track="おかたづけ" data-xy="[0,2]">おかたづけ</div>
+            <div class="button" data-sound-track="さよならさんかく" data-xy="[0,3]">さよならさんかく</div>
+            <div class="button" data-sound-track="Top of the Pyramid" data-xy="[0,4]">Top of the Pyramid</div>
+        </div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
     <div class="page" id="graphicSetting">
         <div class="label headingLabel">グラフィック設定</div>
         <div class="options" data-direction="row">
@@ -513,20 +626,27 @@
 
     <div class="page" id="dataSetting">
         <div class="label headingLabel">データ管理</div>
-        <div class="label" id="dataInformation"></div>
-        <div class="options" data-direction="row">
-            <div class="button" data-page="allDataDeleteAlert" data-xy="[0,0]">全データを削除する</div>
+        <div id="dataInformation">
+            <div class="label">全データ：<span id="totalDataSize">0</span> B</div>
+            <div class="label">設定関連：<span id="settingDataSize">0</span> B</div>
+            <div class="label">リプレイ関連：<span id="replayDataSize">0</span> B</div>
         </div>
-        <div class="back button" data-xy="[0,1]">戻る</div>
+        <div class="options">
+            <div class="button" data-delete-group="settings" data-xy="[0,0]">設定データを削除する</div>
+            <div class="button" data-delete-group="replays" data-xy="[0,1]">リプレイデータを削除する</div>
+            <div class="button" data-delete-group="all" data-xy="[0,2]">全データを削除する</div>
+        </div>
+        <div class="text" id="dataDeleteStatus" aria-live="polite"></div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
     </div>
 
     <div class="page" id="allDataDeleteAlert" data-layer="1">
         <div class="popup">
             <div class="label headingLabel">削除確認</div>
-            <div class="text">全てのデータを削除します。<br /></div>
+            <div class="text" id="dataDeleteDescription"></div>
             <div class="back button" data-xy="[0,1]">戻る</div>
             <div class="options">
-                <div class="button" data-xy="[1,0]" id="allDataDeleteConfirmButton">OK！</div>
+                <div class="button" data-xy="[1,0]" id="allDataDeleteConfirmButton" role="button" aria-disabled="true">削除する</div>
             </div>
         </div>
     </div>

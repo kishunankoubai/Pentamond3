@@ -10,6 +10,11 @@ export type MusicData = {
     type: MusicType;
 };
 
+type PlaybackOptions = {
+    loop?: boolean;
+    onEnded?: () => void;
+};
+
 export class Music {
     private static audioContext: AudioContext | null = null;
 
@@ -42,6 +47,7 @@ export class Music {
 
     private isLoaded = false;
     private isPlaying = false;
+    private playGeneration = 0;
 
     constructor(data: MusicData, volume = 1.0) {
         this.data = data;
@@ -65,6 +71,7 @@ export class Music {
         if (this.isLoaded) return;
 
         const res = await fetch(this.data.src);
+        if (!res.ok) throw new Error(`音声の読み込みに失敗しました: ${res.status}`);
         const arrayBuffer = await res.arrayBuffer();
 
         this.audioBuffer = await Music.context.decodeAudioData(arrayBuffer);
@@ -72,11 +79,12 @@ export class Music {
         this.isLoaded = true;
     }
 
-    async play() {
+    async play(options: PlaybackOptions = {}) {
+        if (this.isPlaying) this.stop();
+        const generation = ++this.playGeneration;
         if (!this.isLoaded) await this.load();
 
-        if (!this.audioBuffer) return;
-        if (this.isPlaying) this.stop();
+        if (!this.audioBuffer || generation !== this.playGeneration) return;
         this.gainNode.gain.cancelScheduledValues(Music.context.currentTime);
 
         const source = Music.context.createBufferSource();
@@ -84,7 +92,7 @@ export class Music {
         source.buffer = this.audioBuffer;
 
         // loop
-        source.loop = this.data.loop;
+        source.loop = options.loop ?? this.data.loop;
 
         if (this.data.loopStart !== undefined) source.loopStart = this.data.loopStart;
 
@@ -92,10 +100,12 @@ export class Music {
 
         source.connect(this.gainNode);
         source.onended = () => {
-            if (!source.loop) {
-                this.isPlaying = false;
-                this.pausedAt = 0;
-            }
+            if (this.sourceNode !== source) return;
+            this.sourceNode = null;
+            this.isPlaying = false;
+            this.pausedAt = 0;
+            source.disconnect();
+            options.onEnded?.();
         };
 
         this.sourceNode = source;
@@ -106,10 +116,12 @@ export class Music {
     }
 
     pause() {
+        ++this.playGeneration;
         if (!this.isPlaying || !this.sourceNode) return;
 
-        this.pausedAt = Music.context.currentTime - this.startedAt;
+        this.pausedAt = this.getPlaybackOffset();
 
+        this.sourceNode.onended = null;
         this.sourceNode.stop();
 
         this.sourceNode.disconnect();
@@ -120,7 +132,9 @@ export class Music {
     }
 
     stop() {
+        ++this.playGeneration;
         if (this.sourceNode) {
+            this.sourceNode.onended = null;
             this.sourceNode.stop();
             this.sourceNode.disconnect();
             this.sourceNode = null;
@@ -128,6 +142,23 @@ export class Music {
 
         this.pausedAt = 0;
         this.isPlaying = false;
+    }
+
+    setLoop(loop: boolean): void {
+        if (!this.sourceNode || this.sourceNode.loop === loop) return;
+        // 何周も再生した後でループを解除しても、再開位置が音声長を超えないようにする。
+        this.startedAt = Music.context.currentTime - this.getPlaybackOffset();
+        this.sourceNode.loop = loop;
+    }
+
+    private getPlaybackOffset(): number {
+        let offset = Music.context.currentTime - this.startedAt;
+        const loopStart = this.sourceNode!.loopStart || 0;
+        const loopEnd = this.sourceNode!.loopEnd || this.audioBuffer!.duration;
+        if (this.sourceNode!.loop && offset >= loopEnd && loopEnd > loopStart) {
+            offset = loopStart + ((offset - loopStart) % (loopEnd - loopStart));
+        }
+        return Math.min(offset, this.audioBuffer!.duration);
     }
 
     async fade(goalVolume: number = 0, duration: number = 1000, stop: boolean = false) {

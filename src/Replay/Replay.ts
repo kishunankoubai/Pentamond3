@@ -43,6 +43,13 @@ export type ReplayData = {
  * controller: Replay, EventSetter
  */
 export class Replay {
+    static async deleteAllData(): Promise<void> {
+        localStorage.removeItem(ReplayDataHandler.storageKey);
+        ReplayDataHandler.tempDataList.length = 0;
+        this.setupTempReplayPage();
+        await this.setupSavedReplayPage();
+    }
+
     static getDataSize() {
         return ReplayDataHandler.getDataSize();
     }
@@ -90,9 +97,7 @@ export class Replay {
         saveButtons.forEach((saveButton) => {
             const index = saveButtons.findIndex((button) => button == saveButton);
             const replayData = ReplayDataHandler.tempDataList.at(-index - 1)!;
-            if (dateList.includes(replayData.date)) {
-                saveButton.classList.add("replaySavedButton");
-            }
+            saveButton.classList.toggle("replaySavedButton", dateList.includes(replayData.date));
         });
     }
 

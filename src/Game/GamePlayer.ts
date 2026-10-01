@@ -38,6 +38,7 @@ export class GamePlayer {
         unput: 0,
         remove: 0,
         handy: 1,
+        targetLines: 15,
     };
     state = {
         hasFinished: false,

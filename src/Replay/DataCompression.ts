@@ -16,6 +16,7 @@ const blockKinds = ["L", "J", "p", "q", "U", "I"];
 const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g"];
 
 export async function replayDataEncryption(data: ReplayData): Promise<string> {
+    const maxGameTime = data.playSetting.maxGameTime === Infinity ? "I" : data.playSetting.maxGameTime;
     const inputData = data.inputData.map((playerInputData) =>
         playerInputData
             .map((input, i) => {
@@ -28,7 +29,7 @@ export async function replayDataEncryption(data: ReplayData): Promise<string> {
             JSON.stringify([
                 2,
                 inputData,
-                [data.playSetting.playerNumber, data.playSetting.mode, data.playSetting.maxGameTime, data.playSetting.handy],
+                [data.playSetting.playerNumber, data.playSetting.mode, maxGameTime, data.playSetting.handy, data.playSetting.targetLines],
                 data.finishTime,
                 data.finishPlayers,
                 data.date,
@@ -43,7 +44,7 @@ export async function replayDataEncryption(data: ReplayData): Promise<string> {
     const data1 = [
         inputData,
         nextData,
-        [data.playSetting.playerNumber, data.playSetting.mode, data.playSetting.maxGameTime, data.playSetting.handy],
+        [data.playSetting.playerNumber, data.playSetting.mode, maxGameTime, data.playSetting.handy, data.playSetting.targetLines],
         data.finishTime,
         data.finishPlayers,
         nuisanceBlockData,
@@ -73,13 +74,15 @@ export async function replayDataDecryption(encryptedData: string): Promise<Repla
             });
         });
     if (version2) {
+        const playerNumber = objectData[2][0];
         return {
             inputData,
             playSetting: {
-                playerNumber: objectData[2][0],
+                playerNumber,
                 mode: objectData[2][1],
-                maxGameTime: objectData[2][2],
-                handy: objectData[2][3],
+                maxGameTime: objectData[2][2] === "I" || objectData[2][2] === null ? Infinity : objectData[2][2],
+                handy: objectData[2][3] ?? Array.from({ length: playerNumber }, () => 1),
+                targetLines: objectData[2][4] ?? 15,
             },
             finishTime: objectData[3],
             finishPlayers: objectData[4],
@@ -92,14 +95,16 @@ export async function replayDataDecryption(encryptedData: string): Promise<Repla
     const nextData = objectData[1].map((playerNextData: string) => playerNextData.split("").map((word) => blockKinds[parseInt(word)]));
     const nuisanceBlockData = objectData[5].map((playerNuisanceData: string) => playerNuisanceData.split("").map((word) => numbers.indexOf(word)));
 
+    const playerNumber = objectData[2][0];
     return {
         inputData: inputData,
         nextData: nextData,
         playSetting: {
-            playerNumber: objectData[2][0],
+            playerNumber,
             mode: objectData[2][1],
-            maxGameTime: objectData[2][2],
-            handy: objectData[2][3],
+            maxGameTime: objectData[2][2] === "I" || objectData[2][2] === null ? Infinity : objectData[2][2],
+            handy: objectData[2][3] ?? Array.from({ length: playerNumber }, () => 1),
+            targetLines: objectData[2][4] ?? 15,
         },
         finishTime: objectData[3],
         finishPlayers: objectData[4],

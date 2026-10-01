@@ -57,7 +57,7 @@ export class DisposableGame {
         };
 
         //登録されているinputをもとにplayersを作成する
-        this.players = DisposableGame.createPlayers(this.playSetting.maxGameTime, inputs, inputCount, this.randomSeeds, { replayData: this.replayData });
+        this.players = DisposableGame.createPlayers(this.playSetting, inputs, inputCount, this.randomSeeds, { replayData: this.replayData });
 
         // ゲームを作成
         const CurrentMode = gameModeList[this.playSetting.mode - 1];
@@ -118,7 +118,7 @@ export class DisposableGame {
         });
     }
 
-    private static createPlayers(maxGameTime: number, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds, { replayData }: { replayData?: ReplayData }) {
+    private static createPlayers(playSetting: PlaySetting, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds, { replayData }: { replayData?: ReplayData }) {
         const players = inputs.map((input, i) =>
             new GamePlayer(input, inputCount, {
                 next: randomSeeds.next[i],
@@ -137,8 +137,10 @@ export class DisposableGame {
                 player.g$element.style.width = `0px`;
             }
 
-            player.playInfo.maxGameTime = maxGameTime;
-            player.playInfo.gameTime = maxGameTime;
+            player.playInfo.maxGameTime = playSetting.maxGameTime;
+            player.playInfo.gameTime = playSetting.maxGameTime;
+            player.playInfo.handy = playSetting.mode === 1 ? (playSetting.handy[i] ?? 1) : 1;
+            player.playInfo.targetLines = playSetting.targetLines;
 
             //リプレイ情報の読み込み
             if (replayData?.nextData?.[i]) {

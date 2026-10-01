@@ -508,6 +508,37 @@
     }
 }
 
+/* 直近・保存済みともに、日時・説明・操作ボタンを同じ列幅で表示する。 */
+:is(#replay, #savedReplay) .options .replayDataContainer {
+    display: grid;
+    grid-template-columns: 65vh 25vh 7vh;
+    gap: 2vh;
+    flex-shrink: 0;
+    margin-left: -10vh;
+    height: 13vh;
+
+    & .button {
+        background-color: transparent;
+        border: 0;
+        border-bottom: 0.5vh solid transparent;
+        margin-left: 0;
+
+        &:focus {
+            border-bottom-color: #ff90be;
+        }
+    }
+
+    & .replayButton {
+        font-size: 4.5vh;
+        margin-left: 0;
+    }
+    & .replayDataDescription {
+        width: 35vh;
+        font-size: 2.8vh;
+        text-wrap: wrap;
+    }
+}
+
 .page:has(.popup) {
     background-color: #0000;
     & .popup {
@@ -750,6 +781,94 @@
     }
 }
 
+#survivalPlaySetting,
+#linePlaySetting {
+    justify-content: flex-start;
+    padding-top: 16vh;
+    box-sizing: border-box;
+
+    & .playSettingPanel {
+        width: 125vh;
+        display: flex;
+        flex-direction: column;
+        gap: 2vh;
+    }
+
+    & .playSettingSection {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+    }
+
+    & .playSettingSectionTitle {
+        font-size: 4vh;
+        color: #6bd;
+    }
+
+    & .button:not(.back) {
+        margin-left: 0;
+        font-size: 3.2vh;
+        height: 6vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-bottom: 2vh;
+        margin-bottom: -2vh;
+    }
+
+    & .selectedValue {
+        color: #ee8888;
+        border-bottom-color: #ee8888;
+    }
+}
+
+#survivalPlaySetting {
+    & .maxTimeOptions {
+        gap: 5vh;
+    }
+
+    & .handySettingSection {
+        gap: 0.8vh;
+    }
+
+    & .handyRow {
+        display: flex;
+        justify-content: center;
+        gap: 2vh;
+        min-height: 7vh;
+
+        & .playerSettingLabel {
+            width: 8vh;
+            font-size: 3.2vh;
+            color: #567;
+        }
+
+        & .handyValue {
+            width: 12vh;
+            font-size: 3.5vh;
+            color: #d76;
+        }
+    }
+}
+
+#linePlaySetting {
+    & .lineTargetSetting {
+        margin-top: 16vh;
+        gap: 5vh;
+    }
+
+    & .settingValue {
+        width: 16vh;
+        font-size: 5vh;
+        color: #d76;
+    }
+
+    & .text {
+        font-size: 3vh;
+    }
+}
+
 #graphicSetting {
     align-items: end;
     & .options {
@@ -811,6 +930,104 @@
         }
         & .selector {
             color: #ee8888;
+        }
+    }
+}
+
+#soundTest {
+    padding-top: 16vh;
+    justify-content: start;
+    & .soundTestPanel {
+        display: flex;
+        flex-direction: column;
+        gap: 6vh;
+        width: 90%;
+    }
+    & #soundTestStatus {
+        font-size: 5vh;
+        text-align: center;
+        min-height: 4vh;
+    }
+    & .soundTestTrackSelection {
+        gap: 3vh;
+        & .label,
+        & .selector {
+            font-size: 5vh;
+        }
+        & .selector {
+            color: #ee8888;
+            margin-left: 0vh;
+        }
+    }
+    & .soundTestControls {
+        gap: 3vh;
+        & .button {
+            font-size: 5vh;
+            &::before {
+                font-size: 5vh;
+            }
+        }
+    }
+    & .button:not(.back) {
+        margin-left: 0;
+    }
+}
+
+#soundTestSelector .scrollableContainer {
+    width: 90%;
+}
+
+#dataSetting {
+    padding-top: 17vh;
+    justify-content: start;
+    gap: 2vh;
+    & #dataInformation {
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+        & .label,
+        & span {
+            font-size: 4.5vh;
+        }
+        margin-bottom: 5vh;
+    }
+    & #dataDeleteStatus {
+        font-size: 4vh;
+        text-align: center;
+        min-height: 3.5vh;
+        max-width: 90%;
+    }
+    & .options {
+        gap: 1.5vh;
+        & .button {
+            font-size: 5vh;
+            &::before {
+                font-size: 5vh;
+            }
+        }
+    }
+}
+
+#allDataDeleteAlert {
+    & #dataDeleteDescription {
+        font-size: 4vh;
+        text-align: center;
+        line-height: 1.8;
+        max-width: 90%;
+    }
+    & #allDataDeleteConfirmButton {
+        background: transparent;
+        border: none;
+        border-bottom: 0.5vh solid transparent;
+        font-size: 6vh;
+        margin-left: 0;
+        &:focus {
+            border-bottom-color: #ff90be;
+        }
+        &[aria-disabled="true"] {
+            opacity: 0.35;
+            cursor: default;
+            pointer-events: none;
         }
     }
 }

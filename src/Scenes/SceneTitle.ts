@@ -16,12 +16,14 @@ import { MusicManager } from "../Utilities/Music/MusicManager";
 import { Scene, sceneManager } from "../Utilities/SceneManager";
 import { ScenePlay } from "./ScenePlay";
 import { ControllerSettingManager } from "../ControllerSettingManager";
+import { SoundTest } from "../SoundTest";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
     private elementEventSetter: ElementEventSetter;
     private pageInteraction: PageInteraction;
     private bgmPreviewActive = false;
+    private readonly soundTest = new SoundTest();
     constructor() {
         super("src/HTML/SceneTitle.html");
         this.elementManager = new ElementManager(this);
@@ -39,6 +41,7 @@ export class SceneTitle extends Scene {
         this.setPageStart();
         this.setSettingButton();
         this.setupBGMSetting();
+        this.soundTest.setup(this, this.elementManager, this.elementEventSetter);
         this.setStageButton();
         this.pageInteraction.start();
         // BeforePlaying
@@ -58,6 +61,8 @@ export class SceneTitle extends Scene {
     }
 
     protected close(): void {
+        this.soundTest.close();
+        DeleteDataHandler.close();
         ControllerRegisterer.clearEvents();
         ControllerSettingManager.close();
         this.pageInteraction.stop();
@@ -207,6 +212,10 @@ export class SceneTitle extends Scene {
         const seLabel = document.querySelector<HTMLElement>("#volumeSetting .container .container:nth-child(2) .label:nth-child(3)")!;
         bgmLabel.innerText = globalValues.bgmVolume + "";
         seLabel.innerText = globalValues.seVolume + "";
+        this.pageManager.addHandler("settingsReset", () => {
+            bgmLabel.innerText = String(globalValues.bgmVolume);
+            seLabel.innerText = String(globalValues.seVolume);
+        });
 
         document.querySelectorAll<HTMLElement>("#volumeSetting .button").forEach((button, i) => {
             button.addEventListener("click", async () => {
@@ -255,6 +264,9 @@ export class SceneTitle extends Scene {
     private setupBGMSetting() {
         const options = Array.from(document.querySelectorAll<HTMLElement>("#bgmSelector1 .scrollableContainer .button"));
         options.forEach((option) => option.classList.toggle("selectedValue", option.textContent?.trim() === globalValues.soloBGM));
+        this.pageManager.addHandler("settingsReset", () => {
+            this.elementManager.selectByIndex("bgmSelector1", options.findIndex((option) => option.textContent?.trim() === globalValues.soloBGM));
+        });
 
         this.elementEventSetter.addHandler("selectorChanged-bgmSelector1", (selector: HTMLElement) => {
             const selectedBGM = selector.textContent?.trim();

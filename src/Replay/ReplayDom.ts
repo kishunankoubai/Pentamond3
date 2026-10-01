@@ -1,4 +1,3 @@
-import { ElementManager } from "../Utilities/Element/ElementManager";
 import { qs, qsAll } from "../Utils";
 import { ReplayData } from "./Replay";
 
@@ -52,9 +51,9 @@ export class ReplayDom {
 
         const html = `
             <div class="replayDataContainer">
-                <button class="replayButton">${this.getDateString(now)}</button>
+                <button class="replayButton button" type="button">${this.getDateString(now)}</button>
                 <div class="replayDataDescription">${this.createReplayDataDescription(replayData)}</div>
-                <button class="replayDeleteButton"></button>
+                <button class="replayDeleteButton button" type="button" aria-label="リプレイを削除する"></button>
             </div>
         `;
 
@@ -82,8 +81,12 @@ export class ReplayDom {
         const solo = replayData.playSetting.playerNumber == 1 ? "ソロ" : "マルチ";
         const mode = this.stringifyMode(replayData.playSetting.mode);
         const time = (replayData.finishTime / 1000).toFixed(2);
+        const setting =
+            replayData.playSetting.mode === 1
+                ? `持ち時間: ${replayData.playSetting.maxGameTime === Infinity ? "Infinity" : replayData.playSetting.maxGameTime}`
+                : `クリア列数: ${replayData.playSetting.targetLines}列`;
 
-        return `${solo} : ${mode}<br>時間: ${time}`;
+        return `${solo} : ${mode}<br>${setting}<br>時間: ${time}`;
     }
 
     private static stringifyMode(mode: number) {
@@ -97,22 +100,28 @@ export class ReplayDom {
         }
     }
 
-    static createTempReplayButton(date: number) {
-        const now = new Date(date);
+    private static createTempReplayButton(replayData: ReplayData) {
+        const now = new Date(replayData.date);
 
         const replayButton = document.createElement("button");
-        replayButton.classList.add("replayButton");
-        replayButton.innerHTML = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes()}:${
-            now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds()
-        }`;
+        replayButton.type = "button";
+        replayButton.classList.add("replayButton", "button");
+        replayButton.innerHTML = this.getDateString(now);
+
+        const description = document.createElement("div");
+        description.classList.add("replayDataDescription");
+        description.innerHTML = this.createReplayDataDescription(replayData);
 
         const saveButton = document.createElement("button");
-        saveButton.classList.add("replaySaveButton");
+        saveButton.type = "button";
+        saveButton.classList.add("replaySaveButton", "button");
+        saveButton.setAttribute("aria-label", "リプレイを保存する");
 
         //リプレイボタンの追加
         const replayContainer = document.createElement("div");
-        replayContainer.classList = "replayDataContainer";
+        replayContainer.classList.add("replayDataContainer");
         replayContainer.appendChild(replayButton);
+        replayContainer.appendChild(description);
         replayContainer.appendChild(saveButton);
         replayContainer.querySelectorAll("button").forEach((button) => {
             button.tabIndex = 0;
@@ -148,6 +157,6 @@ export class ReplayDom {
     static setupTempReplayPage(replayDataList: ReplayData[]) {
         const container = qs("#replay .options");
         container.querySelectorAll(".replayDataContainer").forEach((element) => element.remove());
-        return replayDataList.map((data) => this.createTempReplayButton(data.date));
+        return replayDataList.map((data) => this.createTempReplayButton(data));
     }
 }

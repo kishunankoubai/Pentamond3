@@ -258,7 +258,8 @@
     }
 }
 
-.button:focus {
+.button:focus,
+.selector:focus {
     animation-direction: normal;
     animation-duration: 250ms;
     animation-name: touchVibration;

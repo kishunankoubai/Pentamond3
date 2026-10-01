@@ -110,6 +110,7 @@ export class Mode2 extends GameMode {
         };
         let lastOperateTime = 0;
         p.canvas.guideBorder = true;
+        p.canvas.guideBorderHeight = p.playInfo.targetLines;
         gameEvents.push(
             input.addHandler("inputValid", () => {
                 if (p.loop.g$isStopping) {
@@ -169,7 +170,7 @@ export class Mode2 extends GameMode {
                         p.playInfo.score += (lastTrick.time + lastTrick.attack) * 50;
                         p.playInfo.chain += 1;
                         p.playInfo.maxChain = Math.max(p.playInfo.maxChain, p.playInfo.chain);
-                        p.canvas.guideBorderHeight = 15 - p.playInfo.line;
+                        p.canvas.guideBorderHeight = p.playInfo.targetLines - p.playInfo.line;
                         p.canvas.paintPlayCanvas();
                         if (GraphicSetting.removeShake) {
                             p.animations.removeLineWithTrick.play();
@@ -190,7 +191,7 @@ export class Mode2 extends GameMode {
                 p.playInfo.remove += 1;
                 if (lastTrick) MusicManager.get(`消去音${removeSoundIndex}`)?.play();
 
-                if (p.playInfo.line >= 15) {
+                if (p.playInfo.line >= p.playInfo.targetLines) {
                     p.finish();
                     this.proceedPlayerFinish();
                 }

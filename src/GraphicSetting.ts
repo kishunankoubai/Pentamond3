@@ -12,6 +12,10 @@ export class GraphicSetting {
         this.setupEvents();
     }
 
+    static refresh(): void {
+        this.loadData();
+    }
+
     private static updateButtonStyle() {
         if (!qs("#putShakeOn")) return;
         qs("#putShakeOn").style.color = this.putShake ? "#ee8888" : "";
@@ -31,34 +35,15 @@ export class GraphicSetting {
     }
 
     private static setupEvents() {
-        qsAddEvent("#putShakeOn", "click", () => {
-            if (this.putShake) return;
-            globalValues.graphic.putShake = true;
-        });
-        qsAddEvent("#putShakeOff", "click", () => {
-            if (!this.putShake) return;
-            globalValues.graphic.putShake = false;
-        });
-        qsAddEvent("#removeShakeOn", "click", () => {
-            if (this.removeShake) return;
-            globalValues.graphic.removeShake = true;
-        });
-        qsAddEvent("#removeShakeOff", "click", () => {
-            if (!this.removeShake) return;
-            globalValues.graphic.removeShake = false;
-        });
-        qsAddEvent("#playBackgroundOn", "click", () => {
-            if (this.playBackground) return;
-            globalValues.graphic.playBackground = true;
-        });
-        qsAddEvent("#playBackgroundOff", "click", () => {
-            if (!this.playBackground) return;
-            globalValues.graphic.playBackground = false;
-        });
-
-        qsAddEvent("#graphicSetting button", "click", () => {
-            DataManager.save();
-            this.loadData();
+        const settings: (keyof typeof globalValues.graphic)[] = ["putShake", "removeShake", "playBackground"];
+        settings.forEach((setting) => {
+            [true, false].forEach((enabled) => {
+                qsAddEvent(`#${setting}${enabled ? "On" : "Off"}`, "click", () => {
+                    globalValues.graphic[setting] = enabled;
+                    this.loadData();
+                    DataManager.save();
+                });
+            });
         });
     }
 }
