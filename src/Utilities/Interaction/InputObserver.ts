@@ -4,6 +4,8 @@ import { MyEventListener } from "../MyEventListener";
 export type InputInfo = {
     readonly name: string;
     readonly time: number;
+    /** メニュー操作として使用された入力。ゲーム側へ重複適用しない。 */
+    consumed?: boolean;
 };
 
 export abstract class InputObserver extends MyEventListener {

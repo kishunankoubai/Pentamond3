@@ -53,6 +53,7 @@ export class TalkPanel extends WaitDynamicText {
         this.addHandler("finish", () => {
             if (!this.talk[this.talkIndex].wait) {
                 setTimeout(() => {
+                    if (this.talkIndex === -1) return;
                     if (this.g$hasFinishedTalk) this.finishTalk();
                     else this.displayNextSpeech();
                 }, 100);
@@ -203,6 +204,10 @@ export class TalkManager extends MyEventListener {
     constructor(scene: Scene) {
         super();
         this.scene = scene;
+        scene.addHandler("sceneEnd", () => {
+            this.talkPanel.resetTalk();
+            this.closeLoop.reset();
+        }, 1);
         this.closeLoop.s$loopFrequency = 100;
         this.closeLoop.addHandler("loop", () => {
             if (this.scene.g$pageManager.g$currentPageId == "talk") this.scene.g$pageManager.backPage(1);
@@ -240,12 +245,14 @@ export class TalkManager extends MyEventListener {
         return new Promise<void>((resolve) => {
             const event = this.talkPanel.addHandler(["finishTalk", "resetTalk"], () => {
                 resolve();
-                this.talkPanel.removeEvent([event, event2]);
+                this.talkPanel.removeEvent(event);
+                sceneManager.removeEvent(event2);
                 this.closeLoop.start();
             });
             const event2 = sceneManager.addHandler("sceneChange", () => {
                 resolve();
-                this.talkPanel.removeEvent([event, event2]);
+                this.talkPanel.removeEvent(event);
+                sceneManager.removeEvent(event2);
             });
         });
     }

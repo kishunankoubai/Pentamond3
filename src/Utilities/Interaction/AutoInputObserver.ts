@@ -12,7 +12,7 @@ export class AutoInputObserver extends InputObserver {
     protected type = "autoKeyboard";
     private readonly loop = new LoopManager();
     private inputData: AutoInputData[] = [];
-    private pendingInputData: AutoInputData[] = [];
+    private nextInputIndex = 0;
     private inputGate: () => boolean = () => true;
 
     constructor(inputData: AutoInputData[] = []) {
@@ -27,12 +27,12 @@ export class AutoInputObserver extends InputObserver {
 
     set s$inputData(inputData: AutoInputData[]) {
         this.inputData = structuredClone(inputData);
-        this.pendingInputData = structuredClone(inputData);
+        this.nextInputIndex = 0;
     }
 
     start(): void {
         this.isValid = true;
-        if (this.pendingInputData.length) this.loop.start();
+        if (this.nextInputIndex < this.inputData.length) this.loop.start();
     }
 
     stop(): void {
@@ -48,7 +48,7 @@ export class AutoInputObserver extends InputObserver {
     playReset(): void {
         this.loop.reset();
         this.validInputs = [];
-        this.pendingInputData = structuredClone(this.inputData);
+        this.nextInputIndex = 0;
     }
 
     setPlaybackSpeed(speed: number): void {
@@ -60,13 +60,13 @@ export class AutoInputObserver extends InputObserver {
     }
 
     private processInput(): void {
-        while (this.pendingInputData.length && this.pendingInputData[0].time <= this.loop.g$elapsedTime) {
+        while (this.isValid && this.nextInputIndex < this.inputData.length && this.inputData[this.nextInputIndex].time <= this.loop.g$elapsedTime) {
             // ダメージ硬直などで操作不能なら、入力を捨てずに次フレームまで待つ。
             if (!this.inputGate()) return;
-            const input = this.pendingInputData.shift()!;
+            const input = this.inputData[this.nextInputIndex++];
             if (input.type === "keydown" || input.type === "downup") this.onValidInput(input.keyCode);
             if (input.type === "keyup" || input.type === "downup") this.onInvalidInput(input.keyCode);
         }
-        if (!this.pendingInputData.length) this.loop.stop();
+        if (this.nextInputIndex >= this.inputData.length) this.loop.stop();
     }
 }

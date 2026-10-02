@@ -27,7 +27,8 @@ export class MusicManager {
             if (candidate.data.type === "BGM" && candidate !== music) candidate.stop();
         });
         music.setVolume(1);
-        await music.play();
+        try { await music.play(); }
+        catch (error) { console.warn(`BGM「${name}」を再生できませんでした`, error); }
     }
 
     static updateAllGain() {

@@ -17,6 +17,7 @@ import { MusicManager } from "../Utilities/Music/MusicManager";
 import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
 import * as Setting from "../Settings";
 import { globalValues } from "../Global";
+import { PageManager } from "../Utilities/Page/PageManager";
 
 //ゲーム開始
 export class GameProcessing {
@@ -24,6 +25,7 @@ export class GameProcessing {
     static readonly replaySpeeds = [0.25, 0.5, 0.75, 1, 1.5, 2, 4] as const;
     private static replaySpeedIndex = 3;
     private static replayControlsEnabled = false;
+    private static generation = 0;
 
     static currentGame: DisposableGame | null = null;
 
@@ -46,6 +48,7 @@ export class GameProcessing {
     }
 
     static quit() {
+        ++this.generation;
         this.currentGame?.quit();
         this.currentGame = null;
         this.resetReplayPlaybackState();
@@ -92,6 +95,7 @@ export class GameProcessing {
     static async restartNormal() {
         if (!this.currentGame) throw new Error("一度もプレイされていない");
         const playSetting = this.currentGame.playSetting;
+        PageManager.trimHistoryTo("playPrepare");
         if (!(sceneManager.g$currentScene instanceof ScenePlay) || sceneManager.g$currentScene instanceof SceneReplay) await sceneManager.change(ScenePlay, false);
         await this.startNormal(playSetting);
     }
@@ -101,11 +105,15 @@ export class GameProcessing {
      */
     static async restartReplay() {
         if (!this.isReplaying()) throw new Error("リプレイ中ではない");
+        const origin = ["replay", "savedReplay"].map((id) => ({ id, back: PageManager.getBackIndex(id) })).filter(({ back }) => back > 0).sort((a, b) => a.back - b.back)[0];
+        if (origin) PageManager.trimHistoryTo(origin.id);
         await this.startReplay(this.currentGame.replayData);
     }
 
     static async startNormal(playSetting: PlaySetting) {
+        const generation = ++this.generation;
         await this.beforeStart();
+        if (generation !== this.generation || !(sceneManager.g$currentScene instanceof ScenePlay)) return;
 
         this.currentGame = new DisposableGame(
             this.ModeClassList,
@@ -122,14 +130,18 @@ export class GameProcessing {
         this.currentGame.appendPlayersTo(qs("#play"));
 
         await this.playGameBGM(playSetting.playerNumber);
+        if (generation !== this.generation) return;
 
         await this.countDownAndStart();
     }
 
     static async startReplay(replayData: ReplayData) {
+        const generation = ++this.generation;
         if (!(sceneManager.g$currentScene instanceof SceneReplay)) await sceneManager.change(SceneReplay, false);
+        if (generation !== this.generation || !(sceneManager.g$currentScene instanceof SceneReplay)) return;
         this.resetReplayPlaybackState();
         await this.beforeStart();
+        if (generation !== this.generation) return;
 
         this.setupReplayInputs(replayData);
 
@@ -149,8 +161,10 @@ export class GameProcessing {
         this.currentGame.appendPlayersTo(qs("#play"));
 
         await this.playGameBGM(replayData.playSetting.playerNumber);
+        if (generation !== this.generation) return;
 
         await this.countDownAndStart(() => this.prepareAutoPlay());
+        if (generation !== this.generation) return;
         this.replayControlsEnabled = true;
         this.updateReplayControlDisplay();
     }
@@ -180,36 +194,53 @@ export class GameProcessing {
     }
 
     private static async onFinishNormal() {
+        const game = this.currentGame;
+        const generation = this.generation;
+        if (!game) return;
         await MusicManager.fadeOutBGM(300);
+        if (generation !== this.generation || this.currentGame !== game) return;
         await sceneManager.change(SceneResult);
+        if (generation !== this.generation || this.currentGame !== game || !(sceneManager.g$currentScene instanceof SceneResult)) return;
         inputManager.removeVirtualInputs();
 
-        ResultPageHandler.updateResultLabels(this.currentGame!.game.g$resultText);
-        Replay.addTempData(this.currentGame!);
+        ResultPageHandler.updateResultLabels(game.game.g$resultText);
+        Replay.addTempData(game);
         ResultPageHandler.setSaveButton();
-        ResultPageHandler.updateDetailedResultPage(this.currentGame!);
+        ResultPageHandler.updateDetailedResultPage(game);
     }
 
     private static async onFinishReplay() {
+        const game = this.currentGame;
+        const generation = this.generation;
+        if (!game?.replayData) return;
         this.lockReplayControls();
         await MusicManager.fadeOutBGM(300);
+        if (generation !== this.generation || this.currentGame !== game) return;
         await sceneManager.change(SceneResult, false);
+        if (generation !== this.generation || this.currentGame !== game || !(sceneManager.g$currentScene instanceof SceneResult)) return;
         sceneManager.g$currentPageManager?.openPage("replayResult");
         inputManager.removeVirtualInputs();
 
-        ResultPageHandler.updateResultLabels(this.currentGame!.game.g$resultText);
-        ResultPageHandler.OverWriteTime(this.currentGame!.replayData!.finishTime);
-        ResultPageHandler.updateDetailedResultPage(this.currentGame!);
+        ResultPageHandler.updateResultLabels(game.game.g$resultText);
+        ResultPageHandler.OverWriteTime(game.replayData.finishTime);
+        ResultPageHandler.updateDetailedResultPage(game);
     }
 
     private static async countDownAndStart(beforeGameStart?: () => void) {
+        const game = this.currentGame;
+        const scene = sceneManager.g$currentScene;
+        const generation = this.generation;
         let pageManager = sceneManager.g$currentPageManager;
         if (!pageManager) return;
         //開始演出
-        await countDown(["", "3", "2", "1", "START!"]);
+        const controller = new AbortController();
+        const endEvent = scene?.addHandler("sceneEnd", () => controller.abort(), 1);
+        try { await countDown(["", "3", "2", "1", "START!"], controller.signal); }
+        finally { if (endEvent) scene?.removeEvent(endEvent); }
+        if (generation !== this.generation || this.currentGame !== game || sceneManager.g$currentScene !== scene) return;
 
         beforeGameStart?.();
-        this.currentGame!.start();
+        game?.start();
 
         await pageManager.backPage(1);
     }

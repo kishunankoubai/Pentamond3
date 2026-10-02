@@ -1,142 +1,62 @@
-import { ReplayData } from "./Replay";
+import type { ReplayData } from "./Replay";
 import LZString from "lz-string";
+import { replayKeyCodes } from "../Game/Operations";
 
-// export type ReplayData = {
-//     inputData: AutoKeyboardInputData[][];
-//     nextData: BlockKind[][];
-//     playSetting: PlaySetting;
-//     finishTime: number;
-//     finishPlayers: number[];
-//     nuisanceBlockData: number[][];
-//     date: string;
-// };
-
-const keyCodes = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "KeyC", "KeyV", "KeyB", "Space", "Enter"];
-const blockKinds = ["L", "J", "p", "q", "U", "I"];
-const numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g"];
-
-export async function replayDataEncryption(data: ReplayData): Promise<string> {
-    const maxGameTime = data.playSetting.maxGameTime === Infinity ? "I" : data.playSetting.maxGameTime;
-    const inputData = data.inputData.map((playerInputData) =>
-        playerInputData
-            .map((input, i) => {
-                return (playerInputData[i].time - (i == 0 ? 0 : playerInputData[i - 1].time)).toString(5) + (keyCodes.indexOf(input.keyCode) + 5).toString(36);
-            })
-            .join("")
-    );
-    if (data.version === 2 && data.randomSeeds) {
-        return LZString.compressToUTF16(
-            JSON.stringify([
-                2,
-                inputData,
-                [data.playSetting.playerNumber, data.playSetting.mode, maxGameTime, data.playSetting.handy, data.playSetting.targetLines],
-                data.finishTime,
-                data.finishPlayers,
-                data.date,
-                data.randomSeeds.next,
-                data.randomSeeds.nuisance,
-            ])
-        );
-    }
-
-    const nextData = (data.nextData ?? []).map((playerNextData) => playerNextData.map((kind) => blockKinds.indexOf(kind) + "").join(""));
-    const nuisanceBlockData = (data.nuisanceBlockData ?? []).map((playerNuisanceData) => playerNuisanceData.map((x) => numbers[x]).join(""));
-    const data1 = [
-        inputData,
-        nextData,
-        [data.playSetting.playerNumber, data.playSetting.mode, maxGameTime, data.playSetting.handy, data.playSetting.targetLines],
-        data.finishTime,
-        data.finishPlayers,
-        nuisanceBlockData,
-        data.date,
-    ];
-    const data2 = LZString.compressToUTF16(JSON.stringify(data1));
-    return data2;
+function requireData(condition: unknown): asserts condition {
+    if (!condition) throw new Error("未対応または破損したリプレイです");
 }
 
-export async function replayDataDecryption(encryptedData: string): Promise<ReplayData> {
-    const objectData = JSON.parse(LZString.decompressFromUTF16(encryptedData));
-    const version2 = objectData[0] === 2;
-    const inputSource = version2 ? objectData[1] : objectData[0];
-    const inputData = inputSource
-        .map((playerInputData: string) => {
-            return playerInputData.match(/[0-4]+[^0-4]*|[^0-4]+/g) ?? [];
-        })
-        .map((playerInputData: string[]) => {
-            let elapsedTime = 0;
-            return playerInputData.map((encodedInput) => {
-                elapsedTime += Number.parseInt(encodedInput.slice(0, -1), 5);
-                return {
-                    time: elapsedTime,
-                    keyCode: keyCodes[Number.parseInt(encodedInput.slice(-1), 36) - 5],
-                    type: "downup",
-                };
-            });
+function finitePositive(value: unknown): value is number {
+    return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
+
+/** 入力はフレームへ丸めず、ミリ秒差分＋操作IDを圧縮して再現性を維持する。 */
+export function replayDataEncryption(data: ReplayData): string {
+    requireData(data.version === 2 && data.randomSeeds);
+    const inputData = data.inputData.map((inputs) => inputs.map((input, index) => {
+        const delta = input.time - (index ? inputs[index - 1].time : 0);
+        const keyIndex = replayKeyCodes.indexOf(input.keyCode as typeof replayKeyCodes[number]);
+        requireData(Number.isSafeInteger(delta) && delta >= 0 && keyIndex >= 0);
+        return delta.toString(5) + (keyIndex + 5).toString(36);
+    }).join(""));
+    return LZString.compressToUTF16(JSON.stringify([
+        2, inputData,
+        [data.playSetting.playerNumber, data.playSetting.mode, data.playSetting.maxGameTime === Infinity ? "I" : data.playSetting.maxGameTime, data.playSetting.handy, data.playSetting.targetLines],
+        data.finishTime, data.finishPlayers, data.date, data.randomSeeds.next, data.randomSeeds.nuisance,
+    ]));
+}
+
+export function replayDataDecryption(encryptedData: string): ReplayData {
+    requireData(typeof encryptedData === "string");
+    const source = LZString.decompressFromUTF16(encryptedData);
+    requireData(source);
+    const data = JSON.parse(source);
+    requireData(Array.isArray(data) && data.length === 8 && data[0] === 2);
+    const [_, encodedInputs, settings, finishTime, finishPlayers, date, next, nuisance] = data;
+    requireData(Array.isArray(settings) && settings.length === 5);
+    const [playerNumber, mode, maxTime, handy, targetLines] = settings;
+    requireData(Number.isInteger(playerNumber) && playerNumber >= 1 && playerNumber <= 4);
+    requireData(mode === 1 || mode === 2);
+    requireData(maxTime === "I" || finitePositive(maxTime));
+    requireData(Array.isArray(handy) && handy.length >= playerNumber && handy.every((value) => finitePositive(value) && value >= 0.1 && value <= 10));
+    requireData(Number.isInteger(targetLines) && targetLines >= 1 && targetLines <= 30);
+    requireData(typeof finishTime === "number" && Number.isFinite(finishTime) && finishTime >= 0);
+    requireData(finitePositive(date) && Number.isSafeInteger(date) && date <= 8640000000000000);
+    requireData(Array.isArray(finishPlayers) && finishPlayers.length > 0 && new Set(finishPlayers).size === finishPlayers.length && finishPlayers.every((value) => Number.isInteger(value) && value >= 1 && value <= playerNumber));
+    [next, nuisance].forEach((seeds) => requireData(Array.isArray(seeds) && seeds.length === playerNumber && seeds.every((seed) => Number.isInteger(seed) && seed >= 0 && seed <= 0xffffffff)));
+    requireData(Array.isArray(encodedInputs) && encodedInputs.length === playerNumber);
+    const inputData = encodedInputs.map((encoded: unknown) => {
+        requireData(typeof encoded === "string" && /^(?:[0-4]+[5-9a-d])*$/.test(encoded));
+        let elapsed = 0;
+        return Array.from(encoded.matchAll(/([0-4]+)([5-9a-d])/g), ([_, delta, key]) => {
+            elapsed += Number.parseInt(delta, 5);
+            requireData(Number.isSafeInteger(elapsed) && elapsed <= Math.ceil(finishTime));
+            return { time: elapsed, keyCode: replayKeyCodes[Number.parseInt(key, 36) - 5], type: "downup" as const };
         });
-    if (version2) {
-        const playerNumber = objectData[2][0];
-        return {
-            inputData,
-            playSetting: {
-                playerNumber,
-                mode: objectData[2][1],
-                maxGameTime: objectData[2][2] === "I" || objectData[2][2] === null ? Infinity : objectData[2][2],
-                handy: objectData[2][3] ?? Array.from({ length: playerNumber }, () => 1),
-                targetLines: objectData[2][4] ?? 15,
-            },
-            finishTime: objectData[3],
-            finishPlayers: objectData[4],
-            date: objectData[5],
-            randomSeeds: { next: objectData[6], nuisance: objectData[7] },
-            version: 2,
-        };
-    }
-
-    const nextData = objectData[1].map((playerNextData: string) => playerNextData.split("").map((word) => blockKinds[parseInt(word)]));
-    const nuisanceBlockData = objectData[5].map((playerNuisanceData: string) => playerNuisanceData.split("").map((word) => numbers.indexOf(word)));
-
-    const playerNumber = objectData[2][0];
-    return {
-        inputData: inputData,
-        nextData: nextData,
-        playSetting: {
-            playerNumber,
-            mode: objectData[2][1],
-            maxGameTime: objectData[2][2] === "I" || objectData[2][2] === null ? Infinity : objectData[2][2],
-            handy: objectData[2][3] ?? Array.from({ length: playerNumber }, () => 1),
-            targetLines: objectData[2][4] ?? 15,
-        },
-        finishTime: objectData[3],
-        finishPlayers: objectData[4],
-        nuisanceBlockData: nuisanceBlockData,
-        date: objectData[6],
-    } as ReplayData;
-}
-
-// console.log(btoa(String.fromCharCode(...new Uint8Array(new Uint16Array([3333333, 3333344]).buffer))));
-// console.log(Array.from(new Uint16Array(Uint8Array.from(atob(btoa(String.fromCharCode(...new Uint8Array(new Uint16Array([66333, 33334]).buffer)))), (c) => c.charCodeAt(0)).buffer)));
-
-function numberEncryption(max: number, data: number[]): number {
-    let encryptedData = 0;
-    for (let i = data.length - 1; i >= 0; i--) {
-        encryptedData = encryptedData * max + data[i];
-    }
-    return encryptedData;
-}
-
-function numberDecryption(max: number, encryptedData: number, length: number): number[] {
-    let decryptedData = [];
-    for (let i = 0; i < length; i++) {
-        decryptedData.push(encryptedData % max);
-        encryptedData = Math.floor(encryptedData / max);
-    }
-    return decryptedData;
-}
-
-export function sum(numbers: number[]) {
-    let result = 0;
-    numbers.forEach((number) => {
-        result += number;
     });
-    return result;
+    return {
+        version: 2, inputData, finishTime, finishPlayers, date,
+        randomSeeds: { next, nuisance },
+        playSetting: { playerNumber, mode, maxGameTime: maxTime === "I" ? Infinity : maxTime, handy: handy.slice(0, playerNumber), targetLines },
+    };
 }

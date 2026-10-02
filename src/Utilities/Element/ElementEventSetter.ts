@@ -10,26 +10,17 @@ export class ElementEventSetter extends SceneSetter {
     }
 
     protected progressSet(): void {
-        //pageを戻る
-        document.querySelectorAll<HTMLElement>(".back, [data-back]").forEach((backElement) => {
-            backElement.addEventListener("click", () => {
-                const back = parseInt(backElement.dataset.back || "1");
-                this.scene.g$pageManager.backPage(back);
-            });
-        });
-
-        //page遷移
-        document.querySelectorAll<HTMLElement>("[data-page]").forEach((element) => {
-            element.addEventListener("click", () => this.scene.g$pageManager.openPage(element.dataset.page || ""));
-        });
-
-        //subPage遷移
-        document.querySelectorAll<HTMLElement>(".subPagePrev").forEach((prev) => {
-            prev.addEventListener("click", () => this.elementManager.openSubPageRelatively(-1));
-        });
-        document.querySelectorAll<HTMLElement>(".subPageNext").forEach((next) => {
-            next.addEventListener("click", () => this.elementManager.openSubPageRelatively(1));
-        });
+        const controller = new AbortController();
+        // 個別ボタンの設定処理が済んでから遷移する。動的なボタンにも適用する。
+        document.querySelector(".sceneContainer")?.addEventListener("click", (event) => {
+            const element = event.target instanceof Element ? event.target.closest<HTMLElement>(".back, [data-back], [data-page], .subPagePrev, .subPageNext") : null;
+            if (!element) return;
+            if (element.matches(".back, [data-back]")) this.scene.g$pageManager.backPage(Number.parseInt(element.dataset.back || "1"));
+            else if (element.matches("[data-page]")) this.scene.g$pageManager.openPage(element.dataset.page || "");
+            else if (element.classList.contains("subPagePrev")) this.elementManager.openSubPageRelatively(-1);
+            else this.elementManager.openSubPageRelatively(1);
+        }, { signal: controller.signal });
+        this.scene.addHandler("sceneEnd", () => controller.abort(), 1);
         // subPageが後から生成されるページもあるため、全ページに初期化処理を登録する。
         document.querySelectorAll<HTMLElement>(".page").forEach((page) => {
             this.scene.g$pageManager.addHandler(`changePage-${page.id}`, () => {
@@ -40,7 +31,8 @@ export class ElementEventSetter extends SceneSetter {
         //selector
         document.querySelectorAll<HTMLElement>(".selector").forEach((selector) => {
             // シーンHTMLがDOMに反映された後に、選択肢側の要素も含めて初期化する
-            setTimeout(() => {
+            const timer = setTimeout(() => {
+                if (!selector.isConnected) return;
                 const page = document.getElementById(selector.dataset.page || "");
                 if (!page) return;
 
@@ -70,6 +62,7 @@ export class ElementEventSetter extends SceneSetter {
                     options.find((option) => option.classList.contains("selectedValue"))?.focus();
                 });
             }, 0);
+            this.scene.addHandler("sceneEnd", () => clearTimeout(timer), 1);
         });
     }
 }

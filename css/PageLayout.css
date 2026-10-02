@@ -1,7 +1,7 @@
 #title {
     /* background-color: #eea; */
     & .options {
-        margin-top: 10vh;
+        margin-top: 10cqh;
     }
 }
 
@@ -13,19 +13,19 @@
     background-color: #aaa0;
     z-index: 100;
     & .label {
-        font-size: 7vh;
+        font-size: 7cqh;
     }
     & #loadingCircle {
-        font-size: 13vh;
+        font-size: 13cqh;
     }
 }
 
 #pageStart {
     & .label {
         &#pageStartLabel {
-            font-size: 9vh;
+            font-size: 9cqh;
         }
-        font-size: 3vh;
+        font-size: 3cqh;
     }
 }
 
@@ -35,30 +35,30 @@
     align-items: center;
     width: 100%;
     & label {
-        width: 20vh;
+        width: 20cqh;
         flex: 0 0 auto;
-        margin-right: 3vh;
+        margin-right: 3cqh;
         text-align: center;
     }
     & input {
-        width: 25vh;
-        height: 2vh;
+        width: 25cqh;
+        height: 2cqh;
         -webkit-appearance: none;
         appearance: none;
         background: #ba5;
-        border-radius: 2vh;
+        border-radius: 2cqh;
         &::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 4vh;
-            height: 4vh;
+            width: 4cqh;
+            height: 4cqh;
             background: #eee;
             border-radius: 50%;
             cursor: pointer;
         }
         &::-moz-range-thumb {
-            width: 4vh;
-            height: 4vh;
+            width: 4cqh;
+            height: 4cqh;
             background: #eee;
             border-radius: 50%;
             cursor: pointer;
@@ -78,11 +78,11 @@
 #play {
     background-color: #eee;
     flex-direction: row;
-    gap: 0vh;
+    gap: 0cqh;
     & .playField {
         z-index: 1;
         /* border:  solid #2ac8; */
-        box-shadow: 0 0 1vh #2224;
+        box-shadow: 0 0 1cqh #2224;
         flex: 1;
         background-color: #bde;
         border-radius: 2%;
@@ -90,9 +90,9 @@
         aspect-ratio: 9/10;
         display: flex;
         flex-direction: row;
-        gap: 1vh;
-        margin-left: 0.5vh;
-        margin-right: 0.5vh;
+        gap: 1cqh;
+        margin-left: 0.5cqh;
+        margin-right: 0.5cqh;
         .playCanvas {
             height: 95%;
         }
@@ -107,7 +107,7 @@
             display: flex;
             flex-direction: column;
             justify-content: start;
-            gap: 2vh;
+            gap: 2cqh;
             & .informationLabel {
                 font-family: "RocknRoll One", Arial;
                 color: #2ac;
@@ -137,24 +137,24 @@
 }
 
 #playerRegister {
-    background-image: repeating-linear-gradient(45deg, #ccc 0px, #ccc 5vh, #c3c3c3 5vh, #c3c3c3 10vh);
+    background-image: repeating-linear-gradient(45deg, #ccc 0px, #ccc 5cqh, #c3c3c3 5cqh, #c3c3c3 10cqh);
 
     & #registerText {
-        font-size: 5vh;
+        font-size: 5cqh;
         text-wrap: nowrap;
     }
     & #connectionLabel {
-        height: 15vh;
+        height: 15cqh;
         display: flex;
         flex-direction: row;
-        gap: 4vh;
+        gap: 4cqh;
         & .inputTypeIcon {
             color: #ba4;
-            width: 15vh;
-            height: 15vh;
-            padding: 1vh;
-            border: #6bda 0.5vh solid;
-            border-radius: 1vh;
+            width: 15cqh;
+            height: 15cqh;
+            padding: 1cqh;
+            border: #6bda 0.5cqh solid;
+            border-radius: 1cqh;
             &[data-input-type="keyboard"] {
                 background-image: url(../assets/images/descriptions/keyboard.png);
                 background-repeat: no-repeat;
@@ -175,18 +175,18 @@
 }
 
 #playerNumberSelect {
-    background-image: repeating-linear-gradient(45deg, #ccc 0px, #ccc 5vh, #c3c3c3 5vh, #c3c3c3 10vh);
+    background-image: repeating-linear-gradient(45deg, #ccc 0px, #ccc 5cqh, #c3c3c3 5cqh, #c3c3c3 10cqh);
     & .text {
-        font-size: 5vh;
+        font-size: 5cqh;
     }
     & .options {
-        gap: 8vh;
+        gap: 8cqh;
     }
 }
 
 #playPrepare {
     & .options {
-        gap: 8vh;
+        gap: 8cqh;
         & .playStart {
             color: #d76;
         }
@@ -197,23 +197,23 @@
     background-color: #00000000;
     & #startEffectBase {
         background-color: #eeaa0066;
-        border: #eeaa0099 1vh solid;
-        height: 20vh;
+        border: #eeaa0099 1cqh solid;
+        height: 20cqh;
         width: 120%;
         display: flex;
         justify-content: center;
         align-items: center;
         & .startEffectLabel {
-            /* line-height: 20vh; */
+            /* line-height: 20cqh; */
             font-family: "RocknRoll One", Arial;
             text-align: center;
-            font-size: 20vh;
-            margin-bottom: 3vh;
+            font-size: 20cqh;
+            margin-bottom: 3cqh;
         }
         & #startLabel {
             font-family: "RocknRoll One", Arial;
             text-align: center;
-            font-size: 20vh;
+            font-size: 20cqh;
             color: #ee8888;
         }
     }
@@ -222,23 +222,23 @@
 #result {
     & .resultLabel {
         color: #ee8888;
-        font-size: 10vh;
+        font-size: 10cqh;
         font-family: "RocknRoll One", Arial;
     }
     & .options:nth-child(3) {
-        gap: 8vh;
-        margin-bottom: 8vh;
+        gap: 8cqh;
+        margin-bottom: 8cqh;
     }
 }
 #replayResult {
     & .resultLabel {
         color: #ee8888;
-        font-size: 10vh;
+        font-size: 10cqh;
         font-family: "RocknRoll One", Arial;
     }
     & .options:nth-child(3) {
-        gap: 8vh;
-        margin-right: -2vh;
+        gap: 8cqh;
+        margin-right: -2cqh;
     }
 }
 
@@ -248,41 +248,41 @@
         flex-direction: row;
         align-items: start;
         justify-content: start;
-        gap: 5vh;
-        padding-left: 10vh;
+        gap: 5cqh;
+        padding-left: 10cqh;
     }
 }
 
 #pause {
     background-color: #dddddddd;
     & .container {
-        gap: 8vh;
+        gap: 8cqh;
     }
 }
 
 #replayPause {
     background-color: #dddddddd;
     & .options {
-        gap: 8vh;
+        gap: 8cqh;
     }
 }
 
 #replayControls {
     position: absolute;
     z-index: 2;
-    top: 2vh;
-    right: 2vh;
+    top: 2cqh;
+    right: 2cqh;
     display: flex;
     align-items: center;
-    gap: 2vh;
-    padding: 1vh 2vh;
-    border: 0.8vh solid #2898;
-    border-radius: 1vh;
+    gap: 2cqh;
+    padding: 1cqh 2cqh;
+    border: 0.8cqh solid #2898;
+    border-radius: 1cqh;
     background-color: #eefc;
     pointer-events: none;
 
     & span {
-        font-size: 3vh;
+        font-size: 3cqh;
     }
 
     & #replayPlaybackStatus {
@@ -290,13 +290,13 @@
     }
 
     & #replayPlaybackSpeed {
-        min-width: 7vh;
+        min-width: 7cqh;
         color: #289;
     }
 
     & .replayControlHelp {
         color: #678;
-        font-size: 2.2vh;
+        font-size: 2.2cqh;
     }
 
     &.disabled {
@@ -309,9 +309,9 @@
     display: flex;
     flex-direction: column;
     & .text {
-        font-size: 4vh;
+        font-size: 4cqh;
         & b {
-            font-size: 4vh;
+            font-size: 4cqh;
         }
     }
 }
@@ -321,56 +321,56 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 10vh;
+    gap: 10cqh;
     position: absolute;
-    bottom: 4vh;
+    bottom: 4cqh;
     margin-left: auto;
     margin-right: auto;
 }
 
 #others {
     & .options {
-        margin-top: 10vh;
+        margin-top: 10cqh;
     }
     & .button {
-        font-size: 5vh;
+        font-size: 5cqh;
     }
 }
 
 #howToPlayBasic {
     & .subPage .text {
-        width: 130vh;
-        height: 50vh;
+        width: 130cqh;
+        height: 50cqh;
     }
 }
 
 #replay {
     & .text {
-        font-size: 5vh;
+        font-size: 5cqh;
     }
     & .options {
-        padding-top: 4vh;
-        padding-bottom: 4vh;
-        height: 50vh;
-        width: 130vh;
+        padding-top: 4cqh;
+        padding-bottom: 4cqh;
+        height: 50cqh;
+        width: 130cqh;
         overflow-y: auto;
         background-color: #dddddd88;
-        border-radius: 4vh;
+        border-radius: 4cqh;
         justify-content: start;
-        border: 1vh #5acd solid;
+        border: 1cqh #5acd solid;
         &::-webkit-scrollbar {
-            width: 3.5vh;
+            width: 3.5cqh;
         }
 
         &::-webkit-scrollbar-track {
             background: #ccc0;
-            border-radius: 2vh;
+            border-radius: 2cqh;
         }
 
         &::-webkit-scrollbar-thumb {
             background: #678;
-            border-radius: 2vh;
-            border: 0.4vh solid #456;
+            border-radius: 2cqh;
+            border: 0.4cqh solid #456;
         }
 
         &::-webkit-scrollbar-thumb:hover {
@@ -381,34 +381,34 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2vh;
+            gap: 2cqh;
             & .replayButton {
-                font-size: 4.5vh;
-                margin-left: -10vh;
+                font-size: 4.5cqh;
+                margin-left: -10cqh;
                 &:focus {
                     scale: 1;
                 }
             }
             & .replayDataDescription {
-                font-size: 3vh;
-                width: 25vh;
+                font-size: 3cqh;
+                width: 25cqh;
             }
             & .replaySaveButton {
-                height: 7vh;
+                height: 7cqh;
                 aspect-ratio: 1;
                 background-image: url("../assets/images/descriptions/save.png");
                 background-repeat: no-repeat;
                 background-size: cover;
                 &::before {
-                    font-size: 3vh;
+                    font-size: 3cqh;
                     content: "保存する";
                     position: absolute;
                     bottom: 10%;
                     left: 120%;
                     background-color: #eee8;
-                    border-radius: 1vh;
-                    border: 0.2vh #2894 solid;
-                    padding: 1vh;
+                    border-radius: 1cqh;
+                    border: 0.2cqh #2894 solid;
+                    padding: 1cqh;
                     opacity: 0;
                     pointer-events: none;
                     transition: opacity 200ms;
@@ -432,31 +432,31 @@
 
 #savedReplay {
     & .text {
-        font-size: 5vh;
+        font-size: 5cqh;
     }
     & .options {
-        padding-top: 4vh;
-        padding-bottom: 4vh;
-        height: 50vh;
-        width: 130vh;
+        padding-top: 4cqh;
+        padding-bottom: 4cqh;
+        height: 50cqh;
+        width: 130cqh;
         overflow-y: auto;
         background-color: #dddddd88;
-        border-radius: 4vh;
+        border-radius: 4cqh;
         justify-content: start;
-        border: 1vh #5acd solid;
+        border: 1cqh #5acd solid;
         &::-webkit-scrollbar {
-            width: 3.5vh;
+            width: 3.5cqh;
         }
 
         &::-webkit-scrollbar-track {
             background: #ccc0;
-            border-radius: 2vh;
+            border-radius: 2cqh;
         }
 
         &::-webkit-scrollbar-thumb {
             background: #678;
-            border-radius: 2vh;
-            border: 0.4vh solid #456;
+            border-radius: 2cqh;
+            border: 0.4cqh solid #456;
         }
 
         &::-webkit-scrollbar-thumb:hover {
@@ -467,34 +467,34 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 2vh;
+            gap: 2cqh;
             & .replayButton {
-                font-size: 4.5vh;
-                margin-left: -10vh;
+                font-size: 4.5cqh;
+                margin-left: -10cqh;
                 &:focus {
                     scale: 1;
                 }
             }
             & .replayDataDescription {
-                font-size: 3vh;
-                width: 25vh;
+                font-size: 3cqh;
+                width: 25cqh;
             }
             & .replayDeleteButton {
-                height: 7vh;
+                height: 7cqh;
                 aspect-ratio: 1;
                 background-image: url("../assets/images/descriptions/delete.png");
                 background-repeat: no-repeat;
                 background-size: cover;
                 &::before {
-                    font-size: 3vh;
+                    font-size: 3cqh;
                     content: "削除する";
                     position: absolute;
                     bottom: 10%;
                     left: 120%;
                     background-color: #eee8;
-                    border-radius: 1vh;
-                    border: 0.2vh #2894 solid;
-                    padding: 1vh;
+                    border-radius: 1cqh;
+                    border: 0.2cqh #2894 solid;
+                    padding: 1cqh;
                     opacity: 0;
                     pointer-events: none;
                     transition: opacity 200ms;
@@ -511,16 +511,16 @@
 /* 直近・保存済みともに、日時・説明・操作ボタンを同じ列幅で表示する。 */
 :is(#replay, #savedReplay) .options .replayDataContainer {
     display: grid;
-    grid-template-columns: 65vh 25vh 7vh;
-    gap: 2vh;
+    grid-template-columns: 65cqh 25cqh 7cqh;
+    gap: 2cqh;
     flex-shrink: 0;
-    margin-left: -10vh;
-    height: 13vh;
+    margin-left: -10cqh;
+    height: 13cqh;
 
     & .button {
         background-color: transparent;
         border: 0;
-        border-bottom: 0.5vh solid transparent;
+        border-bottom: 0.5cqh solid transparent;
         margin-left: 0;
 
         &:focus {
@@ -529,12 +529,12 @@
     }
 
     & .replayButton {
-        font-size: 4.5vh;
+        font-size: 4.5cqh;
         margin-left: 0;
     }
     & .replayDataDescription {
-        width: 35vh;
-        font-size: 2.8vh;
+        width: 35cqh;
+        font-size: 2.8cqh;
         text-wrap: wrap;
     }
 }
@@ -544,25 +544,25 @@
     & .popup {
         display: flex;
         flex-direction: column;
-        gap: 2vh;
+        gap: 2cqh;
         background-color: #ddeeff;
         width: 80%;
         height: 80%;
         & .headingLabel {
-            padding: 0.5vh;
-            padding-left: 7vh;
-            padding-right: 7vh;
-            border: 1vh solid #4aba;
-            border-radius: 2vh;
-            font-size: 6vh;
+            padding: 0.5cqh;
+            padding-left: 7cqh;
+            padding-right: 7cqh;
+            border: 1cqh solid #4aba;
+            border-radius: 2cqh;
+            font-size: 6cqh;
         }
         & .text {
-            font-size: 5vh;
+            font-size: 5cqh;
         }
-        padding: 3vh;
-        border: 0.5vh #bde8 solid;
-        border-radius: 3vh;
-        box-shadow: 0 0 3vh #4446;
+        padding: 3cqh;
+        border: 0.5cqh #bde8 solid;
+        border-radius: 3cqh;
+        box-shadow: 0 0 3cqh #4446;
         position: relative;
     }
 }
@@ -570,27 +570,27 @@
 #replayDeleteConfirmButton,
 #allDataDeleteConfirmButton {
     color: #ee8888;
-    font-size: 8vh;
+    font-size: 8cqh;
 }
 
 #musicSetting {
     & .options:first-child {
         & * {
-            gap: 10vh;
-            transform: translateX(-5vh);
+            gap: 10cqh;
+            transform: translateX(-5cqh);
         }
     }
 
     & .selectorPanel {
-        height: 20vh;
-        width: 55vh;
+        height: 20cqh;
+        width: 55cqh;
         flex-direction: column;
         display: flex;
         justify-content: space-around;
         align-items: center;
         & .selector {
-            width: 50vh;
-            font-size: 4vh;
+            width: 50cqh;
+            font-size: 4cqh;
             border: 1px solid black;
             /* aspect-ratio: 3 / 1; */
             text-align: center;
@@ -615,16 +615,16 @@
 
 #controllerSetting {
     justify-content: flex-start;
-    padding-top: 14vh;
+    padding-top: 14cqh;
     box-sizing: border-box;
 
     & .controllerPresetRow {
         display: flex;
-        gap: 3vh;
+        gap: 3cqh;
 
         & .button {
             margin-left: 0;
-            font-size: 3.2vh;
+            font-size: 3.2cqh;
         }
 
         & .selectedValue {
@@ -634,26 +634,26 @@
     }
 
     & #controllerSettingStatus {
-        margin: 1.5vh 0;
-        min-height: 4vh;
-        font-size: 4vh;
+        margin: 1.5cqh 0;
+        min-height: 4cqh;
+        font-size: 4cqh;
         /* color: #567; */
         color: #6bd;
     }
 
     & .controllerMappingGrid {
         display: grid;
-        grid-template-columns: repeat(2, 70vh);
-        gap: 1.2vh 4vh;
+        grid-template-columns: repeat(2, 70cqh);
+        gap: 1.2cqh 4cqh;
 
         & .controllerMappingButton {
             margin-left: 0;
-            height: 7vh;
+            height: 7cqh;
             display: grid;
-            grid-template-columns: 14vh 1fr;
+            grid-template-columns: 14cqh 1fr;
             align-items: center;
-            border: 0.35vh solid #6bd8;
-            border-radius: 1.2vh;
+            border: 0.35cqh solid #6bd8;
+            border-radius: 1.2cqh;
             background-color: #eefb;
 
             &::before {
@@ -665,19 +665,19 @@
             }
 
             & span {
-                font-size: 2.8vh;
+                font-size: 2.8cqh;
             }
 
             & .controllerMappingLabel {
                 color: #567;
                 text-align: left;
-                padding-left: 1.5vh;
+                padding-left: 1.5cqh;
             }
 
             & .controllerMappingValue {
                 color: #d76;
                 text-align: right;
-                padding-right: 1.5vh;
+                padding-right: 1.5cqh;
             }
 
             &.waitingInput {
@@ -692,15 +692,15 @@
     }
 
     & #controllerSettingReset {
-        margin: 1.5vh 0 0;
-        font-size: 4vh;
+        margin: 1.5cqh 0 0;
+        font-size: 4cqh;
         background: none;
         border-color: #22222200;
         &:focus {
             border-color: #ff90be;
         }
 
-        &:disabled {
+        &[aria-disabled="true"] {
             pointer-events: none;
             opacity: 0.35;
         }
@@ -710,30 +710,30 @@
 #controllerBindingSetting {
     & .controllerBindingPopup {
         & #controllerBindingStatus {
-            font-size: 4vh;
+            font-size: 4cqh;
         }
 
         & #controllerBindingList {
-            max-height: 42vh;
+            max-height: 42cqh;
             overflow-y: auto;
             overflow-x: hidden;
             scrollbar-gutter: stable;
-            gap: 0.5vh;
+            gap: 0.5cqh;
 
             & .controllerBindingDelete {
                 margin-left: 0;
-                font-size: 4vh;
+                font-size: 4cqh;
             }
 
             & .controllerBindingEmpty {
-                font-size: 4vh;
+                font-size: 4cqh;
                 color: #888;
             }
         }
 
         & #controllerBindingAdd {
             margin-left: 0;
-            font-size: 4vh;
+            font-size: 4cqh;
 
             &[aria-disabled="true"] {
                 opacity: 0.35;
@@ -749,28 +749,28 @@
 
 #playerControllerSetting {
     & > .text {
-        margin-bottom: 3vh;
-        font-size: 3.2vh;
+        margin-bottom: 3cqh;
+        font-size: 3.2cqh;
     }
 
     & .playerControllerRows {
         display: flex;
         flex-direction: column;
-        gap: 2vh;
+        gap: 2cqh;
 
         & .playerControllerRow {
             display: flex;
-            gap: 2vh;
+            gap: 2cqh;
 
             & .label {
-                width: 8vh;
-                font-size: 3.5vh;
+                width: 8cqh;
+                font-size: 3.5cqh;
                 color: #567;
             }
 
             & .button {
                 margin-left: 0;
-                font-size: 3.2vh;
+                font-size: 3.2cqh;
 
                 &.selectedValue {
                     color: #ee8888;
@@ -784,37 +784,37 @@
 #survivalPlaySetting,
 #linePlaySetting {
     justify-content: flex-start;
-    padding-top: 16vh;
+    padding-top: 16cqh;
     box-sizing: border-box;
 
     & .playSettingPanel {
-        width: 125vh;
+        width: 125cqh;
         display: flex;
         flex-direction: column;
-        gap: 2vh;
+        gap: 2cqh;
     }
 
     & .playSettingSection {
         width: 100%;
         display: flex;
         flex-direction: column;
-        gap: 1vh;
+        gap: 1cqh;
     }
 
     & .playSettingSectionTitle {
-        font-size: 4vh;
+        font-size: 4cqh;
         color: #6bd;
     }
 
     & .button:not(.back) {
         margin-left: 0;
-        font-size: 3.2vh;
-        height: 6vh;
+        font-size: 3.2cqh;
+        height: 6cqh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding-bottom: 2vh;
-        margin-bottom: -2vh;
+        padding-bottom: 2cqh;
+        margin-bottom: -2cqh;
     }
 
     & .selectedValue {
@@ -825,28 +825,28 @@
 
 #survivalPlaySetting {
     & .maxTimeOptions {
-        gap: 5vh;
+        gap: 5cqh;
     }
 
     & .handySettingSection {
-        gap: 0.8vh;
+        gap: 0.8cqh;
     }
 
     & .handyRow {
         display: flex;
         justify-content: center;
-        gap: 2vh;
-        min-height: 7vh;
+        gap: 2cqh;
+        min-height: 7cqh;
 
         & .playerSettingLabel {
-            width: 8vh;
-            font-size: 3.2vh;
+            width: 8cqh;
+            font-size: 3.2cqh;
             color: #567;
         }
 
         & .handyValue {
-            width: 12vh;
-            font-size: 3.5vh;
+            width: 12cqh;
+            font-size: 3.5cqh;
             color: #d76;
         }
     }
@@ -854,18 +854,18 @@
 
 #linePlaySetting {
     & .lineTargetSetting {
-        margin-top: 16vh;
-        gap: 5vh;
+        margin-top: 16cqh;
+        gap: 5cqh;
     }
 
     & .settingValue {
-        width: 16vh;
-        font-size: 5vh;
+        width: 16cqh;
+        font-size: 5cqh;
         color: #d76;
     }
 
     & .text {
-        font-size: 3vh;
+        font-size: 3cqh;
     }
 }
 
@@ -873,42 +873,42 @@
     align-items: end;
     & .options {
         & .button {
-            font-size: 4vh;
+            font-size: 4cqh;
             color: #888;
             transition: color 100ms ease-in-out;
-            margin-left: 2vh;
+            margin-left: 2cqh;
         }
-        margin-right: 45vh;
+        margin-right: 45cqh;
     }
 }
 
 .scrollableContainer {
-    padding-top: 4vh;
-    padding-bottom: 4vh;
-    height: 50vh;
-    width: 130vh;
+    padding-top: 4cqh;
+    padding-bottom: 4cqh;
+    height: 50cqh;
+    width: 130cqh;
     overflow-y: auto;
     background-color: #dddddd88;
-    border-radius: 4vh;
+    border-radius: 4cqh;
     justify-content: start;
     align-items: center;
-    border: 1vh #5acd solid;
+    border: 1cqh #5acd solid;
     display: flex;
     flex-direction: column;
-    gap: 2vh;
+    gap: 2cqh;
     &::-webkit-scrollbar {
-        width: 3.5vh;
+        width: 3.5cqh;
     }
 
     &::-webkit-scrollbar-track {
         background: #ccc0;
-        border-radius: 2vh;
+        border-radius: 2cqh;
     }
 
     &::-webkit-scrollbar-thumb {
         background: #678;
-        border-radius: 2vh;
-        border: 0.4vh solid #456;
+        border-radius: 2cqh;
+        border: 0.4cqh solid #456;
     }
 
     &::-webkit-scrollbar-thumb:hover {
@@ -917,16 +917,16 @@
 
     & .selectedValue {
         color: #ee8888;
-        border: #2ac 0.5vh dashed;
-        border-radius: 1vh;
+        border: #2ac 0.5cqh dashed;
+        border-radius: 1cqh;
     }
 }
 
 #bgmSetting {
     & .options {
         & .label {
-            font-size: 5vh;
-            margin-right: 5vh;
+            font-size: 5cqh;
+            margin-right: 5cqh;
         }
         & .selector {
             color: #ee8888;
@@ -935,36 +935,36 @@
 }
 
 #soundTest {
-    padding-top: 16vh;
+    padding-top: 16cqh;
     justify-content: start;
     & .soundTestPanel {
         display: flex;
         flex-direction: column;
-        gap: 6vh;
+        gap: 6cqh;
         width: 90%;
     }
     & #soundTestStatus {
-        font-size: 5vh;
+        font-size: 5cqh;
         text-align: center;
-        min-height: 4vh;
+        min-height: 4cqh;
     }
     & .soundTestTrackSelection {
-        gap: 3vh;
+        gap: 3cqh;
         & .label,
         & .selector {
-            font-size: 5vh;
+            font-size: 5cqh;
         }
         & .selector {
             color: #ee8888;
-            margin-left: 0vh;
+            margin-left: 0cqh;
         }
     }
     & .soundTestControls {
-        gap: 3vh;
+        gap: 3cqh;
         & .button {
-            font-size: 5vh;
+            font-size: 5cqh;
             &::before {
-                font-size: 5vh;
+                font-size: 5cqh;
             }
         }
     }
@@ -978,31 +978,31 @@
 }
 
 #dataSetting {
-    padding-top: 17vh;
+    padding-top: 17cqh;
     justify-content: start;
-    gap: 2vh;
+    gap: 2cqh;
     & #dataInformation {
         display: flex;
         flex-direction: column;
-        gap: 1vh;
+        gap: 1cqh;
         & .label,
         & span {
-            font-size: 4.5vh;
+            font-size: 4.5cqh;
         }
-        margin-bottom: 5vh;
+        margin-bottom: 5cqh;
     }
     & #dataDeleteStatus {
-        font-size: 4vh;
+        font-size: 4cqh;
         text-align: center;
-        min-height: 3.5vh;
+        min-height: 3.5cqh;
         max-width: 90%;
     }
     & .options {
-        gap: 1.5vh;
+        gap: 1.5cqh;
         & .button {
-            font-size: 5vh;
+            font-size: 5cqh;
             &::before {
-                font-size: 5vh;
+                font-size: 5cqh;
             }
         }
     }
@@ -1010,7 +1010,7 @@
 
 #allDataDeleteAlert {
     & #dataDeleteDescription {
-        font-size: 4vh;
+        font-size: 4cqh;
         text-align: center;
         line-height: 1.8;
         max-width: 90%;
@@ -1018,8 +1018,8 @@
     & #allDataDeleteConfirmButton {
         background: transparent;
         border: none;
-        border-bottom: 0.5vh solid transparent;
-        font-size: 6vh;
+        border-bottom: 0.5cqh solid transparent;
+        font-size: 6cqh;
         margin-left: 0;
         &:focus {
             border-bottom-color: #ff90be;
@@ -1038,26 +1038,26 @@
         & .container {
             flex-direction: row;
             & .label:first-child {
-                left: 40vh;
+                left: 40cqh;
                 position: absolute;
             }
             & .button {
-                height: 8vh;
+                height: 8cqh;
                 aspect-ratio: 1/1;
-                font-size: 8vh;
+                font-size: 8cqh;
                 box-sizing: border-box;
-                border: #22222200 0.2vh solid;
+                border: #22222200 0.2cqh solid;
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 padding: 0;
-                margin-left: 0vh;
+                margin-left: 0cqh;
                 &::before {
                     content: "";
                 }
                 &:focus {
                     outline: none;
-                    border: #ff90be 0.5vh solid;
+                    border: #ff90be 0.5cqh solid;
                 }
             }
         }

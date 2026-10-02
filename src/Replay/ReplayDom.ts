@@ -10,8 +10,8 @@ export class ReplayDom {
             element.remove();
         });
 
-        const replayButtons: HTMLButtonElement[] = [];
-        const deleteButtons: HTMLButtonElement[] = [];
+        const replayButtons: HTMLElement[] = [];
+        const deleteButtons: HTMLElement[] = [];
 
         for (const replayData of replayDataList) {
             const { replayDataContainer, replayButton, deleteButton } = this.createReplayDataContainer(replayData);
@@ -22,23 +22,13 @@ export class ReplayDom {
             deleteButtons.push(deleteButton);
         }
 
-        container.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
-            button.tabIndex = 0;
-            button.addEventListener("mouseover", () => button.focus());
-            button.addEventListener("mouseleave", () => {
-                if (document.activeElement === button) button.blur();
-            });
-        });
-
         //座標の割り振り
         qsAll("#savedReplay .replayButton").forEach((button, i) => {
             button.dataset.xy = `[0,${i}]`;
-            button.tabIndex = 0;
         });
 
         qsAll("#savedReplay .replayDeleteButton").forEach((button, i) => {
             button.dataset.xy = `[1,${i}]`;
-            button.tabIndex = 0;
         });
 
         qs("#savedReplay .back").dataset.xy = `[0,${replayDataList.length}]`;
@@ -51,16 +41,16 @@ export class ReplayDom {
 
         const html = `
             <div class="replayDataContainer">
-                <button class="replayButton button" type="button">${this.getDateString(now)}</button>
+                <div class="replayButton button">${this.getDateString(now)}</div>
                 <div class="replayDataDescription">${this.createReplayDataDescription(replayData)}</div>
-                <button class="replayDeleteButton button" type="button" aria-label="リプレイを削除する"></button>
+                <div class="replayDeleteButton button" aria-label="リプレイを削除する"></div>
             </div>
         `;
 
         const replayDataContainer = this.parser.parseFromString(html, "text/html").body.firstElementChild!;
 
-        const replayButton = replayDataContainer.querySelector(".replayButton") as HTMLButtonElement;
-        const deleteButton = replayDataContainer.querySelector(".replayDeleteButton") as HTMLButtonElement;
+        const replayButton = replayDataContainer.querySelector(".replayButton") as HTMLElement;
+        const deleteButton = replayDataContainer.querySelector(".replayDeleteButton") as HTMLElement;
 
         return { replayButton, deleteButton, replayDataContainer };
     }
@@ -103,8 +93,7 @@ export class ReplayDom {
     private static createTempReplayButton(replayData: ReplayData) {
         const now = new Date(replayData.date);
 
-        const replayButton = document.createElement("button");
-        replayButton.type = "button";
+        const replayButton = document.createElement("div");
         replayButton.classList.add("replayButton", "button");
         replayButton.innerHTML = this.getDateString(now);
 
@@ -112,8 +101,7 @@ export class ReplayDom {
         description.classList.add("replayDataDescription");
         description.innerHTML = this.createReplayDataDescription(replayData);
 
-        const saveButton = document.createElement("button");
-        saveButton.type = "button";
+        const saveButton = document.createElement("div");
         saveButton.classList.add("replaySaveButton", "button");
         saveButton.setAttribute("aria-label", "リプレイを保存する");
 
@@ -123,18 +111,6 @@ export class ReplayDom {
         replayContainer.appendChild(replayButton);
         replayContainer.appendChild(description);
         replayContainer.appendChild(saveButton);
-        replayContainer.querySelectorAll("button").forEach((button) => {
-            button.tabIndex = 0;
-            button.addEventListener("mouseover", () => {
-                button.focus();
-            });
-            button.addEventListener("mouseleave", () => {
-                if (document.activeElement == button) {
-                    (button as HTMLButtonElement).blur();
-                }
-            });
-        });
-
         qs("#replay .options").prepend(replayContainer);
 
         let tempDataListLength = 0;

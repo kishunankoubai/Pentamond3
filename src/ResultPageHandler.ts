@@ -3,6 +3,7 @@ import { qsAll, qs, sleep } from "./Utils";
 import { Replay } from "./Replay/Replay";
 import { PlaySetting } from "./BeforePlaying/PlaySettingSetter";
 import { sceneManager } from "./Utilities/SceneManager";
+import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 
 /**
  * ResultPageに関する、状態を持たない関数群
@@ -22,21 +23,25 @@ export class ResultPageHandler {
 
     static setSaveButton() {
         const saveButton = qs("#result .saveReplayButton");
+        let saving = false;
 
         saveButton.onclick = async () => {
+            if (saving) return;
+            saving = true;
+            setInteractionEnabled(saveButton, false);
             saveButton.innerText = "保存中……";
 
             await sleep(17);
 
             const succeed = await Replay.saveLastOne();
             if (succeed) {
-                Replay.setupSavedReplayPage();
-                Replay.updateTempReplaySaveButton();
                 saveButton.innerText = "保存しました";
                 saveButton.onclick = () => {};
             } else {
                 saveButton.innerText = "リプレイを保存する";
+                setInteractionEnabled(saveButton, true);
             }
+            saving = false;
         };
     }
 

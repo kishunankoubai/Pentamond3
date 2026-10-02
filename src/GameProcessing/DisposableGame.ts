@@ -1,6 +1,6 @@
 import { sleep } from "../Utils";
 
-import { gameEvents, GameMode } from "../Game/GameMode";
+import { GameMode, GameModeClass } from "../Game/GameMode";
 import { GamePlayer } from "../Game/GamePlayer";
 import { InputObserver } from "../Utilities/Interaction/InputObserver";
 import type { ReplayData, ReplayRandomSeeds } from "../Replay/Replay";
@@ -19,6 +19,7 @@ export class DisposableGame {
     readonly randomSeeds: ReplayRandomSeeds;
 
     private hasStarted = false;
+    private disposed = false;
     /**
      * すでに開始されているか
      */
@@ -41,7 +42,7 @@ export class DisposableGame {
     onFinished = () => {};
     onEnding = () => {};
 
-    constructor(gameModeList: (typeof GameMode)[], inputs: InputObserver[], inputCount: number, { playSetting, replayData }: { playSetting?: PlaySetting; replayData?: ReplayData }) {
+    constructor(gameModeList: GameModeClass[], inputs: InputObserver[], inputCount: number, { playSetting, replayData }: { playSetting?: PlaySetting; replayData?: ReplayData }) {
         if (replayData) {
             this.replayData = replayData;
             this.playSetting = replayData.playSetting;
@@ -57,20 +58,17 @@ export class DisposableGame {
         };
 
         //登録されているinputをもとにplayersを作成する
-        this.players = DisposableGame.createPlayers(this.playSetting, inputs, inputCount, this.randomSeeds, { replayData: this.replayData });
+        this.players = DisposableGame.createPlayers(this.playSetting, inputs, inputCount, this.randomSeeds);
 
         // ゲームを作成
         const CurrentMode = gameModeList[this.playSetting.mode - 1];
-        // @ts-ignore
+        if (!CurrentMode) throw new Error("未対応のゲームモードです");
         this.game = new CurrentMode(this.players);
-        gameEvents.push(
-            this.game.addHandler("gameFinish", async () => {
-                await this.onGameFinish();
-            })
-        );
+        this.game.addHandler("gameFinish", () => this.onGameFinish(), 1);
     }
 
     quit() {
+        this.disposed = true;
         this.game.stop();
         this.game.remove();
     }
@@ -101,6 +99,7 @@ export class DisposableGame {
         }
 
         await sleep(1000);
+        if (this.disposed) return;
         this.game.remove();
         this.onFinished();
     }
@@ -118,7 +117,7 @@ export class DisposableGame {
         });
     }
 
-    private static createPlayers(playSetting: PlaySetting, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds, { replayData }: { replayData?: ReplayData }) {
+    private static createPlayers(playSetting: PlaySetting, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds) {
         const players = inputs.map((input, i) =>
             new GamePlayer(input, inputCount, {
                 next: randomSeeds.next[i],
@@ -142,13 +141,6 @@ export class DisposableGame {
             player.playInfo.handy = playSetting.mode === 1 ? (playSetting.handy[i] ?? 1) : 1;
             player.playInfo.targetLines = playSetting.targetLines;
 
-            //リプレイ情報の読み込み
-            if (replayData?.nextData?.[i]) {
-                player.operator.s$next = replayData.nextData[i];
-            }
-            if (replayData?.nuisanceBlockData?.[i]) {
-                player.nuisanceMondManager.s$spawnCoordinates = replayData.nuisanceBlockData[i];
-            }
         });
 
         return players;

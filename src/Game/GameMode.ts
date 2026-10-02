@@ -1,7 +1,8 @@
-import { MyEvent, MyEventListener } from "../Utilities/MyEventListener";
+import { MyEventListener } from "../Utilities/MyEventListener";
+import { EventScope } from "../Utilities/EventScope";
 import { GamePlayer } from "./GamePlayer";
+import { operationKeyCodes } from "./Operations";
 
-export const gameEvents: MyEvent[] = [];
 export type OperateName = "put" | "move-left" | "move-right" | "move-down" | "spin-left" | "spin-right" | "unput" | "hold" | "removeLine";
 export type OperateData = {
     time: number;
@@ -9,6 +10,7 @@ export type OperateData = {
 };
 
 export abstract class GameMode extends MyEventListener {
+    protected readonly events = new EventScope();
     protected players: GamePlayer[] = [];
     protected state = {
         hasFinished: false,
@@ -20,10 +22,10 @@ export abstract class GameMode extends MyEventListener {
         super();
         this.players = players;
         this.operateMemories = new Array(players.length).fill(undefined).map(() => []);
-        const operateNames = ["put", "move-left", "move-right", "move-down", "spin-left", "spin-right", "unput", "hold", "removeLine"];
+        const operateNames = Object.keys(operationKeyCodes) as OperateName[];
         players.forEach((p, i) => {
             operateNames.forEach((operateName) => {
-                gameEvents.push(
+                this.events.add(
                     p.operator.addHandler(operateName, () => {
                         this.operateMemories[i].push({
                             time: Math.floor(p.loop.g$elapsedTime),
@@ -50,10 +52,12 @@ export abstract class GameMode extends MyEventListener {
     protected abstract addPlayerBehavior(index: number): void;
 
     remove() {
-        gameEvents.splice(0).forEach((event) => event.owner?.removeEvent(event));
+        this.events.dispose();
         this.removeAllEvent();
         this.players.forEach((player) => {
-            player.g$element.remove();
+            player.dispose();
         });
     }
 }
+
+export type GameModeClass = new (players: GamePlayer[]) => GameMode;

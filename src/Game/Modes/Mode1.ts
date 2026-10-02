@@ -1,10 +1,9 @@
-import { gameEvents, GameMode } from "../GameMode";
+import { bindPlayerControls } from "../PlayerControls";
+import { GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
 import * as Setting from "../../Settings";
-import { removeMousePointerTemporary } from "../../Utils";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
-import { ControllerRegisterer } from "../../BeforePlaying/ControllerRegisterer";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
 
 export class Mode1 extends GameMode {
@@ -102,33 +101,7 @@ export class Mode1 extends GameMode {
 
     addPlayerBehavior(index: number): void {
         const p = this.players[index];
-        const input = p.input;
-        const gamepadConfig = ControllerRegisterer.gamepadConfigs[index] ?? Setting.gamepadConfigPresets[0];
-        const operate = (keyCode: string) => {
-            if (["ArrowLeft", ...gamepadConfig.moveLeft].includes(keyCode)) {
-                p.operator.move("left");
-            } else if (["ArrowRight", ...gamepadConfig.moveRight].includes(keyCode)) {
-                p.operator.move("right");
-            } else if (["ArrowDown", ...gamepadConfig.moveDown].includes(keyCode)) {
-                p.operator.move("down");
-            } else if (["ArrowUp", ...gamepadConfig.put].includes(keyCode)) {
-                p.operator.put();
-            } else if (["KeyC", ...gamepadConfig.spinLeft].includes(keyCode)) {
-                p.operator.spin("left");
-            } else if (["KeyV", ...gamepadConfig.spinRight].includes(keyCode)) {
-                p.operator.spin("right");
-            } else if (["KeyB", ...gamepadConfig.unput].includes(keyCode)) {
-                p.operator.unput();
-            } else if (["Space", ...gamepadConfig.hold].includes(keyCode)) {
-                p.operator.hold();
-            } else if (["Enter", ...gamepadConfig.removeLine].includes(keyCode)) {
-                p.operator.removeLine();
-            } else {
-                return;
-            }
-            removeMousePointerTemporary();
-            p.updateCanvas();
-        };
+        bindPlayerControls(p, index, this.events);
 
         p.label.s$visible = { gameTime: true, playTime: false, line: false, lastTrick: true, chain: true, score: true };
         const updateLabel = () => {
@@ -142,36 +115,9 @@ export class Mode1 extends GameMode {
             });
         };
 
-        let lastOperateTime = 0;
 
-        gameEvents.push(
-            input.addHandler("inputValid", () => {
-                if (p.loop.g$isStopping) {
-                    return;
-                }
-                operate(input.g$latestPressingKey);
-            }),
-
-            p.loop.addHandler(["loop"], () => {
-                const moveKeys = [
-                    "ArrowLeft",
-                    "ArrowRight",
-                    "ArrowDown",
-                    ...gamepadConfig.moveLeft,
-                    ...gamepadConfig.moveRight,
-                    ...gamepadConfig.moveDown,
-                ];
-                const latestKey = input.getLatestPressingKey(moveKeys);
-                const pressTime = Date.now() - input.getPressTime(latestKey);
-                if (pressTime >= Setting.input.delayTime && latestKey != "") {
-                    if (pressTime - lastOperateTime >= Setting.input.repeatTime) {
-                        operate(latestKey);
-                        lastOperateTime = pressTime;
-                    }
-                } else {
-                    lastOperateTime = 0;
-                }
-
+        this.events.add(
+            p.loop.addHandler("loop", () => {
                 p.playInfo.playTime = p.loop.g$elapsedTime;
                 updateLabel();
                 p.updateGameTime();
@@ -261,9 +207,9 @@ export class Mode1 extends GameMode {
                     p.playInfo.score += (lastTrick.time + lastTrick.attack) * 50;
                     const attack = lastTrick.attack + Math.ceil(p.playInfo.chain / 5);
                     p.damageInfo.attackTask += Math.round(attack * p.playInfo.handy);
-                    p.playInfo.maxChain = Math.max(p.playInfo.maxChain, p.playInfo.chain);
                     p.playInfo.recovery += Math.round(lastTrick.time * p.playInfo.handy);
                     p.playInfo.chain += 1;
+                    p.playInfo.maxChain = Math.max(p.playInfo.maxChain, p.playInfo.chain);
                     p.playInfo.trickCount += 1;
                     if (GraphicSetting.removeShake) {
                         p.animations.removeLineWithTrick.play();

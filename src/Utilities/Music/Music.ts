@@ -48,6 +48,8 @@ export class Music {
     private isLoaded = false;
     private isPlaying = false;
     private playGeneration = 0;
+    private fadeGeneration = 0;
+    private loading?: Promise<void>;
 
     constructor(data: MusicData, volume = 1.0) {
         this.data = data;
@@ -69,17 +71,17 @@ export class Music {
 
     async load() {
         if (this.isLoaded) return;
-
-        const res = await fetch(this.data.src);
-        if (!res.ok) throw new Error(`音声の読み込みに失敗しました: ${res.status}`);
-        const arrayBuffer = await res.arrayBuffer();
-
-        this.audioBuffer = await Music.context.decodeAudioData(arrayBuffer);
-
-        this.isLoaded = true;
+        this.loading ??= (async () => {
+            const res = await fetch(this.data.src);
+            if (!res.ok) throw new Error(`音声の読み込みに失敗しました: ${res.status}`);
+            this.audioBuffer = await Music.context.decodeAudioData(await res.arrayBuffer());
+            this.isLoaded = true;
+        })().finally(() => { this.loading = undefined; });
+        await this.loading;
     }
 
     async play(options: PlaybackOptions = {}) {
+        ++this.fadeGeneration;
         if (this.isPlaying) this.stop();
         const generation = ++this.playGeneration;
         if (!this.isLoaded) await this.load();
@@ -116,6 +118,7 @@ export class Music {
     }
 
     pause() {
+        ++this.fadeGeneration;
         ++this.playGeneration;
         if (!this.isPlaying || !this.sourceNode) return;
 
@@ -132,6 +135,7 @@ export class Music {
     }
 
     stop() {
+        ++this.fadeGeneration;
         ++this.playGeneration;
         if (this.sourceNode) {
             this.sourceNode.onended = null;
@@ -163,6 +167,7 @@ export class Music {
 
     async fade(goalVolume: number = 0, duration: number = 1000, stop: boolean = false) {
         if (!this.sourceNode || !this.isPlaying) return;
+        const generation = ++this.fadeGeneration;
 
         const now = Music.context.currentTime;
         const currentGain = this.gainNode.gain.value;
@@ -175,6 +180,7 @@ export class Music {
 
         await new Promise<void>((resolve) => {
             setTimeout(() => {
+                if (generation !== this.fadeGeneration) { resolve(); return; }
                 if (stop) {
                     this.stop();
                 } else {
@@ -187,6 +193,8 @@ export class Music {
     }
 
     setVolume(volume: number) {
+        ++this.fadeGeneration;
+        this.gainNode.gain.cancelScheduledValues(Music.context.currentTime);
         this.volume = Music.clamp(volume);
         this.updateGain();
     }

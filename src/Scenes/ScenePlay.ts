@@ -1,6 +1,6 @@
 import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
 import { GameProcessing } from "../GameProcessing/GameProcessing";
-import { setupPlayBackground } from "../PlayBackground";
+import { playBackground, setupPlayBackground } from "../PlayBackground";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 import { inputManager } from "../Utilities/Interaction/InputManager";
@@ -42,6 +42,7 @@ export class ScenePlay extends Scene {
     }
 
     protected close(): void {
+        playBackground.stop();
         if (this.pauseInputEvent) inputManager.removeEvent(this.pauseInputEvent);
         this.pageInteraction.stop();
         this.controller.abort();
@@ -59,7 +60,7 @@ export class ScenePlay extends Scene {
             page.setOpenAnimation(
                 [
                     {
-                        transform: "translate(0, 0.3vh)",
+                        transform: "translate(0, 0.3cqh)",
                         opacity: 0,
                     },
                     {
@@ -81,7 +82,7 @@ export class ScenePlay extends Scene {
                         opacity: 1,
                     },
                     {
-                        transform: "translate(0, 0.3vh)",
+                        transform: "translate(0, 0.3cqh)",
                         opacity: 0,
                     },
                 ],

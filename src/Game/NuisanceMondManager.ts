@@ -3,7 +3,6 @@ import { MyEventListener } from "../Utilities/MyEventListener";
 import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { Monoiamond } from "../BlockOperate/Monoiamond";
 import * as Setting from "../Settings";
-import { gameEvents } from "./GameMode";
 import { SeededRandom } from "../Utilities/Random/SeededRandom";
 
 /**
@@ -27,8 +26,6 @@ export class NuisanceMondManager extends MyEventListener {
     private taskCount = 0;
     //nuisanceBlockを三回に一回にする用のcount
     private progressCount = 0;
-    private spawnCoordinates: number[] = [];
-    private spawnCoordinateMemory: number[] = [];
     private random: SeededRandom;
     private playbackSpeed = 1;
 
@@ -42,11 +39,13 @@ export class NuisanceMondManager extends MyEventListener {
         super();
         this.blockManager = blockManager;
         this.random = new SeededRandom(seed);
-        gameEvents.push(
-            this.loop.addHandler("loop", () => {
-                this.damageProcess();
-            })
-        );
+        this.loop.addHandler("loop", () => this.damageProcess());
+    }
+
+    dispose(): void {
+        this.stop();
+        this.loop.removeAllEvent();
+        this.removeAllEvent();
     }
 
     //damage処理中でないときは前回のdamageによるpenaltyを返す
@@ -54,14 +53,6 @@ export class NuisanceMondManager extends MyEventListener {
     get g$penalty(): number {
         if (this.damaging) return -1;
         return this.penalty;
-    }
-
-    get g$spawnCoordinateMemory(): number[] {
-        return this.spawnCoordinateMemory;
-    }
-
-    set s$spawnCoordinates(spawnCoordinates: number[]) {
-        this.spawnCoordinates = spawnCoordinates;
     }
 
     //damageProgressを呼び出す頻度を取得する
@@ -86,7 +77,6 @@ export class NuisanceMondManager extends MyEventListener {
         } else {
             this.blockManager.remove(x, y);
         }
-        this.spawnCoordinateMemory.push(x);
     }
 
     //taskの分だけNuisanceBlockによるdamage処理を行う
@@ -238,7 +228,7 @@ export class NuisanceMondManager extends MyEventListener {
             //指定されたtaskの量の生成が完了していないとき
             if (this.taskCount < this.task) {
                 this.progress();
-                const x = this.spawnCoordinates.length ? this.spawnCoordinates.shift()! : this.random.nextInt(Setting.playWidth);
+                const x = this.random.nextInt(Setting.playWidth);
                 this.createNuisanceBlock(x, 0);
                 this.progressCount++;
                 this.taskCount++;

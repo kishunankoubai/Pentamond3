@@ -1,10 +1,8 @@
-import { gameEvents, GameMode } from "../GameMode";
+import { bindPlayerControls } from "../PlayerControls";
+import { GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
-import * as Setting from "../../Settings";
-import { removeMousePointerTemporary } from "../../Utils";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
-import { ControllerRegisterer } from "../../BeforePlaying/ControllerRegisterer";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
 
 export class Mode2 extends GameMode {
@@ -69,33 +67,7 @@ export class Mode2 extends GameMode {
 
     addPlayerBehavior(index: number): void {
         const p = this.players[index];
-        const input = p.input;
-        const gamepadConfig = ControllerRegisterer.gamepadConfigs[index] ?? Setting.gamepadConfigPresets[0];
-        const operate = (keyCode: string) => {
-            if (["ArrowLeft", ...gamepadConfig.moveLeft].includes(keyCode)) {
-                p.operator.move("left");
-            } else if (["ArrowRight", ...gamepadConfig.moveRight].includes(keyCode)) {
-                p.operator.move("right");
-            } else if (["ArrowDown", ...gamepadConfig.moveDown].includes(keyCode)) {
-                p.operator.move("down");
-            } else if (["ArrowUp", ...gamepadConfig.put].includes(keyCode)) {
-                p.operator.put();
-            } else if (["KeyC", ...gamepadConfig.spinLeft].includes(keyCode)) {
-                p.operator.spin("left");
-            } else if (["KeyV", ...gamepadConfig.spinRight].includes(keyCode)) {
-                p.operator.spin("right");
-            } else if (["KeyB", ...gamepadConfig.unput].includes(keyCode)) {
-                p.operator.unput();
-            } else if (["Space", ...gamepadConfig.hold].includes(keyCode)) {
-                p.operator.hold();
-            } else if (["Enter", ...gamepadConfig.removeLine].includes(keyCode)) {
-                p.operator.removeLine();
-            } else {
-                return;
-            }
-            removeMousePointerTemporary();
-            p.updateCanvas();
-        };
+        bindPlayerControls(p, index, this.events);
 
         p.label.s$visible = { gameTime: false, playTime: true, line: true, lastTrick: false, chain: true, score: true };
         const updateLabel = () => {
@@ -108,36 +80,10 @@ export class Mode2 extends GameMode {
                 score: p.playInfo.score + "",
             });
         };
-        let lastOperateTime = 0;
         p.canvas.guideBorder = true;
         p.canvas.guideBorderHeight = p.playInfo.targetLines;
-        gameEvents.push(
-            input.addHandler("inputValid", () => {
-                if (p.loop.g$isStopping) {
-                    return;
-                }
-                operate(input.g$latestPressingKey);
-            }),
-
-            p.loop.addHandler(["loop"], () => {
-                const moveKeys = [
-                    "ArrowLeft",
-                    "ArrowRight",
-                    "ArrowDown",
-                    ...gamepadConfig.moveLeft,
-                    ...gamepadConfig.moveRight,
-                    ...gamepadConfig.moveDown,
-                ];
-                const latestKey = input.getLatestPressingKey(moveKeys);
-                const pressTime = Date.now() - input.getPressTime(latestKey);
-                if (pressTime >= Setting.input.delayTime && latestKey != "") {
-                    if (pressTime - lastOperateTime >= Setting.input.repeatTime) {
-                        operate(latestKey);
-                        lastOperateTime = pressTime;
-                    }
-                } else {
-                    lastOperateTime = 0;
-                }
+        this.events.add(
+            p.loop.addHandler("loop", () => {
                 p.playInfo.playTime = p.loop.g$elapsedTime;
                 updateLabel();
             }),
@@ -164,6 +110,7 @@ export class Mode2 extends GameMode {
                 const continuesChain = !!lastTrick && ["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name);
                 const removeSoundIndex = continuesChain ? Math.min(6, p.playInfo.chain) : 0;
                 if (lastTrick) {
+                    p.playInfo.trickCount += 1;
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {
                         p.playInfo.line += 1;
                         p.playInfo.score += p.playInfo.chain * 100;

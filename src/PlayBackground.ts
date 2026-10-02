@@ -3,6 +3,8 @@ import { qs } from "./Utils";
 import { Vector } from "./Vector";
 
 export function setupPlayBackground() {
+    playBackgroundLoop.stop();
+    colorAnimation?.cancel();
     const element = qs("#playBackground");
 
     colorAnimation = element.animate(
@@ -30,6 +32,7 @@ export function setupPlayBackground() {
         }
     );
     element.appendChild(canvas);
+    colorAnimation.pause();
 }
 
 let colorAnimation: Animation | null;

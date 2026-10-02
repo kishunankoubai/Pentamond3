@@ -26,7 +26,7 @@ export class GamepadInput extends MyEventListener {
 
         this.loop.addHandler("loop", () => {
             const gamepad = navigator.getGamepads()[this.index];
-            if (!gamepad) return;
+            if (!gamepad) { this.releaseInputs(); return; }
 
             this.updateGamepad(gamepad);
         });
@@ -98,5 +98,17 @@ export class GamepadInput extends MyEventListener {
      */
     stop() {
         this.loop.stop();
+        this.releaseInputs();
+    }
+
+    private releaseInputs(): void {
+        this.lastButtons.forEach((pressed, buttonIndex) => {
+            if (pressed) this.executeEvent("buttonUp", { buttonIndex, pressed: false });
+        });
+        this.lastAxesInfo.forEach((axis) => {
+            if (axis.active) this.executeEvent("axisInactive", { ...axis, active: false });
+        });
+        this.lastButtons = [];
+        this.lastAxesInfo = [];
     }
 }

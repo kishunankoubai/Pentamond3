@@ -12,6 +12,7 @@ export type MyEvent = {
     readonly handler: Function;
     readonly lifeCount: LifeCounter;
     owner?: MyEventListener;
+    active?: boolean;
 };
 
 /**
@@ -51,8 +52,9 @@ export class EventManager {
         this.getLivingEvent(event)
             .filter((e) => e.className.some((name) => classNameArray.includes(name)))
             .forEach((e) => {
-                e.handler(item);
+                if (e.active === false || e.lifeCount.g$finished) return;
                 e.lifeCount.countUp();
+                e.handler(item);
             });
     }
 }
@@ -69,7 +71,7 @@ export abstract class MyEventListener {
      */
     addEvent(event: MyEvent | MyEvent[]): MyEvent[] {
         const livingEvent = EventManager.getLivingEvent(event);
-        livingEvent.forEach((e) => (e.owner = this));
+        livingEvent.forEach((e) => { e.owner = this; e.active = true; });
         this.registeredEvents.push(...livingEvent);
         return livingEvent;
     }
@@ -89,6 +91,8 @@ export abstract class MyEventListener {
      * @param event 指定したイベント
      */
     removeEvent(event: MyEvent | MyEvent[]): void {
+        const removing = Array.isArray(event) ? event : [event];
+        this.registeredEvents.filter((e) => removing.includes(e)).forEach((e) => e.active = false);
         if (Array.isArray(event)) {
             this.registeredEvents = this.registeredEvents.filter((e) => !event.includes(e));
         } else {
@@ -100,6 +104,7 @@ export abstract class MyEventListener {
      * すべてのイベントを削除する
      */
     removeAllEvent(): void {
+        this.registeredEvents.forEach((event) => event.active = false);
         this.registeredEvents = [];
     }
 

@@ -47,8 +47,8 @@ export class InformationLabelManager {
     private createLabels(playerNum: number) {
         const isSinglePlayer = playerNum == 1;
 
-        const textFontSize = isSinglePlayer ? "6vh" : `calc((100vh * 14 / 9 / ${playerNum}) /17)`;
-        const headerFontSize = isSinglePlayer ? "4vh" : `calc((100vh * 14 / 9 / ${playerNum}) /22)`;
+        const textFontSize = isSinglePlayer ? "6cqh" : `calc((100cqh * 14 / 9 / ${playerNum}) /17)`;
+        const headerFontSize = isSinglePlayer ? "4cqh" : `calc((100cqh * 14 / 9 / ${playerNum}) /22)`;
 
         const labels = {
             gameTime: new Label("Time", textFontSize, headerFontSize),
@@ -59,9 +59,9 @@ export class InformationLabelManager {
             score: new Label("Score", textFontSize, headerFontSize),
         };
 
-        labels.lastTrick.setTextFontSize(isSinglePlayer ? "3vh" : `calc((100vh * 14 / 9 / ${playerNum}) / 33)`);
-        labels.score.setTextFontSize(isSinglePlayer ? "4vh" : `calc((100vh * 14 / 9 / ${playerNum}) / 28)`);
-        labels.playTime.setTextFontSize(isSinglePlayer ? "4vh" : `calc((100vh * 14 / 9 / ${playerNum}) / 28)`);
+        labels.lastTrick.setTextFontSize(isSinglePlayer ? "3cqh" : `calc((100cqh * 14 / 9 / ${playerNum}) / 33)`);
+        labels.score.setTextFontSize(isSinglePlayer ? "4cqh" : `calc((100cqh * 14 / 9 / ${playerNum}) / 28)`);
+        labels.playTime.setTextFontSize(isSinglePlayer ? "4cqh" : `calc((100cqh * 14 / 9 / ${playerNum}) / 28)`);
 
         return labels;
     }

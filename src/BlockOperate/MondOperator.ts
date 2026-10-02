@@ -6,7 +6,6 @@ import { NextManager } from "./NextManager";
 import { Pentiamond } from "./Pentiamond";
 import * as Setting from "../Settings";
 import { TrickInfo } from "../Trick";
-import { BlockKind } from "./Block";
 
 export class MondOperator extends MyEventListener {
     blockManager: BlockManager = new BlockManager();
@@ -33,16 +32,6 @@ export class MondOperator extends MyEventListener {
 
     get g$blockManager(): BlockManager {
         return this.blockManager;
-    }
-
-    get g$nextMemory(): BlockKind[] {
-        return window.structuredClone(this.next.g$nextMemory);
-    }
-
-    set s$next(next: BlockKind[]) {
-        if (!this.next.g$currentKind) {
-            this.next.s$next = next;
-        }
     }
 
     private get g$ghostState(): MondState[] {

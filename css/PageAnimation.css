@@ -10,7 +10,7 @@
 
 @keyframes fade {
     0% {
-        padding-top: 2vh;
+        padding-top: 2cqh;
         opacity: 0;
     }
     100% {
@@ -32,19 +32,19 @@
 
 @keyframes shake {
     0% {
-        transform: translateX(0vh);
+        transform: translateX(0cqh);
     }
     25% {
-        transform: translateX(0.2vh);
+        transform: translateX(0.2cqh);
     }
     50% {
-        transform: translateX(0vh);
+        transform: translateX(0cqh);
     }
     75% {
-        transform: translateX(-0.2vh);
+        transform: translateX(-0.2cqh);
     }
     100% {
-        transform: translateX(0vh);
+        transform: translateX(0cqh);
     }
 }
 
@@ -54,7 +54,7 @@
     animation-delay: 0;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-    filter: blur(1vh);
+    filter: blur(1cqh);
 }
 
 .checkPoint {
@@ -63,7 +63,7 @@
     animation-delay: 0;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
-    filter: blur(1vh);
+    filter: blur(1cqh);
 }
 
 @keyframes rotate {
@@ -86,7 +86,7 @@
 
 @keyframes loading {
     0% {
-        padding-top: 2vh;
+        padding-top: 2cqh;
     }
     100% {
         padding-top: 0;
@@ -108,7 +108,7 @@
         filter: hue-rotate(0deg);
     }
     50% {
-        transform: rotate(180deg) translateY(-12vh);
+        transform: rotate(180deg) translateY(-12cqh);
         filter: hue-rotate(180deg);
     }
     100% {
@@ -197,13 +197,13 @@
 
 @keyframes startEffectBaseAnimation {
     0% {
-        transform: translate3d(0, 0, -20vh);
+        transform: translate3d(0, 0, -20cqh);
     }
     50% {
         transform: translate3d(0, 0, 0);
     }
     70% {
-        transform: translate3d(0, 0, 10vh);
+        transform: translate3d(0, 0, 10cqh);
     }
     100% {
         transform: translate3d(0, 0, 0);
@@ -213,47 +213,47 @@
 @keyframes startEffectAnimation {
     0% {
         /* rotate: -10deg; */
-        transform: translate3d(0, -50vh, -20vh);
+        transform: translate3d(0, -50cqh, -20cqh);
         opacity: 0;
-        filter: blur(0.5vh);
+        filter: blur(0.5cqh);
     }
     30% {
         rotate: 0deg;
         transform: translate3d(0, 0, 0);
-        filter: blur(0vh);
+        filter: blur(0cqh);
         opacity: 1;
     }
     70% {
         rotate: 0deg;
         transform: translate3d(0, 0, 0);
         opacity: 1;
-        filter: blur(0vh);
+        filter: blur(0cqh);
     }
     100% {
-        transform: translate3d(0, 50vh, -40vh);
+        transform: translate3d(0, 50cqh, -40cqh);
         /* rotate: 270deg; */
-        filter: blur(0.5vh);
+        filter: blur(0.5cqh);
         opacity: 0;
     }
 }
 
 @keyframes startLabelAnimation {
     0% {
-        transform: perspective(30vh) translate3d(0, -50vh, -10vh);
+        transform: perspective(30cqh) translate3d(0, -50cqh, -10cqh);
         opacity: 0;
     }
     30% {
-        transform: perspective(30vh) translate3d(0, 0, 10vh);
+        transform: perspective(30cqh) translate3d(0, 0, 10cqh);
         opacity: 1;
     }
     60% {
-        transform: perspective(30vh) translate3d(0, 0, 10vh);
-        filter: blur(0vh);
+        transform: perspective(30cqh) translate3d(0, 0, 10cqh);
+        filter: blur(0cqh);
         opacity: 1;
     }
     100% {
-        transform: perspective(30vh) translate3d(0, 0, 20vh);
-        filter: blur(2vh);
+        transform: perspective(30cqh) translate3d(0, 0, 20cqh);
+        filter: blur(2cqh);
         opacity: 0;
     }
 }
@@ -269,22 +269,22 @@
 
 @keyframes touchVibration {
     0% {
-        transform: translate(0vh);
+        transform: translate(0cqh);
     }
     20% {
-        transform: translate(-0.7vh);
+        transform: translate(-0.7cqh);
     }
     40% {
-        transform: translate(0.7vh);
+        transform: translate(0.7cqh);
     }
     60% {
-        transform: translate(-0.4vh);
+        transform: translate(-0.4cqh);
     }
     80% {
-        transform: translate(0.3vh);
+        transform: translate(0.3cqh);
     }
     100% {
-        transform: translate(0vh);
+        transform: translate(0cqh);
     }
 }
 
@@ -298,13 +298,13 @@
 
 @keyframes rightFadeIn {
     0% {
-        transform: translate(10vh);
-        filter: blur(0.5vh);
+        transform: translate(10cqh);
+        filter: blur(0.5cqh);
         opacity: 0;
     }
     100% {
-        transform: translate(0vh);
-        filter: blur(0vh);
+        transform: translate(0cqh);
+        filter: blur(0cqh);
         opacity: 1;
     }
 }
@@ -319,13 +319,13 @@
 
 @keyframes leftFadeIn {
     0% {
-        transform: translate(-10vh);
-        filter: blur(0.5vh);
+        transform: translate(-10cqh);
+        filter: blur(0.5cqh);
         opacity: 0;
     }
     100% {
-        transform: translate(0vh);
-        filter: blur(0vh);
+        transform: translate(0cqh);
+        filter: blur(0cqh);
         opacity: 1;
     }
 }

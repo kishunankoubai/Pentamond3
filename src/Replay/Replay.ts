@@ -1,4 +1,3 @@
-import { BlockKind } from "../BlockOperate/Block";
 import { AutoInputData } from "../Utilities/Interaction/AutoInputObserver";
 import * as Setting from "../Settings";
 
@@ -9,6 +8,7 @@ import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { qsAll } from "../Utils";
 import { sceneManager } from "../Utilities/SceneManager";
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
+import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 
 //リプレイ
 export type ReplayRandomSeeds = {
@@ -18,15 +18,11 @@ export type ReplayRandomSeeds = {
 
 export type ReplayData = {
     inputData: AutoInputData[][];
-    /** version 1のリプレイとの後方互換用。version 2以降はseedを使用する。 */
-    nextData?: BlockKind[][];
     playSetting: PlaySetting;
     finishTime: number;
     finishPlayers: number[];
-    /** version 1のリプレイとの後方互換用。version 2以降はseedを使用する。 */
-    nuisanceBlockData?: number[][];
-    randomSeeds?: ReplayRandomSeeds;
-    version?: 2;
+    randomSeeds: ReplayRandomSeeds;
+    version: 2;
     date: number;
 };
 
@@ -43,6 +39,7 @@ export type ReplayData = {
  * controller: Replay, EventSetter
  */
 export class Replay {
+    private static renderedSavedPages = new WeakMap<Element, string>();
     static async deleteAllData(): Promise<void> {
         localStorage.removeItem(ReplayDataHandler.storageKey);
         ReplayDataHandler.tempDataList.length = 0;
@@ -55,16 +52,22 @@ export class Replay {
     }
 
     static async setupSavedReplayPage() {
-        const replayDataList = await ReplayDataHandler.getReplayDataList();
+        const container = document.querySelector("#savedReplay .options");
+        if (!container) return;
+        const replayDataList = ReplayDataHandler.getReplayDataList();
+        const signature = JSON.stringify(replayDataList.map((data) => data.date));
+        if (this.renderedSavedPages.get(container) === signature) return;
 
         // Dom
         const buttons = ReplayDom.setupSavedReplayPage(replayDataList);
 
         // Event
         ReplayEventSetter.setSavedReplayPageEvent(replayDataList, buttons);
+        this.renderedSavedPages.set(container, signature);
     }
 
     static setupTempReplayPage() {
+        if (!document.querySelector("#replay .options")) return;
         const buttons = ReplayDom.setupTempReplayPage(ReplayDataHandler.tempDataList);
         buttons.forEach(({ replayButton, saveButton }) => ReplayEventSetter.setTempReplayPageEvent(ReplayDataHandler.tempDataList, { replayButton, saveButton }));
         this.updateTempReplaySaveButton();
@@ -98,10 +101,12 @@ export class Replay {
             const index = saveButtons.findIndex((button) => button == saveButton);
             const replayData = ReplayDataHandler.tempDataList.at(-index - 1)!;
             saveButton.classList.toggle("replaySavedButton", dateList.includes(replayData.date));
+            setInteractionEnabled(saveButton, !dateList.includes(replayData.date));
         });
     }
 
     static saveLastOne() {
-        return this.save(ReplayDataHandler.tempDataList.at(-1)!);
+        const data = ReplayDataHandler.tempDataList.at(-1);
+        return data ? this.save(data) : Promise.resolve(false);
     }
 }

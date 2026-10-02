@@ -17,6 +17,7 @@ import { Scene, sceneManager } from "../Utilities/SceneManager";
 import { ScenePlay } from "./ScenePlay";
 import { ControllerSettingManager } from "../ControllerSettingManager";
 import { SoundTest } from "../SoundTest";
+import { populateBGMSelectors } from "../BGMTracks";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
@@ -40,6 +41,7 @@ export class SceneTitle extends Scene {
         this.setPageAnimation();
         this.setPageStart();
         this.setSettingButton();
+        populateBGMSelectors();
         this.setupBGMSetting();
         this.soundTest.setup(this, this.elementManager, this.elementEventSetter);
         this.setStageButton();
@@ -56,6 +58,7 @@ export class SceneTitle extends Scene {
         // リプレイのイベントの設定と、リプレイページの設定
         Replay.setupTempReplayPage();
         Replay.setupSavedReplayPage();
+        this.pageManager.addHandler("changePage-savedReplay", () => Replay.setupSavedReplayPage());
         GameStartEventSetter.normal();
         if (Music.g$initialized) MusicManager.playExclusiveBGM("つみきのおしろ");
     }
@@ -77,8 +80,8 @@ export class SceneTitle extends Scene {
             page.setOpenAnimation(
                 [
                     {
-                        filter: "blur(0.5vh)",
-                        transform: "translate(0, -0.3vh)",
+                        filter: "blur(0.5cqh)",
+                        transform: "translate(0, -0.3cqh)",
                         opacity: 0,
                     },
                     {
@@ -99,7 +102,7 @@ export class SceneTitle extends Scene {
                         opacity: 1,
                     },
                     {
-                        filter: "blur(1vh)",
+                        filter: "blur(1cqh)",
                         scale: 1.2,
                         opacity: 0,
                     },
@@ -138,7 +141,7 @@ export class SceneTitle extends Scene {
                 {
                     backgroundColor: "#222222",
                     color: "#22222200",
-                    filter: "blur(1vh)",
+                    filter: "blur(1cqh)",
                     opacity: "1",
                 },
                 {
@@ -171,13 +174,13 @@ export class SceneTitle extends Scene {
                             color: "#333355",
                         },
                         {
-                            filter: "blur(1vh)",
+                            filter: "blur(1cqh)",
                         },
                         {
                             backgroundColor: "#333355",
                             color: "#333355",
                             clipPath: "circle(0% at 50% 50%)",
-                            filter: "blur(1vh)",
+                            filter: "blur(1cqh)",
                         },
                     ],
                     {
@@ -195,13 +198,19 @@ export class SceneTitle extends Scene {
     }
 
     private setPageStart() {
+        // 音声の初期化はページ全体への直接クリックで行う。
+        // pageStart は data-xy を付けず、キーボード・コントローラーの決定対象にしない。
+        let starting = false;
         document.getElementById("pageStart")!.addEventListener("click", async () => {
+            if (starting || this.pageManager.g$currentPageId !== "pageStart") return;
+            starting = true;
             setupMusics();
             const titlePage = this.pageManager.getPage("title")!;
             this.pageManager.openPage("title");
             titlePage.closeImmediately();
             titlePage.g$element.style.display = "none";
             await this.pageManager.getPage("pageStart")?.hasClosed();
+            if (sceneManager.g$currentScene !== this) return;
             titlePage.s$visible = true;
             await MusicManager.get("つみきのおしろ")?.play();
         });

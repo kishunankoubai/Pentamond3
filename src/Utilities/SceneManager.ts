@@ -63,6 +63,7 @@ export class SceneManager extends MyEventListener {
     private currentScene: Scene | null = null;
     private baseContainer: HTMLElement | null = document.querySelector(".sceneContainer");
     private static instance: SceneManager;
+    private changeGeneration = 0;
 
     constructor() {
         if (SceneManager.instance) return SceneManager.instance;
@@ -91,10 +92,14 @@ export class SceneManager extends MyEventListener {
     /**
      * sceneContainerにSceneの要素を入れる
      */
-    private async loadSceneHTML(htmlPath: string): Promise<void> {
+    private async loadSceneHTML(htmlPath: string, generation: number): Promise<boolean> {
+        const response = await fetch(htmlPath);
+        if (!response.ok) throw new Error(`シーンを読み込めませんでした: ${htmlPath} (${response.status})`);
+        const html = await response.text();
+        if (generation !== this.changeGeneration) return false;
         this.resetHTML();
-        const html = await fetch(htmlPath).then((response) => response.text());
         this.baseContainer!.innerHTML = html;
+        return true;
     }
 
     /**
@@ -102,13 +107,16 @@ export class SceneManager extends MyEventListener {
      * @param scene 指定するシーン
      */
     async change(scene: SceneClass, defaultStart: boolean = true): Promise<void> {
+        const generation = ++this.changeGeneration;
         if (this.currentScene) {
             this.currentScene.executeEvent("sceneEnd");
         }
-        this.currentScene = new scene();
-        await this.loadSceneHTML(this.currentScene.g$htmlPath);
-        this.currentScene.executeEvent("sceneStart");
-        if (defaultStart) await this.currentScene.defaultStart();
+        const nextScene = new scene();
+        this.currentScene = nextScene;
+        if (!await this.loadSceneHTML(nextScene.g$htmlPath, generation)) return;
+        nextScene.executeEvent("sceneStart");
+        if (defaultStart) await nextScene.defaultStart();
+        if (generation !== this.changeGeneration) return;
         this.executeEvent("sceneChange");
     }
 

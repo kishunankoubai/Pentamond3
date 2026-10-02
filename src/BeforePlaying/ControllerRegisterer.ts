@@ -1,5 +1,5 @@
 import { inputManager } from "../Utilities/Interaction/InputManager";
-import { qs, qsAddEvent, qsAll, sleep } from "../Utils";
+import { qs, qsAddEvent, qsAll } from "../Utils";
 
 import * as Setting from "../Settings";
 import { debug } from "../Run";
@@ -8,6 +8,7 @@ import { sceneManager } from "../Utilities/SceneManager";
 import { MyEvent } from "../Utilities/MyEventListener";
 import { ControllerSettingManager } from "../ControllerSettingManager";
 import { PageManager } from "../Utilities/Page/PageManager";
+import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 
 /**
  * コントローラーの登録をしたりする
@@ -24,9 +25,7 @@ export class ControllerRegisterer {
         let currentPlayerNumber = 1;
 
         // コントローラーの登録の準備
-        pageManager.addHandler(["openPage-playerRegister"], async () => {
-            // なぜかPlaySettingSetterよりもこっちが早く反応するから遅らせる
-            await sleep(1);
+        pageManager.addHandler(["openPage-playerRegister"], () => {
             const { playerNumber } = PlaySettingSetter.getPlaySetting();
             currentPlayerNumber = playerNumber;
             this.startControllerRegistration(currentPlayerNumber);
@@ -109,8 +108,8 @@ export class ControllerRegisterer {
     }
 
     private static enablePlayerRegisterButtons(available: boolean) {
-        qsAll("#playerRegister button").forEach((element) => {
-            (element as HTMLButtonElement).disabled = !available;
+        qsAll("#playerRegister .button").forEach((element) => {
+            setInteractionEnabled(element, available);
         });
     }
 

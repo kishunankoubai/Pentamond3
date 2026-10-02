@@ -3,6 +3,7 @@ import { inputManager } from "./InputManager";
 import { InputInfo, InputObserver } from "./InputObserver";
 import { MyEvent } from "../MyEventListener";
 import { MusicManager } from "../Music/MusicManager";
+import { initializeInteractionElements, isInteractionEnabled } from "../Element/InteractionElement";
 
 type InteractionElement = {
     element: HTMLElement;
@@ -45,8 +46,7 @@ export class PageInteraction {
             ({ element }) =>
                 !element.classList.contains("closing") &&
                 element.getClientRects().length > 0 &&
-                element.getAttribute("aria-disabled") !== "true" &&
-                (!(element instanceof HTMLButtonElement) || !element.disabled)
+                isInteractionEnabled(element)
         );
     }
 
@@ -87,9 +87,10 @@ export class PageInteraction {
 
         const handler = (item: [InputObserver, InputInfo]) => {
             if (!this.isValid || PageInteraction.inputBlocked) return;
-            if (Date.now() - PageInteraction.lastOperateTime <= PageInteraction.operateDebounce) return;
-
+            this.getInteractionElements();
             const elements = this.g$validElements;
+            if (elements.length) item[1].consumed = true;
+            if (Date.now() - PageInteraction.lastOperateTime <= PageInteraction.operateDebounce) return;
             const activeElement = elements.find((element) => element.element == document.activeElement);
             if (!activeElement) {
                 if (elements.length) elements[0].element.focus();
@@ -113,7 +114,9 @@ export class PageInteraction {
             return;
         }
 
-        const elements = Array.from(pageManager.g$currentPage?.g$element?.querySelectorAll<HTMLElement>("[data-xy]") || []);
+        const page = pageManager.g$currentPage?.g$element;
+        if (page) initializeInteractionElements(page);
+        const elements = Array.from(page?.querySelectorAll<HTMLElement>("[data-xy]") || []);
         this.interactionElements = elements.map((element) => ({
             element: element,
             coordinate: JSON.parse(element.dataset.xy || "[0,0]") as [number, number],

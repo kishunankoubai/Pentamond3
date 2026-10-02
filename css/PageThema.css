@@ -4,7 +4,7 @@
     /* min-height: fit-content;
     min-width: fit-content; */
     font-family: "Mochiy Pop P One", Arial;
-    font-size: 6vh;
+    font-size: 6cqh;
     align-items: center;
     justify-content: center;
     /* color: #6bd; */
@@ -27,16 +27,18 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: auto;
-    height: 100%;
+    /* 画面高ではなくゲーム領域の高さ(cqh)を各画面の共通単位にする。 */
+    width: min(100vw, calc(100vh * 14 / 9));
+    height: min(100vh, calc(100vw * 9 / 14));
+    container-type: size;
     aspect-ratio: 14/9;
     max-width: 100%;
     max-height: 100%;
     min-width: 0;
     min-height: 0;
     background-color: #ffffff;
-    border: 1vh white solid;
-    border-radius: 1vh;
+    border: min(1vh, calc(9vw / 14)) white solid;
+    border-radius: 1cqh;
     &::before {
         position: absolute;
         width: 100%;
@@ -76,7 +78,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 3vh;
+    gap: 3cqh;
 }
 
 .options {
@@ -84,7 +86,7 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    gap: 3vh;
+    gap: 3cqh;
     &[data-direction="row"] {
         flex-direction: row;
     }
@@ -94,15 +96,15 @@ body {
 .selector {
     color: #ffca3e;
     cursor: pointer;
-    /* padding: 2vh; */
-    border-bottom: #22222200 0.5vh solid;
-    margin-left: -6vh;
+    /* padding: 2cqh; */
+    border-bottom: #22222200 0.5cqh solid;
+    margin-left: -6cqh;
     &:active {
         scale: 0.98;
     }
     &::before {
         content: "★ ";
-        font-size: 6vh;
+        font-size: 6cqh;
         opacity: 0;
         transition: opacity 100ms ease-in-out;
         color: #ff90be;
@@ -111,7 +113,7 @@ body {
     &:focus {
         outline: none;
         border: none;
-        border-bottom: #ff90be 0.5vh solid;
+        border-bottom: #ff90be 0.5cqh solid;
         &::before {
             opacity: 1;
             transition: opacity 200ms ease-in-out;
@@ -126,23 +128,23 @@ body {
 .headingLabel {
     background-color: #aee5;
     position: absolute;
-    padding: 0.5vh;
-    padding-left: 7vh;
-    padding-right: 140vh;
-    top: 2vh;
-    left: 5vh;
-    font-size: 8vh;
-    border: 1vh double #8aba;
-    border-radius: 0.5vh;
+    padding: 0.5cqh;
+    padding-left: 7cqh;
+    padding-right: 140cqh;
+    top: 2cqh;
+    left: 5cqh;
+    font-size: 8cqh;
+    border: 1cqh double #8aba;
+    border-radius: 0.5cqh;
     color: #289;
 }
 
 .back {
     position: absolute;
-    bottom: 3vh;
-    left: 8vh;
-    padding: 1.5vh;
-    font-size: 5vh;
+    bottom: 3cqh;
+    left: 8cqh;
+    padding: 1.5cqh;
+    font-size: 5cqh;
     color: #ff9c40;
 }
 
@@ -154,47 +156,47 @@ p {
 
 #talk {
     & .namePanel {
-        top: 49vh;
-        left: 17.5vh;
-        height: 9vh;
+        top: 49cqh;
+        left: 17.5cqh;
+        height: 9cqh;
         aspect-ratio: 4 / 1;
-        border: #222244 0.6vh solid;
-        border-radius: 3vh;
+        border: #222244 0.6cqh solid;
+        border-radius: 3cqh;
         background-color: #8888aa;
-        font-size: 6vh;
-        box-shadow: 1vh 1vh 2vh #33333366;
+        font-size: 6cqh;
+        box-shadow: 1cqh 1cqh 2cqh #33333366;
         text-align: center;
-        line-height: 7vh;
+        line-height: 7cqh;
         align-items: center;
         justify-content: center;
         position: absolute;
     }
     & .talkPanel {
-        top: 60vh;
+        top: 60cqh;
         display: block;
         aspect-ratio: 14 / 4;
-        height: 35vh;
-        border: #222244 0.8vh solid;
-        border-radius: 4vh;
+        height: 35cqh;
+        border: #222244 0.8cqh solid;
+        border-radius: 4cqh;
         background-color: #8888aa;
         text-align: left;
         align-items: start;
         justify-content: left;
         overflow-wrap: anywhere;
         text-wrap: wrap;
-        padding-top: 2vh;
-        padding-left: 3vh;
-        padding-right: 3vh;
-        font-size: 6vh;
+        padding-top: 2cqh;
+        padding-left: 3cqh;
+        padding-right: 3cqh;
+        font-size: 6cqh;
         line-height: 1.6;
         outline: none;
         & * {
             text-wrap: wrap;
         }
-        box-shadow: 1vh 1vh 2vh #33333366;
+        box-shadow: 1cqh 1cqh 2cqh #33333366;
         & ruby {
             & rt {
-                font-size: 2.5vh;
+                font-size: 2.5cqh;
             }
         }
         position: absolute;

@@ -11,12 +11,12 @@
     justify-content: center;
     align-items: start;
     flex-direction: column;
-    gap: 3vh;
+    gap: 3cqh;
     flex: 1;
-    /* margin-right: 10vh; */
-    margin-left: 25vh;
+    /* margin-right: 10cqh; */
+    margin-left: 25cqh;
     & * {
-        font-size: 5vh;
+        font-size: 5cqh;
     }
 
     &:has(.button:nth-child(1):focus) ~ .selectOptionDescriptions :nth-child(1) {
@@ -53,10 +53,10 @@
         height: 100%;
     }
     & .text {
-        margin-left: 5vh;
+        margin-left: 5cqh;
         margin-right: auto;
         /* text-wrap: nowrap; */
-        font-size: 4.5vh;
+        font-size: 4.5cqh;
     }
 }
 

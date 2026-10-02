@@ -1,6 +1,7 @@
 import { globalValues } from "./Global";
 import { Music } from "./Utilities/Music/Music";
 import { MusicManager } from "./Utilities/Music/MusicManager";
+import { bgmTracks } from "./BGMTracks";
 
 export function setupMusics() {
     if (Music.g$initialized) {
@@ -8,42 +9,7 @@ export function setupMusics() {
     }
 
     Music.init();
-    MusicManager.add({
-        name: "つみきのおしろ",
-        src: "assets/musics/つみきのおしろ.m4a",
-        srcVolume: 0.8,
-        loop: true,
-        type: "BGM",
-    });
-
-    MusicManager.add({
-        name: "ならべてトライアングル",
-        src: "assets/musics/ならべてトライアングル.m4a",
-        srcVolume: 0.6,
-        loop: true,
-        type: "BGM",
-    });
-    MusicManager.add({
-        name: "おかたづけ",
-        src: "assets/musics/おかたづけ.m4a",
-        srcVolume: 0.8,
-        loop: true,
-        type: "BGM",
-    });
-    MusicManager.add({
-        name: "Top of the Pyramid",
-        src: "assets/musics/Top of the Pyramid.m4a",
-        srcVolume: 0.8,
-        loop: true,
-        type: "BGM",
-    });
-    MusicManager.add({
-        name: "さよならさんかく",
-        src: "assets/musics/さよならさんかく.m4a",
-        srcVolume: 0.8,
-        loop: true,
-        type: "BGM",
-    });
+    bgmTracks.forEach(({ name, srcVolume }) => MusicManager.add({ name, src: `assets/musics/${name}.m4a`, srcVolume, loop: true, type: "BGM" }));
 
     MusicManager.add({
         name: "ボタン",

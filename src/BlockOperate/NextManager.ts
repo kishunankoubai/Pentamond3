@@ -8,7 +8,6 @@ export class NextManager {
     private currentKind: BlockKind | null = null;
     private prevKind: BlockKind | null = null;
     private count: number = 0;
-    private nextMemory: BlockKind[] = [];
     private random: SeededRandom;
 
     constructor(seed: number) {
@@ -16,7 +15,6 @@ export class NextManager {
         this.next2 = window.structuredClone(this.next);
         this.random.shuffle(this.next);
         this.random.shuffle(this.next2);
-        this.nextMemory = window.structuredClone(this.next);
     }
 
     get g$holdKind(): BlockKind | null {
@@ -39,15 +37,6 @@ export class NextManager {
         return this.count;
     }
 
-    get g$nextMemory(): BlockKind[] {
-        return window.structuredClone(this.nextMemory);
-    }
-
-    set s$next(next: BlockKind[]) {
-        this.next = window.structuredClone(next);
-        this.next2 = [];
-    }
-
     forgetPrev() {
         this.prevKind = null;
     }
@@ -55,7 +44,6 @@ export class NextManager {
     private popNext() {
         if (this.next.length == this.next2.length) {
             this.next.push(this.next2[this.count % this.next2.length]);
-            this.nextMemory.push(this.next[this.next2.length]!);
         }
         this.currentKind = this.next.shift()!;
         this.count++;

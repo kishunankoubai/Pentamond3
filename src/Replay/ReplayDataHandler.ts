@@ -1,11 +1,8 @@
-import LZString from "lz-string";
+import type { ReplayData } from "./Replay";
 
-import { OperateName } from "../Game/GameMode";
-import { ReplayData } from "./Replay";
-
-import { qs } from "../Utils";
 import { replayDataDecryption, replayDataEncryption } from "./DataCompression";
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
+import { operationKeyCodes } from "../Game/Operations";
 
 export class ReplayDataHandler {
     static readonly storageKey = "Pentamond3-replayData";
@@ -16,16 +13,16 @@ export class ReplayDataHandler {
 
         while (this.tempDataList.length > max) {
             this.tempDataList.shift();
-            qs("#replay .replayDataContainer:first-child").remove();
         }
     }
 
     static getDataSize() {
-        return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size;
+        try { return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size; }
+        catch { return 0; }
     }
 
     static createReplayData({ players, game, playSetting, randomSeeds }: DisposableGame) {
-        const inputData = game.operateMemories.map((operateMemory) => operateMemory.map(({ time, operateName }) => ({ time: time, keyCode: this.convertOperateName(operateName), type: "downup" })));
+        const inputData = game.operateMemories.map((operateMemory) => operateMemory.map(({ time, operateName }) => ({ time, keyCode: operationKeyCodes[operateName], type: "downup" })));
         const finishTime = Math.max(...players.map((player) => player.playInfo.playTime));
         const finishPlayers = players.map((player, i) => (player.playInfo.playTime == finishTime ? i + 1 : -1)).filter((value) => value != -1);
 
@@ -42,57 +39,53 @@ export class ReplayDataHandler {
         return replayData;
     }
 
-    private static convertOperateName(operateName: OperateName) {
-        return operateName == "put"
-            ? "ArrowUp"
-            : operateName == "move-left"
-              ? "ArrowLeft"
-              : operateName == "move-right"
-                ? "ArrowRight"
-                : operateName == "move-down"
-                  ? "ArrowDown"
-                  : operateName == "spin-left"
-                    ? "KeyC"
-                    : operateName == "spin-right"
-                      ? "KeyV"
-                      : operateName == "unput"
-                        ? "KeyB"
-                        : operateName == "hold"
-                          ? "Space"
-                          : operateName == "removeLine"
-                            ? "Enter"
-                            : "";
-    }
 
     static async removeSavedReplayData(data: ReplayData) {
-        const replayDataList = await this.getReplayDataList();
+        const replayDataList = this.getReplayDataList();
         const removedList = replayDataList.filter((value) => value.date != data.date);
-        const encodedList = await Promise.all(removedList.map((d) => replayDataEncryption(d)));
+        const encodedList = removedList.map((d) => replayDataEncryption(d));
         const json = JSON.stringify(encodedList);
 
-        localStorage.setItem(this.storageKey, json);
+        if (removedList.length) localStorage.setItem(this.storageKey, json);
+        else localStorage.removeItem(this.storageKey);
     }
 
-    static async getReplayDataList(): Promise<ReplayData[]> {
-        const json = localStorage.getItem(this.storageKey);
-        const encodedList: string[] = json ? JSON.parse(json) : [];
-        const replayData = await Promise.all(encodedList.map((encodedData) => replayDataDecryption(encodedData)));
-
-        return replayData;
+    static getReplayDataList(): ReplayData[] {
+        const valid: ReplayData[] = [];
+        const validEncoded: string[] = [];
+        let raw: string | null;
+        try { raw = localStorage.getItem(this.storageKey); }
+        catch (error) { console.warn("リプレイ保存領域を読み込めませんでした", error); return []; }
+        if (!raw) return [];
+        try {
+            const encodedList: unknown = JSON.parse(raw);
+            if (!Array.isArray(encodedList)) throw new Error("リプレイ一覧の形式が不正です");
+            const dates = new Set<number>();
+            encodedList.forEach((encoded) => {
+                try {
+                    const data = replayDataDecryption(encoded);
+                    if (dates.has(data.date)) return;
+                    dates.add(data.date);
+                    valid.push(data);
+                    validEncoded.push(encoded);
+                } catch { /* 読み込めない項目だけ削除し、正常な項目は保持する。 */ }
+            });
+            if (validEncoded.length === encodedList.length) return valid;
+        } catch { /* 一覧そのものが壊れている場合も起動を妨げない。 */ }
+        try {
+            if (validEncoded.length) localStorage.setItem(this.storageKey, JSON.stringify(validEncoded));
+            else localStorage.removeItem(this.storageKey);
+        } catch (error) { console.warn("読み込めないリプレイを削除できませんでした", error); }
+        return valid;
     }
 
     static getDateList(): number[] {
-        const json = localStorage.getItem(this.storageKey);
-        const encodedList: string[] = json ? JSON.parse(json) : [];
-
-        return encodedList.map((str) => {
-            const data = JSON.parse(LZString.decompressFromUTF16(str));
-            return data[0] === 2 ? data[5] : data[6];
-        });
+        return this.getReplayDataList().map((data) => data.date);
     }
 
     static async saveReplayData(data: ReplayData, { onOverMax, onError }: { onOverMax: () => void; onError: () => void }): Promise<boolean> {
-        const dateList = this.getDateList();
+        const replayDataList = this.getReplayDataList();
+        const dateList = replayDataList.map((saved) => saved.date);
 
         // 同じデータを保存しない
         if (dateList.includes(data.date)) {
@@ -105,37 +98,18 @@ export class ReplayDataHandler {
             return false;
         }
 
-        const replayDataList = await this.getReplayDataList();
-
-        // 降順に並べる
+        // 表示時に新しい順へ並ぶよう、保存は古い順にする。
         replayDataList.push(data);
         replayDataList.sort((a, b) => a.date - b.date);
 
-        // 11件以上になったら古いものから消していく
-        while (replayDataList.length >= 11) {
-            replayDataList.shift();
-        }
-
-        const encodedList = await Promise.all(replayDataList.map((data) => replayDataEncryption(data)));
-        // dataArray.forEach((dataString) => {
-        //     const data = replayDataDecryption(dataString);
-        //     const now = new Date(data.date);
-        //     const date = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()} ${now.getHours()}:${now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes()}:${
-        //         now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds()
-        //     }`;
-        //     const size = new Blob([dataString]).size;
-        //     console.log(`The size of ${date} is ${size}`);
-        // });
-
         try {
+            const encodedList = replayDataList.map((data) => replayDataEncryption(data));
             localStorage.setItem(this.storageKey, JSON.stringify(encodedList));
         } catch (error) {
             onError();
             return false;
         }
 
-        const dataSize = this.getDataSize();
-        console.log(`The sum of size of replayData is ${dataSize}byte`);
         return true;
     }
 }

@@ -83,8 +83,8 @@ export class SceneResult extends Scene {
             page.setOpenAnimation(
                 [
                     {
-                        filter: "blur(0.5vh)",
-                        transform: "translate(0, -0.3vh)",
+                        filter: "blur(0.5cqh)",
+                        transform: "translate(0, -0.3cqh)",
                         opacity: 0,
                     },
                     {
@@ -105,7 +105,7 @@ export class SceneResult extends Scene {
                         opacity: 1,
                     },
                     {
-                        filter: "blur(1vh)",
+                        filter: "blur(1cqh)",
                         scale: 1.2,
                         opacity: 0,
                     },

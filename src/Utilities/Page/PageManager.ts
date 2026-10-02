@@ -24,15 +24,15 @@ export class PageManager extends MyEventListener {
      */
 
     private static pageMemories: PageMemory[] = [];
-    private static currentSceneClass: SceneClass;
+    private readonly sceneClass: SceneClass;
+    private hasOpenedPage = false;
 
     private initializeFlag: LifeCounter = new LifeCounter(1);
     private pages: Page[] = [];
 
     constructor(scene: Scene | SceneClass) {
         super();
-        if (scene instanceof Scene) PageManager.currentSceneClass = getConstructor(scene);
-        else PageManager.currentSceneClass = scene;
+        this.sceneClass = scene instanceof Scene ? getConstructor(scene) : scene;
     }
 
     get g$isInitialized(): boolean {
@@ -93,18 +93,19 @@ export class PageManager extends MyEventListener {
     private setPagesVisibility(displayPageIds: string[], closeImmediately: boolean = false): void {
         // 同じページを複数回開いても履歴上は一つとして扱う。
         displayPageIds = [...new Set(displayPageIds)];
+        if (displayPageIds.some((id) => !this.getPage(id))) throw Error("指定されたページが存在しません");
+        const principlePage = getMaxElements(displayPageIds, (id) => this.getPage(id)!.g$layer);
+        if (principlePage.length >= 2) throw Error("ページのレイヤーが一意ではありません");
+        if (!principlePage.length) throw Error("指定されたページが存在しません");
         this.pages.forEach((page) => {
             if (displayPageIds.includes(page.g$id)) page.s$visible = true;
             else if (closeImmediately) page.closeImmediately();
             else page.s$visible = false;
         });
 
-        const principlePage = getMaxElements(displayPageIds, (id) => Page.getLayer(id));
-        if (principlePage.length >= 2) throw Error("ページのレイヤーが一意ではありません");
-        else if (principlePage.length === 0) throw Error("指定されたページが存在しません");
-
+        this.hasOpenedPage = true;
         PageManager.pageMemories.push({
-            scene: PageManager.currentSceneClass,
+            scene: this.sceneClass,
             displayingPageIds: window.structuredClone(displayPageIds),
             principlePageId: principlePage[0],
         });
@@ -120,7 +121,7 @@ export class PageManager extends MyEventListener {
         const latestMemory = PageManager.pageMemories.at(-1);
         // Sceneを新しく開いた場合、同じSceneクラスの古い表示状態を引き継がない。
         // 履歴から戻す場合はbackPage側が明示的に表示状態を復元する。
-        let displayPageIds = latestMemory?.scene === PageManager.currentSceneClass ? latestMemory.displayingPageIds : [];
+        let displayPageIds = this.hasOpenedPage && latestMemory?.scene === this.sceneClass ? latestMemory.displayingPageIds : [];
         displayPageIds = prevPageId ? getFilteredArray(displayPageIds, [prevPageId]) : window.structuredClone(displayPageIds);
         if (!displayPageIds.includes(pageId)) displayPageIds.push(pageId);
         this.setPagesVisibility(displayPageIds, closeImmediately);
@@ -130,7 +131,7 @@ export class PageManager extends MyEventListener {
             if (prevPageId) {
                 this.executeEvent(["closePage", `closePage-${prevPageId}`], prevPageId);
                 this.executeEvent(["openSameLayerPage", `openSameLayerPage-${pageId}`, "trueChangePage", `trueChangePage-${pageId}`], pageId);
-            } else if (PageManager.pageMemories.length > 1 && PageManager.pageMemories.at(-2)!.scene === PageManager.currentSceneClass) {
+            } else if (PageManager.pageMemories.length > 1 && PageManager.pageMemories.at(-2)!.scene === this.sceneClass) {
                 this.executeEvent(["openUpperLayerPage", `openUpperLayerPage-${pageId}`], pageId);
             } else this.executeEvent("openSceneFirstPage", pageId);
         }
@@ -151,7 +152,8 @@ export class PageManager extends MyEventListener {
         }
 
         const prevMemory = PageManager.pageMemories.at(-1);
-        if (prevMemory && prevMemory.scene === PageManager.currentSceneClass) {
+        if (this.hasOpenedPage && prevMemory && prevMemory.scene === this.sceneClass) {
+            if (prevMemory.principlePageId === pageId && page.g$visible) return;
             const prevPage = this.getPage(prevMemory.principlePageId)!;
 
             if (prevPage.g$layer < page.g$layer) this.openPageHandler(eventIgnore, page.g$id);
@@ -177,9 +179,8 @@ export class PageManager extends MyEventListener {
         }
         const currentMemory = PageManager.pageMemories.at(-1)!;
         const memory = PageManager.pageMemories[targetIndex];
-        PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
-
         const layer = this.g$currentPage?.g$layer ?? 0;
+        PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
         let pageManager: PageManager = this;
 
         let prevLayer = 0;
@@ -239,6 +240,12 @@ export class PageManager extends MyEventListener {
         const backIndex = PageManager.pageMemories.findLastIndex((memory) => memory.principlePageId == pageId);
         if (backIndex == -1) return 0;
         return PageManager.pageMemories.length - 1 - backIndex;
+    }
+
+    /** 再戦時、終了済みのラウンドだけを履歴から取り除く（画面は変更しない）。 */
+    static trimHistoryTo(pageId: string): void {
+        const index = this.pageMemories.findLastIndex((memory) => memory.principlePageId === pageId);
+        if (index >= 0) this.pageMemories = this.pageMemories.slice(0, index + 1);
     }
 
     /**

@@ -6,6 +6,7 @@ import { InputInfo, InputObserver } from "./Utilities/Interaction/InputObserver"
 import { PageInteraction } from "./Utilities/Interaction/PageInteraction";
 import { MyEvent } from "./Utilities/MyEventListener";
 import { sceneManager } from "./Utilities/SceneManager";
+import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 
 type ControllerAction = keyof GamepadConfig;
 
@@ -31,6 +32,8 @@ type StoredControllerSettings = {
     customConfigs: GamepadConfig[];
 };
 
+type CompactControllerSettings = [version: 2, selectedSlot: number, slots: [actionIndex: number, inputs: number[]][][]];
+
 export class ControllerSettingManager {
     static readonly storageKey = "Pentamond3-controllerSettings";
     private static selectedSlot = 0;
@@ -48,14 +51,30 @@ export class ControllerSettingManager {
         try {
             const raw = localStorage.getItem(this.storageKey);
             if (!raw) return;
-            const data = JSON.parse(raw) as Partial<StoredControllerSettings>;
-            if (Number.isInteger(data.selectedSlot) && 0 <= data.selectedSlot! && data.selectedSlot! <= 3) this.selectedSlot = data.selectedSlot!;
-            if (Array.isArray(data.customConfigs)) {
-                data.customConfigs.slice(0, 3).forEach((config, index) => {
+            const data = JSON.parse(raw);
+            if (Array.isArray(data) && data[0] === 2) {
+                if (!this.isValidSlot(data[1]) || !Array.isArray(data[2]) || data[2].length > 3) throw new Error("設定の形式が不正です");
+                this.selectedSlot = data[1];
+                data[2].forEach((slot: unknown, slotIndex: number) => {
+                    if (!Array.isArray(slot)) throw new Error("配置の形式が不正です");
+                    const config = this.createDefaultConfig();
+                    slot.forEach((entry: unknown) => {
+                        if (!Array.isArray(entry) || entry.length !== 2 || !Number.isInteger(entry[0]) || !actions[entry[0]] || !Array.isArray(entry[1])) throw new Error("割り当ての形式が不正です");
+                        config[actions[entry[0]]] = entry[1].map((code: number) => this.decodeInput(code));
+                    });
+                    this.customConfigs[slotIndex] = this.normalizeConfig(config);
+                });
+            } else {
+                const legacy = data as Partial<StoredControllerSettings>;
+                if (!legacy || legacy.version !== 1) throw new Error("設定の形式が不正です");
+                if (this.isValidSlot(legacy.selectedSlot!)) this.selectedSlot = legacy.selectedSlot!;
+                legacy.customConfigs?.slice(0, 3).forEach((config, index) => {
                     if (this.isValidConfig(config)) this.customConfigs[index] = this.normalizeConfig(config);
                 });
+                this.save();
             }
         } catch (error) {
+            this.reset(false);
             console.warn("コントローラー設定を読み込めませんでした", error);
         }
     }
@@ -159,13 +178,8 @@ export class ControllerSettingManager {
             const button = document.createElement("div");
             button.className = "button controllerBindingDelete";
             button.dataset.xy = `[0,${index}]`;
-            button.tabIndex = 0;
             button.textContent = `${this.formatInput(input)} を削除`;
             button.addEventListener("click", () => this.deleteBinding(action, input));
-            button.addEventListener("mouseover", () => button.focus());
-            button.addEventListener("mouseleave", () => {
-                if (document.activeElement === button) button.blur();
-            });
             list.appendChild(button);
         });
         if (!inputs.length) {
@@ -179,12 +193,10 @@ export class ControllerSettingManager {
         const backButton = document.querySelector<HTMLElement>("#controllerBindingSetting .back");
         if (addButton) {
             addButton.dataset.xy = `[0,${inputs.length}]`;
-            addButton.tabIndex = 0;
-            addButton.setAttribute("aria-disabled", String(inputs.length >= maxBindingsPerAction));
+            setInteractionEnabled(addButton, inputs.length < maxBindingsPerAction);
         }
         if (backButton) {
             backButton.dataset.xy = `[0,${inputs.length + 1}]`;
-            backButton.tabIndex = 0;
         }
     }
 
@@ -258,8 +270,8 @@ export class ControllerSettingManager {
             if (value) value.textContent = config[action].length ? config[action].map((input) => this.formatInput(input)).join(" / ") : "登録なし";
             button.classList.toggle("readOnlyMapping", this.selectedSlot === 0);
         });
-        const resetButton = document.getElementById("controllerSettingReset") as HTMLButtonElement | null;
-        if (resetButton) resetButton.disabled = this.selectedSlot === 0;
+        const resetButton = document.getElementById("controllerSettingReset");
+        if (resetButton) setInteractionEnabled(resetButton, this.selectedSlot !== 0);
     }
 
     private static renderPlayerSlots(): void {
@@ -276,8 +288,29 @@ export class ControllerSettingManager {
 
     private static save(): void {
         if (globalValues.nosave) return;
-        const data: StoredControllerSettings = { version: 1, selectedSlot: this.selectedSlot, customConfigs: structuredClone(this.customConfigs) };
-        localStorage.setItem(this.storageKey, JSON.stringify(data));
+        const initial = this.createDefaultConfig();
+        const slots: CompactControllerSettings[2] = this.customConfigs.map((config) => actions.flatMap((action, index) =>
+            JSON.stringify(config[action]) === JSON.stringify(initial[action]) ? [] : [[index, config[action].map((input) => this.encodeInput(input))] as [number, number[]]]
+        ));
+        while (slots.length && !slots.at(-1)!.length) slots.pop();
+        try {
+            if (this.selectedSlot === 0 && !slots.length) localStorage.removeItem(this.storageKey);
+            else localStorage.setItem(this.storageKey, JSON.stringify([2, this.selectedSlot, slots] satisfies CompactControllerSettings));
+        } catch (error) {
+            console.warn("コントローラー設定を保存できませんでした", error);
+            this.setStatus("設定を保存できませんでした。現在のページでは変更が有効ですが、再読み込みで失われます。");
+        }
+    }
+
+    private static encodeInput(input: string): number {
+        if (input.startsWith("button:")) return Number(input.slice(7));
+        const sign = input[6];
+        return -(Number(input.slice(7)) * 2 + (sign === "+" ? 2 : 1));
+    }
+
+    private static decodeInput(code: number): string {
+        if (!Number.isSafeInteger(code)) throw new Error("入力IDが不正です");
+        return code >= 0 ? `button:${code}` : `stick:${(-code % 2) === 0 ? "+" : "-"}${Math.floor((-code - 1) / 2)}`;
     }
 
     private static getConfig(slot: number): GamepadConfig {

@@ -7,7 +7,7 @@ import { CanvasManager } from "../CanvasManager";
 import { InformationLabelManager } from "./InformationLabelManager";
 import { TrickInfo } from "../Trick";
 import * as Setting from "../Settings";
-import { gameEvents } from "./GameMode";
+import { EventScope } from "../Utilities/EventScope";
 import { GraphicSetting } from "../GraphicSetting";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 
@@ -56,7 +56,7 @@ export class GamePlayer {
         put: this.playField.animate(
             [
                 {
-                    transform: "translate(0, 0.3vh)",
+                    transform: "translate(0, 0.3cqh)",
                 },
                 {
                     transform: "",
@@ -158,7 +158,7 @@ export class GamePlayer {
         damageBoard: this.playField.animate(
             [
                 {
-                    transform: "translate(0, 1.4vh)",
+                    transform: "translate(0, 1.4cqh)",
                 },
                 {
                     transform: "",
@@ -177,11 +177,11 @@ export class GamePlayer {
                     rotate: "0deg",
                 },
                 {
-                    transform: "translate(-0.08vh, 0)",
+                    transform: "translate(-0.08cqh, 0)",
                     rotate: "-0.2deg",
                 },
                 {
-                    transform: "translate(0.08vh, 0)",
+                    transform: "translate(0.08cqh, 0)",
                     rotate: "0.2deg",
                 },
                 {
@@ -216,12 +216,13 @@ export class GamePlayer {
         ),
     };
     runningAnimations: Animation[] = [];
+    private readonly events = new EventScope();
 
     constructor(input: InputObserver, playerCount: number, seeds: { next: number; nuisance: number }) {
         this.operator = new MondOperator(seeds.next);
         this.label = new InformationLabelManager(playerCount);
         this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance);
-        gameEvents.push(
+        this.events.add(
             this.nuisanceMondManager.addHandler("finishDamage", () => {
                 this.state.damaging = false;
                 this.damageInfo.damageTask = 0;
@@ -296,9 +297,7 @@ export class GamePlayer {
         this.loop.stop();
         this.operator.stop();
         this.nuisanceMondManager.stop();
-        this.runningAnimations = Object.values(this.animations).filter((animation) => {
-            animation.playState == "running";
-        });
+        this.runningAnimations = Object.values(this.animations).filter((animation) => animation.playState === "running");
         this.runningAnimations.forEach((animation) => {
             animation.pause();
         });
@@ -312,8 +311,19 @@ export class GamePlayer {
         Object.values(this.animations).forEach((animation) => (animation.playbackRate = speed));
     }
 
+    dispose(): void {
+        this.stop();
+        this.events.dispose();
+        this.nuisanceMondManager.dispose();
+        Object.values(this.animations).forEach((animation) => animation.cancel());
+        this.runningAnimations = [];
+        if (this.input instanceof AutoInputObserver) this.input.setInputGate(() => false);
+        this.playField.remove();
+    }
+
     finish() {
         this.stop();
+        this.playInfo.playTime = this.loop.g$elapsedTime;
         this.updateGameTime();
         this.state.hasFinished = true;
         this.animations.timeWarning.cancel();

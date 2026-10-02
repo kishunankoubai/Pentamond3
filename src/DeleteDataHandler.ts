@@ -5,6 +5,7 @@ import { Replay } from "./Replay/Replay";
 import { ReplayDataHandler } from "./Replay/ReplayDataHandler";
 import { ControllerRegisterer } from "./BeforePlaying/ControllerRegisterer";
 import { PlaySettingSetter } from "./BeforePlaying/PlaySettingSetter";
+import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 
 type DataGroup = "all" | "settings" | "replays";
 
@@ -21,8 +22,7 @@ export class DeleteDataHandler {
         const labels = { all: "全データ", settings: "設定データ", replays: "リプレイデータ" };
         const status = document.getElementById("dataDeleteStatus");
         const setConfirmEnabled = (enabled: boolean) => {
-            confirmButton.setAttribute("aria-disabled", String(!enabled));
-            confirmButton.tabIndex = enabled ? 0 : -1;
+            setInteractionEnabled(confirmButton, enabled);
         };
         setConfirmEnabled(false);
         if (status) status.textContent = "";
@@ -92,7 +92,11 @@ export class DeleteDataHandler {
     }
 
     private static updateDataSize(): void {
-        const settings = new Blob(DataManager.settingStorageKeys.map((key) => localStorage.getItem(key) ?? "")).size;
+        // 容量にも、読み込み時に除外したリプレイを含めない。
+        ReplayDataHandler.getReplayDataList();
+        let settings = 0;
+        try { settings = new Blob(DataManager.settingStorageKeys.map((key) => localStorage.getItem(key) ?? "")).size; }
+        catch (error) { console.warn("保存データの容量を読み込めませんでした", error); }
         const replays = ReplayDataHandler.getDataSize();
         for (const [id, size] of [
             ["totalDataSize", settings + replays],

@@ -24,6 +24,7 @@ export class DynamicTextSetter extends SceneSetter {
             dynamicText.addHandler("write", () => {
                 element.innerHTML = dynamicText.g$element.innerHTML;
             });
+            this.scene.addHandler("sceneEnd", () => dynamicText.reset(), 1);
         });
 
         let talkPage = document.querySelector<HTMLElement>("#talk");
