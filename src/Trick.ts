@@ -33,7 +33,7 @@ export const trickInfos: TrickInfo[] = [
         ],
     },
     {
-        name: "一列揃え(上)",
+        name: "一列揃え(下)",
         time: 10,
         attack: 10,
         shape: [

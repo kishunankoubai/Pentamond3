@@ -8,6 +8,7 @@ import { GraphicSetting } from "./GraphicSetting";
 import { Music } from "./Utilities/Music/Music";
 import { MusicManager } from "./Utilities/Music/MusicManager";
 import { bgmTracks } from "./BGMTracks";
+import { PlayStatistics } from "./PlayStatistics";
 
 export class DataManager {
     private static key = [11, 11];
@@ -31,6 +32,7 @@ export class DataManager {
     }
 
     static read() {
+        PlayStatistics.read();
         if (globalValues.nosave) return;
 
         ControllerSettingManager.read();
@@ -63,12 +65,13 @@ export class DataManager {
     }
 
     static deletePlayData() {
-        this.save();
+        PlayStatistics.reset();
         PageManager.resetMemory();
         sceneManager.change(SceneTitle);
     }
 
     static delete() {
+        PlayStatistics.reset();
         this.resetSettings();
         PageManager.resetMemory();
         sceneManager.change(SceneTitle);

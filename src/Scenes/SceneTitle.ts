@@ -18,6 +18,8 @@ import { ScenePlay } from "./ScenePlay";
 import { ControllerSettingManager } from "../ControllerSettingManager";
 import { SoundTest } from "../SoundTest";
 import { populateBGMSelectors } from "../BGMTracks";
+import { setupTrickList } from "../TrickList";
+import { setupStatisticsPage } from "../StatisticsPage";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
@@ -38,6 +40,8 @@ export class SceneTitle extends Scene {
     }
 
     protected initialize(): void {
+        setupTrickList(this.elementManager);
+        setupStatisticsPage(this);
         this.setPageAnimation();
         this.setPageStart();
         this.setSettingButton();

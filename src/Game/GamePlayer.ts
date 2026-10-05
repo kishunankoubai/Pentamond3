@@ -51,6 +51,7 @@ export class GamePlayer {
         lastDamageTime: 0,
         totalDamage: 0,
         totalAttack: 0,
+        maxAttack: 0,
     };
     animations = {
         put: this.playField.animate(

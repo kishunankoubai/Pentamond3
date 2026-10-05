@@ -29,6 +29,36 @@
     }
 }
 
+#trickList {
+    & .trickListPage {
+        width: 120cqh;
+    }
+    & .trickCard {
+        width: 100%;
+        padding: 5cqh;
+        border-radius: 3cqh;
+        background-color: #eefb;
+        display: flex;
+        flex-direction: column;
+        gap: 8cqh;
+    }
+    & .trickName {
+        font-size: 6cqh;
+    }
+    & .trickValues {
+        display: flex;
+        gap: 12cqh;
+        & span {
+            font-size: 5.5cqh;
+        }
+    }
+    & .trickCanvas {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+}
+
 .rangeContainer {
     display: flex;
     justify-content: center;
@@ -989,7 +1019,7 @@
         & span {
             font-size: 4.5cqh;
         }
-        margin-bottom: 5cqh;
+        margin-bottom: 1cqh;
     }
     & #dataDeleteStatus {
         font-size: 4cqh;
@@ -1004,6 +1034,26 @@
             &::before {
                 font-size: 5cqh;
             }
+        }
+    }
+}
+
+#information {
+    & .subPage {
+        width: 120cqh;
+        gap: 1.5cqh;
+    }
+    & .statisticSection {
+        font-size: 5.5cqh;
+        margin-bottom: 2cqh;
+    }
+    & .statisticRow {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        gap: 4cqh;
+        & span {
+            font-size: 4.5cqh;
         }
     }
 }

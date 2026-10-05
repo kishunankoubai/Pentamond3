@@ -6,8 +6,9 @@ import { ReplayDataHandler } from "./Replay/ReplayDataHandler";
 import { ControllerRegisterer } from "./BeforePlaying/ControllerRegisterer";
 import { PlaySettingSetter } from "./BeforePlaying/PlaySettingSetter";
 import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
+import { PlayStatistics } from "./PlayStatistics";
 
-type DataGroup = "all" | "settings" | "replays";
+type DataGroup = "all" | "settings" | "replays" | "play";
 
 export class DeleteDataHandler {
     private static pendingGroup: DataGroup | null = null;
@@ -19,7 +20,7 @@ export class DeleteDataHandler {
         const confirmButton = document.querySelector<HTMLElement>("#allDataDeleteConfirmButton");
         if (!pageManager || !confirmButton) return;
         let deleting = false;
-        const labels = { all: "全データ", settings: "設定データ", replays: "リプレイデータ" };
+        const labels = { all: "全データ", settings: "設定データ", replays: "リプレイデータ", play: "プレイデータ" };
         const status = document.getElementById("dataDeleteStatus");
         const setConfirmEnabled = (enabled: boolean) => {
             setInteractionEnabled(confirmButton, enabled);
@@ -48,10 +49,12 @@ export class DeleteDataHandler {
                 if (description)
                     description.textContent =
                         group === "settings"
-                            ? "音量・BGM・グラフィック・コントローラー設定を初期値に戻します。 リプレイは残ります。 この操作は取り消せません。"
+                            ? "音量・BGM・グラフィック・コントローラー設定を初期値に戻します。 プレイデータとリプレイは残ります。 この操作は取り消せません。"
                             : group === "replays"
-                              ? "保存済みと直近のリプレイをすべて削除します。 設定は残ります。 この操作は取り消せません。"
-                              : "設定を初期値に戻し、保存済みと直近のリプレイをすべて削除します。 この操作は取り消せません。";
+                              ? "保存済みと直近のリプレイをすべて削除します。 設定とプレイデータは残ります。 この操作は取り消せません。"
+                              : group === "play"
+                                ? "情報ページの累計・最高記録をすべて削除します。 設定とリプレイは残ります。 この操作は取り消せません。"
+                                : "設定を初期値に戻し、プレイデータと保存済み・直近のリプレイをすべて削除します。 この操作は取り消せません。";
                 pageManager.openPage("allDataDeleteAlert");
                 // 開いた直後の決定入力で削除されないよう、コントローラーでも無効化する。
                 this.confirmTimer = setTimeout(() => {
@@ -66,12 +69,13 @@ export class DeleteDataHandler {
             deleting = true;
             setConfirmEnabled(false);
             try {
-                if (group !== "replays") {
+                if (group === "all" || group === "settings") {
                     DataManager.resetSettings();
                     ControllerRegisterer.gamepadConfigs = ControllerSettingManager.getPlayerConfigs(PlaySettingSetter.getPlaySetting().playerNumber);
                     pageManager.executeEvent("settingsReset");
                 }
-                if (group !== "settings") await Replay.deleteAllData();
+                if (group === "all" || group === "play") PlayStatistics.reset();
+                if (group === "all" || group === "replays") await Replay.deleteAllData();
                 await pageManager.backPage(1);
                 if (status && pageManager.g$currentPageId === "dataSetting") status.textContent = `${labels[group]}を削除しました。`;
             } catch (error) {
@@ -98,9 +102,11 @@ export class DeleteDataHandler {
         try { settings = new Blob(DataManager.settingStorageKeys.map((key) => localStorage.getItem(key) ?? "")).size; }
         catch (error) { console.warn("保存データの容量を読み込めませんでした", error); }
         const replays = ReplayDataHandler.getDataSize();
+        const play = PlayStatistics.getDataSize();
         for (const [id, size] of [
-            ["totalDataSize", settings + replays],
+            ["totalDataSize", settings + replays + play],
             ["settingDataSize", settings],
+            ["playDataSize", play],
             ["replayDataSize", replays],
         ] as const) {
             const element = document.getElementById(id);

@@ -173,6 +173,7 @@ export class Mode1 extends GameMode {
                     p.damageInfo.totalDamage += p.damageInfo.damageTask;
                 }
                 if (p.damageInfo.attackTask) {
+                    p.damageInfo.maxAttack = Math.max(p.damageInfo.maxAttack, p.damageInfo.attackTask);
                     console.log(`Player ${index + 1} has attacked: ${p.damageInfo.attackTask}`);
                     this.players.forEach((player, i) => {
                         if (i != index) {

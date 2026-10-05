@@ -169,6 +169,16 @@
         <div class="back button" data-xy="[0,2]">戻る</div>
     </div>
 
+    <div class="page" id="trickList">
+        <div class="label headingLabel">役一覧</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
     <div class="page" id="howToPlayBasic">
         <div class="label headingLabel">基本編</div>
         <div class="subPage">
@@ -242,7 +252,7 @@
             <div class="selectWithDescriptionOptions">
                 <div class="button" data-page="replay" data-xy="[0,0]">直近のリプレイ</div>
                 <div class="button" data-page="savedReplay" data-xy="[0,1]">保存したリプレイ</div>
-                <div class="button" data-page="statistics" data-xy="[0,2]">情報</div>
+                <div class="button" data-page="information" data-xy="[0,2]">情報</div>
                 <div class="button" data-page="ranking" data-xy="[0,3]">ランキング</div>
                 <div class="button" data-page="mission" data-xy="[0,4]">ミッション</div>
             </div>
@@ -268,6 +278,38 @@
             </div>
         </div>
         <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="information">
+        <div class="label headingLabel">情報</div>
+        <div class="subPage">
+            <div class="statisticSection">累計</div>
+            <div class="statisticRow"><span>プレイ回数</span><span data-statistic="playCount"></span></div>
+            <div class="statisticRow"><span>設置回数</span><span data-statistic="putCount"></span></div>
+            <div class="statisticRow"><span>役成立回数</span><span data-statistic="trickCount"></span></div>
+            <div class="statisticRow"><span>一列揃え回数</span><span data-statistic="lineCount"></span></div>
+            <div class="statisticRow"><span>一手戻し回数</span><span data-statistic="unputCount"></span></div>
+            <div class="statisticRow"><span>ホールド回数</span><span data-statistic="holdCount"></span></div>
+        </div>
+        <div class="subPage">
+            <div class="statisticSection">ソロ</div>
+            <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="soloSurvivalScore"></span></div>
+            <div class="statisticRow"><span>サバイバル：最長プレイ時間</span><span data-statistic="soloSurvivalTime" data-format="time"></span></div>
+            <div class="statisticRow"><span>サバイバル：累計回復</span><span data-statistic="soloRecovery"></span></div>
+            <div class="statisticRow"><span>十五列揃え：最速タイム</span><span data-statistic="soloSprintTime" data-format="time"></span></div>
+        </div>
+        <div class="subPage">
+            <div class="statisticSection">マルチ</div>
+            <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="multiSurvivalScore"></span></div>
+            <div class="statisticRow"><span>サバイバル：最大攻撃</span><span data-statistic="multiSurvivalAttack"></span></div>
+            <div class="statisticRow"><span>十五列揃え：最速タイム</span><span data-statistic="multiSprintTime" data-format="time"></span></div>
+        </div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
     </div>
 
     <div class="page" id="replay">
@@ -617,15 +659,17 @@
         <div id="dataInformation">
             <div class="label">全データ：<span id="totalDataSize">0</span> B</div>
             <div class="label">設定関連：<span id="settingDataSize">0</span> B</div>
+            <div class="label">プレイデータ関連：<span id="playDataSize">0</span> B</div>
             <div class="label">リプレイ関連：<span id="replayDataSize">0</span> B</div>
         </div>
         <div class="options">
             <div class="button" data-delete-group="settings" data-xy="[0,0]">設定データを削除する</div>
-            <div class="button" data-delete-group="replays" data-xy="[0,1]">リプレイデータを削除する</div>
-            <div class="button" data-delete-group="all" data-xy="[0,2]">全データを削除する</div>
+            <div class="button" data-delete-group="play" data-xy="[0,1]">プレイデータを削除する</div>
+            <div class="button" data-delete-group="replays" data-xy="[0,2]">リプレイデータを削除する</div>
+            <div class="button" data-delete-group="all" data-xy="[0,3]">全データを削除する</div>
         </div>
         <div class="text" id="dataDeleteStatus" aria-live="polite"></div>
-        <div class="back button" data-xy="[0,3]">戻る</div>
+        <div class="back button" data-xy="[0,4]">戻る</div>
     </div>
 
     <div class="page" id="allDataDeleteAlert" data-layer="1">

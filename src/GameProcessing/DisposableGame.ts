@@ -6,6 +6,7 @@ import { InputObserver } from "../Utilities/Interaction/InputObserver";
 import type { ReplayData, ReplayRandomSeeds } from "../Replay/Replay";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { createRandomSeed } from "../Utilities/Random/SeededRandom";
+import { PlayStatistics } from "../PlayStatistics";
 
 /**
  * ゲームのセッティングから片付けまでやって捨てられるクラス
@@ -93,6 +94,7 @@ export class DisposableGame {
     }
 
     private async onGameFinish() {
+        PlayStatistics.recordCompletedGame(this);
         this.onEnding();
         if (this.isReplay()) {
             this.onFinishReplay();

@@ -1,4 +1,4 @@
-import { BlockKind, BlockProperty } from "./BlockOperate/Block";
+import { BlockKind, BlockProperty, ShapeInfo } from "./BlockOperate/Block";
 import { MondState } from "./BlockOperate/Monoiamond";
 import { Pentiamond } from "./BlockOperate/Pentiamond";
 import * as Setting from "./Settings";
@@ -12,6 +12,33 @@ export type GraphicData = {
 };
 
 export class CanvasManager {
+    /** 役一覧用の、高さ1・灰色の盤面。ゲーム本体と同じ三角形を描画する。 */
+    static createRowCanvas(shape: readonly ShapeInfo[]): HTMLCanvasElement {
+        const canvas = document.createElement("canvas");
+        this.paintRowCanvas(canvas, shape);
+        return canvas;
+    }
+
+    /** 同じ盤面を再描画し、役の形のバリエーションを切り替える。 */
+    static paintRowCanvas(canvas: HTMLCanvasElement, shape: readonly ShapeInfo[]): void {
+        canvas.width = Math.round(Setting.blockWidth * (shape.length + 1) / 2);
+        canvas.height = Setting.blockHeight;
+        const context = canvas.getContext("2d")!;
+        context.fillStyle = Setting.backgroundColor;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.strokeStyle = Setting.canvasGrid.color;
+        context.lineWidth = Setting.canvasGrid.width;
+        for (let x = 0; x <= (shape.length + 1) / 2; x++) {
+            context.beginPath();
+            context.moveTo(x * Setting.blockWidth, 0);
+            context.lineTo(x * Setting.blockWidth, canvas.height);
+            context.stroke();
+        }
+        shape.forEach(([direction, visible], x) => {
+            this.paintTriangle(context, [Setting.blockWidth * x / 2, 0], ["g", direction, visible]);
+        });
+    }
+
     private playCanvas: HTMLCanvasElement = document.createElement("canvas");
     private pct: CanvasRenderingContext2D;
     private nextCanvas: HTMLCanvasElement = document.createElement("canvas");
@@ -86,32 +113,35 @@ export class CanvasManager {
     }
 
     private paintBlock(x: number, y: number, property: BlockProperty, isGhost = false) {
+        CanvasManager.paintTriangle(this.pct, this.getGraphicPosition(x, y), property, 1, isGhost);
+    }
+
+    private static paintTriangle(context: CanvasRenderingContext2D, position: number[], property: BlockProperty, scale = 1, isGhost = false) {
         if (!property[2]) {
             return;
         }
 
         if (isGhost) {
-            this.pct.strokeStyle = Setting.mondGrid.ghost.color;
-            this.pct.fillStyle = Setting.blockColor.ghost[property[0]];
-            this.pct.lineWidth = Setting.mondGrid.ghost.width;
+            context.strokeStyle = Setting.mondGrid.ghost.color;
+            context.fillStyle = Setting.blockColor.ghost[property[0]];
+            context.lineWidth = Setting.mondGrid.ghost.width;
         } else {
-            this.pct.strokeStyle = Setting.mondGrid.normal.color;
-            this.pct.fillStyle = Setting.blockColor.normal[property[0]];
-            this.pct.lineWidth = Setting.mondGrid.normal.width;
+            context.strokeStyle = Setting.mondGrid.normal.color;
+            context.fillStyle = Setting.blockColor.normal[property[0]];
+            context.lineWidth = Setting.mondGrid.normal.width;
         }
-        this.pct.lineJoin = "bevel";
-        this.pct.lineCap = "round";
-        const position = this.getGraphicPosition(x, y);
-        const p1 = arrayPlus([0, property[1] ? Setting.blockHeight : 0], position);
-        const p2 = arrayPlus([Setting.blockWidth / 2, property[1] ? 0 : Setting.blockHeight], position);
-        const p3 = arrayPlus([Setting.blockWidth, property[1] ? Setting.blockHeight : 0], position);
-        this.pct.beginPath();
-        this.pct.moveTo(p1[0], p1[1]);
-        this.pct.lineTo(p2[0], p2[1]);
-        this.pct.lineTo(p3[0], p3[1]);
-        this.pct.closePath();
-        this.pct.fill();
-        this.pct.stroke();
+        context.lineJoin = "bevel";
+        context.lineCap = "round";
+        const p1 = arrayPlus([0, property[1] ? Setting.blockHeight * scale : 0], position);
+        const p2 = arrayPlus([Setting.blockWidth * scale / 2, property[1] ? 0 : Setting.blockHeight * scale], position);
+        const p3 = arrayPlus([Setting.blockWidth * scale, property[1] ? Setting.blockHeight * scale : 0], position);
+        context.beginPath();
+        context.moveTo(p1[0], p1[1]);
+        context.lineTo(p2[0], p2[1]);
+        context.lineTo(p3[0], p3[1]);
+        context.closePath();
+        context.fill();
+        context.stroke();
     }
 
     private paintBackground() {
@@ -186,25 +216,7 @@ export class CanvasManager {
     }
 
     private paintNextBlock(x: number, y: number, property: BlockProperty, isHold: boolean = false) {
-        if (!property[2]) {
-            return;
-        }
-        this.nct.strokeStyle = Setting.mondGrid.normal.color;
-        this.nct.fillStyle = Setting.blockColor.normal[property[0]];
-        this.nct.lineWidth = Setting.mondGrid.normal.width;
-        this.nct.lineJoin = "bevel";
-        this.nct.lineCap = "round";
         const scale = isHold ? Setting.next.scale.hold : Setting.next.scale.normal;
-        const position = this.getNextGraphicPosition(x, y, isHold);
-        const p1 = arrayPlus([0, property[1] ? Setting.blockHeight * scale : 0], position);
-        const p2 = arrayPlus([(Setting.blockWidth * scale) / 2, property[1] ? 0 : Setting.blockHeight * scale], position);
-        const p3 = arrayPlus([Setting.blockWidth * scale, property[1] ? Setting.blockHeight * scale : 0], position);
-        this.nct.beginPath();
-        this.nct.moveTo(p1[0], p1[1]);
-        this.nct.lineTo(p2[0], p2[1]);
-        this.nct.lineTo(p3[0], p3[1]);
-        this.nct.closePath();
-        this.nct.fill();
-        this.nct.stroke();
+        CanvasManager.paintTriangle(this.nct, this.getNextGraphicPosition(x, y, isHold), property, scale);
     }
 }
