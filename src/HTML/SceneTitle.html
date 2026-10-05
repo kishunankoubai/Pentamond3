@@ -130,11 +130,14 @@
     <div class="page" id="playPrepare">
         <div class="label headingLabel">プレイ準備</div>
         <div class="options" data-direction="row">
-            <div class="playStart button" data-xy="[0,0]">スタート!</div>
-            <div class="button" id="playPrepareControllerButton" data-xy="[1,0]">コントローラー</div>
-            <div class="button" id="playPrepareSettingButton" data-xy="[2,0]">プレイ設定</div>
+            <div class="playStart button" data-xy="[1,0]">スタート！</div>
         </div>
-        <div class="back button" data-xy="[0,1]">戻る</div>
+        <div class="options" data-direction="row">
+            <div class="button" id="playPrepareControllerButton" data-xy="[0,1]">コントローラー</div>
+            <div class="button" id="playPrepareSettingButton" data-xy="[1,1]">プレイ設定</div>
+            <div class="button" id="playPrepareTrickListButton" data-page="trickList" data-xy="[2,1]">役一覧</div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
     </div>
 
     <div class="page" id="playerRegister">
@@ -158,6 +161,30 @@
             <div class="button" data-xy="[4,0]" data-page="trickTutorial">役の揃え方</div>
         </div>
         <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
+    <div class="page" id="operateTutorial">
+        <div class="label headingLabel">操作方法</div>
+        <div class="text">前の教習をクリアすると、次の教習が解放されます。</div>
+        <div class="text">✓ はクリア済みです。何度でも挑戦できます。</div>
+        <div id="operationLessonList" class="lessonList"></div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
+    </div>
+
+    <div class="page" id="BasicRule">
+        <div class="label headingLabel">基本ルール</div>
+        <div class="text">前の教習をクリアすると、次の教習が解放されます。</div>
+        <div class="text">✓ はクリア済みです。何度でも挑戦できます。</div>
+        <div id="basicRuleLessonList" class="lessonList"></div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
+    </div>
+
+    <div class="page" id="advancedRule">
+        <div class="label headingLabel">応用など</div>
+        <div class="text">前の教習をクリアすると、次の教習が解放されます。</div>
+        <div class="text">✓ はクリア済みです。何度でも挑戦できます。</div>
+        <div id="advancedLessonList" class="lessonList"></div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
     </div>
 
     <div class="page" id="help">

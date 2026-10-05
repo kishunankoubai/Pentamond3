@@ -3,6 +3,7 @@ import { LoopManager } from "../Loop/LoopManager";
 import { MyEventListener } from "../MyEventListener";
 import { Scene, sceneManager } from "../SceneManager";
 import { WaitDynamicText } from "./DynamicText";
+import { spaceJapaneseHTML } from "./JapaneseText";
 
 export type Talk = {
     html: string;
@@ -28,6 +29,8 @@ export class TalkPanel extends WaitDynamicText {
     private talk: Talk[] = [];
     private talkIndex: number = -1;
     private talkFinished: boolean = false;
+    private automaticAdvance: ReturnType<typeof setTimeout> | null = null;
+    private htmlResolver: (html: string) => string = (html) => html;
     constructor() {
         super();
         this.g$element.classList.add("talkPanel");
@@ -52,10 +55,10 @@ export class TalkPanel extends WaitDynamicText {
 
         this.addHandler("finish", () => {
             if (!this.talk[this.talkIndex].wait) {
-                setTimeout(() => {
-                    if (this.talkIndex === -1) return;
-                    if (this.g$hasFinishedTalk) this.finishTalk();
-                    else this.displayNextSpeech();
+                this.automaticAdvance = setTimeout(() => {
+                    this.automaticAdvance = null;
+                    if (this.talkIndex === -1 || this.talkFinished) return;
+                    this.displayNextSpeech();
                 }, 100);
             }
         });
@@ -87,6 +90,17 @@ export class TalkPanel extends WaitDynamicText {
         this.talk = talk;
     }
 
+    /** 文字送りを始める前に、操作案内などの可変な文言を解決する。 */
+    set s$htmlResolver(resolver: (html: string) => string) {
+        this.htmlResolver = resolver;
+    }
+
+    /** 表示途中の文字数を維持して、現在の案内だけを更新する。 */
+    refreshSpeech(): void {
+        if (this.talkIndex < 0 || this.talkFinished) return;
+        this.updateHTML(spaceJapaneseHTML(this.htmlResolver(this.talk[this.talkIndex].html)));
+    }
+
     /**
      * @param namePanel namePanelとして使用したい要素
      */
@@ -96,6 +110,7 @@ export class TalkPanel extends WaitDynamicText {
     }
 
     resetTalk(): void {
+        this.clearAutomaticAdvance();
         if (this.talkIndex == -1) return;
         super.reset();
         this.g$element.style.display = "none";
@@ -120,6 +135,7 @@ export class TalkPanel extends WaitDynamicText {
     }
 
     displayNextSpeech() {
+        this.clearAutomaticAdvance();
         if (!super.g$hasStarted) {
             this.startTalk();
             return;
@@ -143,7 +159,7 @@ export class TalkPanel extends WaitDynamicText {
     }
 
     private readTalk(index: number) {
-        super.s$html = this.talk[index].html;
+        super.s$html = spaceJapaneseHTML(this.htmlResolver(this.talk[index].html));
         super.s$loopFrequency = this.talk[index].frequency;
         super.s$waitFrequency = this.talk[index].waitFrequency ?? 1000;
         super.s$waitString = !this.talk[index].wait ? "" : (this.talk[index].waitString ?? "▼");
@@ -163,12 +179,18 @@ export class TalkPanel extends WaitDynamicText {
 
     finishTalk() {
         if (this.talkFinished) return;
+        this.clearAutomaticAdvance();
         this.stop();
         this.talkFinished = true;
         this.g$element.style.display = "none";
         this.namePanel.style.display = "none";
         this.talkIndex = this.talk.length - 1;
         this.executeEvent("finishTalk");
+    }
+
+    private clearAutomaticAdvance(): void {
+        if (this.automaticAdvance !== null) clearTimeout(this.automaticAdvance);
+        this.automaticAdvance = null;
     }
 }
 
@@ -233,14 +255,15 @@ export class TalkManager extends MyEventListener {
     }
 
     async talk(talks: PreTalk[]): Promise<void> {
+        this.talkPanel.resetTalk();
+        // 前の会話のresetTalk通知で開始された閉鎖処理も、新しい会話には持ち越さない。
         this.closeLoop.reset();
+        if (!talks.length) return;
+        this.talkPanel.s$talk = talks.map((talk) => this.createTalk(talk));
         const talkPageExists = document.getElementById("talk");
         if (talkPageExists && this.scene.g$pageManager.g$currentPageId != "talk") this.scene.g$pageManager.openPage("talk");
-        this.talkPanel.g$element.focus();
-
-        this.talkPanel.resetTalk();
-        this.talkPanel.s$talk = talks.map((talk) => this.createTalk(talk));
         this.talkPanel.startTalk();
+        this.talkPanel.g$element.focus();
         this.executeEvent("startTalk");
         return new Promise<void>((resolve) => {
             const event = this.talkPanel.addHandler(["finishTalk", "resetTalk"], () => {
@@ -250,6 +273,8 @@ export class TalkManager extends MyEventListener {
                 this.closeLoop.start();
             });
             const event2 = sceneManager.addHandler("sceneChange", () => {
+                // defaultStart内で始まった会話を、同じシーンの開始通知で終了しない。
+                if (sceneManager.g$currentScene === this.scene) return;
                 resolve();
                 this.talkPanel.removeEvent(event);
                 sceneManager.removeEvent(event2);

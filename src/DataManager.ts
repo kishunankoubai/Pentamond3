@@ -9,6 +9,7 @@ import { Music } from "./Utilities/Music/Music";
 import { MusicManager } from "./Utilities/Music/MusicManager";
 import { bgmTracks } from "./BGMTracks";
 import { PlayStatistics } from "./PlayStatistics";
+import { TutorialProgress } from "./Tutorial/TutorialProgress";
 
 export class DataManager {
     private static key = [11, 11];
@@ -33,6 +34,7 @@ export class DataManager {
 
     static read() {
         PlayStatistics.read();
+        TutorialProgress.read();
         if (globalValues.nosave) return;
 
         ControllerSettingManager.read();
@@ -66,12 +68,14 @@ export class DataManager {
 
     static deletePlayData() {
         PlayStatistics.reset();
+        TutorialProgress.reset();
         PageManager.resetMemory();
         sceneManager.change(SceneTitle);
     }
 
     static delete() {
         PlayStatistics.reset();
+        TutorialProgress.reset();
         this.resetSettings();
         PageManager.resetMemory();
         sceneManager.change(SceneTitle);

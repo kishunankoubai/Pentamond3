@@ -11,6 +11,7 @@ export class DynamicText extends LoopManager {
     private progress: number = 0;
 
     private html: string = "";
+    private textLength = 0;
     private hasFinished: boolean = false;
     private fastRuby: boolean = true;
 
@@ -55,9 +56,19 @@ export class DynamicText extends LoopManager {
      */
     set s$html(html: string) {
         if (this.hasStartedCheck()) return;
+        this.setHTML(html);
+    }
+
+    /** 入力機器などに応じた文言の変更。文字送りの進行位置と待機状態は維持する。 */
+    updateHTML(html: string): void {
+        this.setHTML(html);
+        this.element.innerHTML = this.hasFinished ? this.html : this.createPrefix(this.progress);
+    }
+
+    private setHTML(html: string): void {
         this.temporaryElement.innerHTML = html.replace(/\n\s*/g, "\n").replace(/>\s+</g, "><");
         this.html = this.temporaryElement.innerHTML;
-        if (this.fastRuby) this.temporaryElement.innerHTML = this.temporaryElement.innerHTML.replace(/<rt>[^(<\/rt>)]*<\/rt>/g, "");
+        this.textLength = this.countTextLength();
     }
 
     /**
@@ -84,7 +95,7 @@ export class DynamicText extends LoopManager {
      * 表示を開始する
      */
     override start(): void {
-        if (this.hasFinished) return;
+        if (this.hasFinished || !this.g$isStopping) return;
         super.start();
     }
 
@@ -95,8 +106,7 @@ export class DynamicText extends LoopManager {
         if (this.hasFinished) return;
         super.stop();
         this.element.innerHTML = this.g$html;
-        const text = this.temporaryElement.textContent || this.temporaryElement.innerText || "";
-        this.progress = text.length;
+        this.progress = this.textLength;
         this.hasFinished = true;
         this.executeEvent("finish");
     }
@@ -106,40 +116,48 @@ export class DynamicText extends LoopManager {
      */
     private write(): void {
         if (this.hasFinished) return;
-        const text = this.temporaryElement.textContent || this.temporaryElement.innerText || "";
-        //次の文字のindexを取得する
-        let charIndex = this.html.indexOf(text[this.progress]);
-        while (this.element.innerHTML.includes(this.html.substring(0, charIndex + 1))) {
-            const temporaryCharIndex = this.html.indexOf(text[this.progress], charIndex + 1);
-            if (temporaryCharIndex == -1) break;
-            else charIndex = temporaryCharIndex;
-        }
-        //次の文字を表示する
-        //ルビをすぐに表示する場合
-        if (this.fastRuby) {
-            //表示するのが最後の文字でない場合
-            if (this.progress < text.length - 1) {
-                //さらに次の文字のindexを取得する
-                let nextCharIndex = this.html.indexOf(text[this.progress + 1]);
-                while (this.html.substring(0, charIndex + 1).includes(this.html.substring(0, nextCharIndex + 1))) {
-                    const temporaryCharIndex = this.html.indexOf(text[this.progress + 1], nextCharIndex + 1);
-                    if (temporaryCharIndex == -1) break;
-                    else nextCharIndex = temporaryCharIndex;
-                }
-                //表示する文字の次の文字の一つ前まで表示する
-                this.element.innerHTML = this.html.substring(0, nextCharIndex);
-                //表示するのが最後の文字の場合
-            } else {
-                this.element.innerHTML = this.html;
-                this.progress = text.length;
-            }
-            //ルビも一文字ずつ表示する場合
-        } else this.element.innerHTML = this.html.substring(0, charIndex + 1);
-
         this.progress++;
+        // 表示中のHTMLは操作キー案内などで書き換わるため、進行位置の判定に使わない。
+        // 元のDOMから文字数だけで切り出し、属性内の文字・HTML実体参照にも影響されない。
+        this.element.innerHTML = this.createPrefix(this.progress);
         this.executeEvent("write");
-        //すべて表示し終わった場合は処理を終了させる
-        if (text.length <= this.progress) this.finish();
+        if (this.textLength <= this.progress) this.finish();
+    }
+
+    private countTextLength(): number {
+        const walker = document.createTreeWalker(this.temporaryElement, NodeFilter.SHOW_TEXT);
+        let length = 0;
+        let node: Node | null;
+        while ((node = walker.nextNode())) {
+            if (this.fastRuby && node.parentElement?.closest("rt, rp")) continue;
+            length += Array.from(node.nodeValue ?? "").length;
+        }
+        return length;
+    }
+
+    private createPrefix(length: number): string {
+        const prefix = document.createElement("div");
+        let remaining = length;
+        const copy = (source: Node, parent: Node): void => {
+            if (source instanceof Element && this.fastRuby && source.matches("rt, rp")) {
+                // 読み方は、対応する親文字が表示されてからまとめて表示する。
+                if (parent.textContent) parent.appendChild(source.cloneNode(true));
+                return;
+            }
+            if (remaining <= 0) return;
+            if (source.nodeType === Node.TEXT_NODE) {
+                const characters = Array.from(source.nodeValue ?? "");
+                const visible = characters.slice(0, remaining).join("");
+                remaining -= Math.min(remaining, characters.length);
+                parent.appendChild(document.createTextNode(visible));
+            } else {
+                const clone = source.cloneNode(false);
+                for (const child of source.childNodes) copy(child, clone);
+                parent.appendChild(clone);
+            }
+        };
+        for (const child of this.temporaryElement.childNodes) copy(child, prefix);
+        return prefix.innerHTML;
     }
 
     protected hasStartedCheck() {
@@ -220,9 +238,14 @@ export class WaitDynamicText extends DynamicText {
         this.waitLoopManager.stop();
     }
 
+    override updateHTML(html: string): void {
+        super.updateHTML(html);
+        if (this.g$hasFinished && this.waitStringVisible) this.g$element.innerHTML += this.waitString;
+    }
+
     override start(): void {
         super.start();
-        if (this.g$hasFinished) this.waitLoopManager.start();
+        if (this.g$hasFinished && this.willWait && this.waitLoopManager.g$isStopping) this.waitLoopManager.start();
     }
 
     /**

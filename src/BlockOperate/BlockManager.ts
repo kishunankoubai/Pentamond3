@@ -1,4 +1,4 @@
-import { Block } from "./Block";
+import { Block, BlockProperty } from "./Block";
 import { spinCorrection, moveCorrection } from "./MondInfo";
 import { Monoiamond } from "./Monoiamond";
 import { Pentiamond } from "./Pentiamond";
@@ -24,6 +24,13 @@ export class BlockManager {
 
     getBlockProperty(x: number, y: number) {
         return this.blocks[x][y].g$property;
+    }
+
+    /** 教材地形・一手戻しのスナップショットを、外部参照を保持せず読み込む。 */
+    load(properties: BlockProperty[][]): void {
+        if (properties.length !== Setting.playWidth || properties.some((column) => column.length !== Setting.playHeight))
+            throw new Error("盤面サイズが一致しません");
+        properties.forEach((column, x) => column.forEach((property, y) => this.blocks[x][y].s$property = [...property]));
     }
 
     /**
@@ -154,13 +161,13 @@ export class BlockManager {
      * @param moveDirection 移動方向
      * @returns 移動に成功したか
      */
-    move(mond: Pentiamond, moveDirection: "right" | "left" | "down"): boolean {
+    move(mond: Pentiamond, moveDirection: "right" | "left" | "down", allowSlide = true): boolean {
         if (!mond.g$visible) {
             return false;
         }
         this.removePentiamond(mond);
         const [x, y] = mond.g$position;
-        const displacement = moveCorrection[moveDirection];
+        const displacement = moveDirection === "down" && !allowSlide ? [[0, 1]] : moveCorrection[moveDirection];
         for (let i = 0; i < displacement.length; i++) {
             mond.s$position = [x + displacement[i][0], y + displacement[i][1]];
             if (this.canDisplayPentiamond(mond)) {

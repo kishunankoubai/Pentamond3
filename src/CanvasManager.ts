@@ -50,6 +50,8 @@ export class CanvasManager {
         hold: null,
     };
     guideBorder: boolean = false;
+    /** 教習の指定位置。通常プレイでは空のまま。 */
+    targetMondStates: MondState[] = [];
     guideBorderHeight: number = 15;
     constructor() {
         this.playCanvas.classList.add("playCanvas");
@@ -90,6 +92,9 @@ export class CanvasManager {
         this.paintGrid();
         this.paintGhost();
         this.paintBlocks();
+        this.targetMondStates.forEach(([x, y, kind, direction]) => {
+            CanvasManager.paintTriangle(this.pct, this.getGraphicPosition(x, y), [kind, direction, true], 1, false, true);
+        });
     }
 
     private paintGhost() {
@@ -116,7 +121,7 @@ export class CanvasManager {
         CanvasManager.paintTriangle(this.pct, this.getGraphicPosition(x, y), property, 1, isGhost);
     }
 
-    private static paintTriangle(context: CanvasRenderingContext2D, position: number[], property: BlockProperty, scale = 1, isGhost = false) {
+    private static paintTriangle(context: CanvasRenderingContext2D, position: number[], property: BlockProperty, scale = 1, isGhost = false, isTarget = false) {
         if (!property[2]) {
             return;
         }
@@ -131,6 +136,10 @@ export class CanvasManager {
             context.lineWidth = Setting.mondGrid.normal.width;
         }
         context.lineJoin = "bevel";
+        if (isTarget) {
+            context.strokeStyle = "#ffffff";
+            context.lineWidth = 9;
+        }
         context.lineCap = "round";
         const p1 = arrayPlus([0, property[1] ? Setting.blockHeight * scale : 0], position);
         const p2 = arrayPlus([Setting.blockWidth * scale / 2, property[1] ? 0 : Setting.blockHeight * scale], position);
@@ -140,7 +149,7 @@ export class CanvasManager {
         context.lineTo(p2[0], p2[1]);
         context.lineTo(p3[0], p3[1]);
         context.closePath();
-        context.fill();
+        if (!isTarget) context.fill();
         context.stroke();
     }
 

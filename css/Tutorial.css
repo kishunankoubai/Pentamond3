@@ -1,0 +1,137 @@
+#operateTutorial, #BasicRule, #advancedRule {
+    & .text {
+        font-size: 3.2cqh;
+        margin: 1cqh 0;
+    }
+    & .lessonList {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        width: 132cqh;
+        gap: 3cqh;
+        margin-top: 4cqh;
+    }
+    & .lessonButton {
+        font-size: 3.8cqh;
+        width: 100%;
+    }
+    & .lessonCleared {
+        border-color: #6bd;
+    }
+    & .lessonLocked {
+        color: #929bad;
+        opacity: 0.65;
+    }
+    & .back {
+        margin-top: 5cqh;
+    }
+}
+#BasicRule .lessonButton, #advancedRule .lessonButton {
+    font-size: 3.4cqh;
+}
+.tutorialScene {
+    & #lessonHeading {
+        position: absolute;
+        top: 2cqh;
+        font-size: 4.5cqh;
+    }
+    & #lessonBoard {
+        position: absolute;
+        top: 10cqh;
+        left: 5cqh;
+        width: 62cqh;
+        height: 82cqh;
+        display: flex;
+        gap: 3cqh;
+        align-items: flex-start;
+        justify-content: flex-start;
+        & .playCanvas {
+            height: 82cqh;
+            width: auto;
+        }
+        & .nextCanvas {
+            width: 15cqh;
+            height: auto;
+            margin-top: 5cqh;
+        }
+    }
+    & #lessonNextLabel {
+        position: absolute;
+        left: 44cqh;
+        top: 1cqh;
+        font-size: 2cqh;
+    }
+    & #lessonGuide {
+        position: absolute;
+        left: 74cqh;
+        top: 11cqh;
+        width: 72cqh;
+        height: 80cqh;
+        padding: 2.5cqh;
+        border-radius: 3cqh;
+        background: #eefc;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 1.2cqh;
+        & * {
+            font-size: 2.7cqh;
+            text-wrap: wrap;
+            line-height: 1.5;
+        }
+        & .lessonSectionHeading {
+            font-size: 3.2cqh;
+            color: #228899;
+            border-bottom: 0.2cqh solid #6bd;
+            width: 100%;
+        }
+        & #lessonProgress {
+            font-size: 3.2cqh;
+            white-space: pre-line;
+        }
+        & #lessonRuleSummary {
+            white-space: pre-line;
+            font-size: 2.8cqh;
+        }
+        & #lessonControls {
+            white-space: pre-line;
+        }
+        & #lessonStatus {
+            margin-top: auto;
+        }
+    }
+    & #lessonPauseHint {
+        position: absolute;
+        left: 5cqh;
+        bottom: 2cqh;
+        font-size: 2.5cqh;
+    }
+    & #lessonPausePointer {
+        position: absolute;
+        right: 5cqh;
+        bottom: 2cqh;
+        font-size: 3cqh;
+    }
+    & #talk {
+        background: #2234;
+    }
+    & #talk .talkPanel {
+        left: 6cqh;
+        width: 140cqh;
+        height: 31cqh;
+        top: 61cqh;
+        aspect-ratio: auto;
+        font-size: 4.3cqh;
+    }
+    & #talk .talkPanel * {
+        font-size: inherit;
+    }
+    & #lessonTalkHint {
+        position: absolute;
+        bottom: 2cqh;
+        font-size: 2.5cqh;
+    }
+    & #lessonPause {
+        background: #eefc;
+    }
+}

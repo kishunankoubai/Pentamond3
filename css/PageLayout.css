@@ -215,6 +215,7 @@
 }
 
 #playPrepare {
+    gap: 12cqh;
     & .options {
         gap: 8cqh;
         & .playStart {
@@ -1111,5 +1112,11 @@
                 }
             }
         }
+    }
+}
+
+#tutorial {
+    .options {
+        gap: 7vh;
     }
 }

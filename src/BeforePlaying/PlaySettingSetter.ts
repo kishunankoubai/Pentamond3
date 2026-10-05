@@ -73,11 +73,14 @@ export class PlaySettingSetter {
             });
         });
 
-        sceneManager.g$currentPageManager?.addHandler(["changePage-survivalPlaySetting", "changePage-linePlaySetting"], () => this.render());
+        sceneManager.g$currentPageManager?.addHandler(["changePage-playPrepare", "changePage-survivalPlaySetting", "changePage-linePlaySetting"], () => this.render());
         this.render();
     }
 
     private static render(): void {
+        const trickListButton = document.getElementById("playPrepareTrickListButton");
+        if (trickListButton) trickListButton.hidden = this.playSetting.mode !== 1;
+
         document.querySelectorAll<HTMLElement>("#survivalPlaySetting [data-max-time]").forEach((button) => {
             const value = button.dataset.maxTime === "Infinity" ? Infinity : Number(button.dataset.maxTime);
             button.classList.toggle("selectedValue", value === this.playSetting.maxGameTime);

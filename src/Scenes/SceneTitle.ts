@@ -20,6 +20,7 @@ import { SoundTest } from "../SoundTest";
 import { populateBGMSelectors } from "../BGMTracks";
 import { setupTrickList } from "../TrickList";
 import { setupStatisticsPage } from "../StatisticsPage";
+import { setupTutorialMenu } from "../Tutorial/TutorialMenu";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
@@ -42,6 +43,7 @@ export class SceneTitle extends Scene {
     protected initialize(): void {
         setupTrickList(this.elementManager);
         setupStatisticsPage(this);
+        setupTutorialMenu(this);
         this.setPageAnimation();
         this.setPageStart();
         this.setSettingButton();

@@ -2,6 +2,7 @@ import { getConstructor } from "./Common";
 import { MyEventListener } from "./MyEventListener";
 import { PageManager } from "./Page/PageManager";
 import { SceneSetter } from "./SceneSetter";
+import { spaceJapaneseTextNodes } from "./Text/JapaneseText";
 
 export abstract class Scene extends MyEventListener {
     /*
@@ -99,6 +100,7 @@ export class SceneManager extends MyEventListener {
         if (generation !== this.changeGeneration) return false;
         this.resetHTML();
         this.baseContainer!.innerHTML = html;
+        spaceJapaneseTextNodes(this.baseContainer!);
         return true;
     }
 

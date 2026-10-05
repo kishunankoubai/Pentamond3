@@ -1,0 +1,31 @@
+<div class="pageBundle tutorialScene">
+    <div class="page" id="practice">
+        <div class="label" id="lessonHeading"></div>
+        <div id="lessonBoard"><div id="lessonNextLabel">HOLD / NEXT</div></div>
+        <div id="lessonGuide">
+            <div class="lessonSectionHeading">クリア条件</div>
+            <div id="lessonCondition"></div>
+            <div id="lessonProgress"></div>
+            <div id="lessonRuleSummary"></div>
+            <div class="lessonSectionHeading">いまの課題</div>
+            <div id="lessonTask"></div>
+            <div class="lessonSectionHeading">教習メモ</div>
+            <div id="lessonKnowledge"></div>
+            <div id="lessonControls"></div>
+            <div id="lessonStatus" aria-live="polite"></div>
+        </div>
+        <div id="lessonPauseHint"></div>
+        <div class="button" id="lessonPausePointer" role="button">ポーズ</div>
+    </div>
+    <div class="page" id="talk" data-layer="1">
+        <div id="lessonTalkHint">クリック／決定で次へ</div>
+    </div>
+    <div class="page" id="lessonPause" data-layer="2">
+        <div class="label headingLabel">教習を休憩中</div>
+        <div class="options">
+            <div class="button back" data-xy="[0,0]">再開</div>
+            <div class="button" id="lessonRetry" data-xy="[0,1]">はじめから挑戦</div>
+            <div class="button" id="lessonLeave" data-xy="[0,2]">教習項目一覧へ</div>
+        </div>
+    </div>
+</div>
