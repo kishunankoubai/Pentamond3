@@ -1,14 +1,15 @@
 import { inputManager } from "../Utilities/Interaction/InputManager";
-import { qs, qsAddEvent, qsAll } from "../Utils";
+import { qsAddEvent, qsAll } from "../Utils";
 
 import * as Setting from "../Settings";
-import { debug } from "../Run";
 import { PlaySettingSetter } from "./PlaySettingSetter";
 import { sceneManager } from "../Utilities/SceneManager";
 import { MyEvent } from "../Utilities/MyEventListener";
 import { ControllerSettingManager } from "../ControllerSettingManager";
 import { PageManager } from "../Utilities/Page/PageManager";
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
+import { InputRegistrationView } from "./InputRegistrationView";
+import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
 
 /**
  * コントローラーの登録をしたりする
@@ -16,9 +17,12 @@ import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 export class ControllerRegisterer {
     static gamepadConfigs: Setting.GamepadConfig[] = [];
     private static inputEvents: MyEvent[] = [];
+    private static controller: AbortController | null = null;
+    private static readonly registrationView = new InputRegistrationView("playerRegister");
 
     static setEvents() {
         this.clearEvents();
+        this.controller = new AbortController();
         let pageManager = sceneManager.g$currentPageManager;
         if (!pageManager) return;
         // closure
@@ -43,14 +47,21 @@ export class ControllerRegisterer {
 
         // 登録されたとき
         this.inputEvents.push(inputManager.addHandler("inputRegistered", () => {
+            if (pageManager.g$currentPageId !== "playerRegister") return;
             // アイコンをだす
             this.onInputRegistered(currentPlayerNumber);
         }));
 
         this.inputEvents.push(inputManager.addHandler("finishRegister", () => {
-            const registerText = document.getElementById("registerText");
-            if (registerText) registerText.innerHTML = '<div style="color:#d66">完了！</div>';
+            if (pageManager.g$currentPageId !== "playerRegister") return;
+            this.registrationView.render(true);
         }));
+
+        window.addEventListener("gamepaddisconnected", (event) => {
+            if (pageManager.g$currentPageId !== "playerRegister") return;
+            if (inputManager.g$registeredInputs.some((input) => input instanceof GamepadObserver && input.g$index === event.gamepad.index))
+                this.startControllerRegistration(currentPlayerNumber);
+        }, { signal: this.controller.signal });
 
         qsAddEvent("#registerButton", "click", () => {
             this.onClickOk(currentPlayerNumber);
@@ -66,6 +77,8 @@ export class ControllerRegisterer {
     }
 
     static clearEvents() {
+        this.controller?.abort();
+        this.controller = null;
         inputManager.removeEvent(this.inputEvents);
         this.inputEvents = [];
     }
@@ -75,11 +88,7 @@ export class ControllerRegisterer {
         if (!pageManager) return;
 
         // まだ全員登録し終わっていないならリターン
-        if (inputManager.g$registering) {
-            if (debug) {
-                inputManager.finishRegister();
-            } else return;
-        }
+        if (inputManager.g$registering || !this.registrationView.ready) return;
 
         if (playerNumber > 1) {
             ControllerSettingManager.startPlayerSelection(playerNumber);
@@ -115,41 +124,21 @@ export class ControllerRegisterer {
 
     // normalを準備
     private static startControllerRegistration(playerNumber: number) {
-        // 既に登録されているものを外す
-        if (inputManager.g$registeredInputNumber > 0) {
-            inputManager.removeVirtualInputs();
-            inputManager.resetRegister();
-        }
-
-        // 前の表示を消す
-        Array.from(qs("#connectionLabel").children).forEach((element) => {
-            element.remove();
-        });
-
-        qs("#registerText").innerText = `登録したい入力機器のボタンを押してください：あと${playerNumber - inputManager.g$registeredInputNumber}人`;
-
+        inputManager.removeVirtualInputs();
         this.gamepadConfigs = [];
 
         inputManager.s$maxInputNumber = playerNumber;
         inputManager.startRegister();
+        this.registrationView.reset(playerNumber);
     }
 
     // コントローラーが登録されたときアイコンを出す
     private static onInputRegistered(playerNumber: number) {
         const registerInputs = inputManager.g$registeredInputs;
         const registeredInput = registerInputs.at(-1);
-        const connectionLabel = document.getElementById("connectionLabel");
-        const registerText = document.getElementById("registerText");
-
         // このイベントはタイトル画面の登録UI専用。別Sceneでは何もしない。
-        if (!registeredInput || !connectionLabel || !registerText) return;
-
-        const typeIcon = document.createElement("div");
-        typeIcon.dataset.inputType = registeredInput.g$type;
-        typeIcon.classList.add("inputTypeIcon");
-        connectionLabel.appendChild(typeIcon);
-
-        registerText.innerText = `登録したい入力機器のボタンを押してください：あと${playerNumber - inputManager.g$registeredInputNumber}人`;
+        if (!registeredInput) return;
+        this.registrationView.render();
 
         this.gamepadConfigs.push(playerNumber === 1 ? ControllerSettingManager.getSelectedConfig() : structuredClone(Setting.gamepadConfigPresets[0]));
     }

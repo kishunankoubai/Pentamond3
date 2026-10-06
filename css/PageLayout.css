@@ -166,14 +166,21 @@
     }
 }
 
-#playerRegister {
+.inputRegistrationPage {
     background-image: repeating-linear-gradient(45deg, #ccc 0px, #ccc 5cqh, #c3c3c3 5cqh, #c3c3c3 10cqh);
 
-    & #registerText {
+    & .registrationMessage {
         font-size: 5cqh;
         text-wrap: nowrap;
     }
-    & #connectionLabel {
+    & .registrationComplete {
+        color: #d66;
+    }
+    & .button[aria-disabled="true"] {
+        opacity: 0.35;
+        pointer-events: none;
+    }
+    & .registrationConnections {
         height: 15cqh;
         display: flex;
         flex-direction: row;
@@ -284,16 +291,10 @@
     }
 }
 
-#pause {
+.pauseMenu {
     background-color: #dddddddd;
-    & .container {
-        gap: 8cqh;
-    }
-}
-
-#replayPause {
-    background-color: #dddddddd;
-    & .options {
+    gap: 4cqh;
+    & .container, & .options {
         gap: 8cqh;
     }
 }

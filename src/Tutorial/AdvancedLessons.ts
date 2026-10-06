@@ -3,7 +3,7 @@ import { basicRuleLessons } from "./BasicRuleLessons";
 
 export const advancedLessonOffset = operationLessons.length + basicRuleLessons.length;
 export const advancedLessons = [
-    { id: "next", name: "ネクスト", count: 2, knowledge: "NEXTには、これから出現するモンドが順番に表示されます。次の形も見ながら置き場所を考えましょう。" },
+    { id: "next", name: "ネクスト", count: 4, knowledge: "NEXTには、これから出現するモンドが順番に表示されます。次の形も見ながら置き場所を考えましょう。" },
     { id: "holdReset", name: "ホールド2回で元の位置に", count: 1, knowledge: "上へ移動する操作はありません。ホールドにモンドがあれば、2回入れ替えることで今のモンドを初期位置・初期の向きに戻せます。" },
     { id: "juggling", name: "ジャグリング", count: 1, knowledge: "設置 → ホールド → 一手戻し → ホールドで、ネクストのモンドを取り出せます。サバイバルでは一手戻しのペナルティがあるため、使いどころを考えましょう。" },
     { id: "rotation", name: "回転入れ", count: 2, knowledge: "真下へ設置するだけでは入らない場所でも、滑り移動のあとに回転すると入ることがあります。白枠の形と向きに合わせましょう。" },

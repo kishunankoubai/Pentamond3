@@ -7,6 +7,8 @@ import { BasicRuleBoard } from "../Tutorial/BasicRuleBoard";
 import { AdvancedBoard } from "../Tutorial/AdvancedBoard";
 import { advancedLessonOffset, advancedLessons } from "../Tutorial/AdvancedLessons";
 import { TutorialProgress } from "../Tutorial/TutorialProgress";
+import { TutorialInput } from "../Tutorial/TutorialInput";
+import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 import { EventScope } from "../Utilities/EventScope";
@@ -42,10 +44,10 @@ const padLabels: Record<OperateName, string> = {
 
 export class SceneTutorial extends Scene {
     static requestedIndex = 0;
-    static controllerInput = false;
+    private readonly lessonInput = TutorialInput.selected;
     private readonly model: PracticeBoard | BasicRuleBoard | AdvancedBoard;
     private readonly canvas = new CanvasManager();
-    private readonly interaction = new PageInteraction(this);
+    private readonly interaction = new PageInteraction(this, (input) => input === this.lessonInput);
     private readonly talk = new TalkManager(this);
     private readonly events = new EventScope();
     private readonly controller = new AbortController();
@@ -56,7 +58,7 @@ export class SceneTutorial extends Scene {
     private generation = 0;
     private busy = false;
     private disposed = false;
-    private usingController = SceneTutorial.controllerInput;
+    private readonly usingController = this.lessonInput?.g$type === "gamepad";
     private hideIntroMond = false;
     private lastTickAt = 0;
 
@@ -94,6 +96,7 @@ export class SceneTutorial extends Scene {
         });
         document.getElementById("lessonPausePointer")!.addEventListener("click", () => this.pause(), { signal: this.controller.signal });
         document.getElementById("lessonLeave")!.addEventListener("click", () => this.leave(), { signal: this.controller.signal });
+        document.getElementById("lessonTitle")!.addEventListener("click", () => this.leave("title"), { signal: this.controller.signal });
         document.getElementById("lessonRetry")!.addEventListener("click", async () => {
             this.generation++;
             this.finishBoardWait(false);
@@ -106,7 +109,9 @@ export class SceneTutorial extends Scene {
         }, { signal: this.controller.signal });
         document.addEventListener("visibilitychange", () => { if (document.hidden) this.pause(); }, { signal: this.controller.signal });
         window.addEventListener("blur", () => this.pause(), { signal: this.controller.signal });
-        window.addEventListener("gamepaddisconnected", () => { if (this.usingController) this.pause(); }, { signal: this.controller.signal });
+        window.addEventListener("gamepaddisconnected", (event) => {
+            if (this.lessonInput instanceof GamepadObserver && this.lessonInput.g$index === event.gamepad.index) this.pause();
+        }, { signal: this.controller.signal });
         this.loop.s$loopFrequency = repeatSetting.repeatTime;
         this.loop.s$onTime = false;
         this.loop.addHandler("loop", () => this.repeat());
@@ -187,13 +192,9 @@ export class SceneTutorial extends Scene {
     }
 
     private onInput(input: InputObserver, info: InputInfo): void {
+        if (input !== this.lessonInput) return;
         if (!["keyboard", "gamepad"].includes(input.g$type)) return;
         const controller = input.g$type === "gamepad";
-        if (controller !== this.usingController) {
-            this.usingController = controller;
-            this.render();
-            this.talk.talkPanel.refreshSpeech();
-        }
         if (["practice", "talk"].includes(this.pageManager.g$currentPageId) && (controller ? gamepadConfigPresets[0].pause : ["Escape", "KeyP"]).includes(info.name)) {
             info.consumed = true;
             this.pause();
@@ -420,7 +421,7 @@ export class SceneTutorial extends Scene {
             case "next": return [
                 "盤面の右側にあるNEXTを見てみましょう。これから出現するモンドが、上から順番に並んでいます。",
                 "今のモンドだけでなく、次に来る形も見ておくと、置き場所を考えやすくなります。",
-                "NEXTの一番上の形を確かめてから、今のモンドを白枠に設置してください。そのあと、予告されていたモンドも新しい白枠に設置しましょう。",
+                "NEXTの一番上の形を確かめてから、今のモンドを白枠に設置してください。予告と出現する形を見比べながら、4個設置しましょう。",
             ];
             case "holdReset": return [
                 "Pentamondには、上へ移動する操作はありません。下へ動かしすぎたとき、ホールドを使って戻すことができます。",
@@ -560,12 +561,13 @@ export class SceneTutorial extends Scene {
         if (this.model instanceof BasicRuleBoard) this.model.setActive(false);
         this.pageManager.openPage("lessonPause");
     }
-    private async leave(): Promise<void> {
+    private async leave(pageId = this.model instanceof AdvancedBoard ? "advancedRule" : this.model instanceof BasicRuleBoard ? "BasicRule" : "operateTutorial"): Promise<void> {
         if (this.disposed) return;
+        const back = PageManager.getBackIndex(pageId);
+        if (back <= 0) return;
         this.generation++;
         this.finishBoardWait(false);
         this.busy = true;
-        const back = PageManager.getBackIndex(this.model instanceof AdvancedBoard ? "advancedRule" : this.model instanceof BasicRuleBoard ? "BasicRule" : "operateTutorial");
-        if (back > 0) await this.pageManager.backPage(back);
+        await this.pageManager.backPage(back);
     }
 }

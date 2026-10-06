@@ -33,7 +33,7 @@ export class PageInteraction {
         }
     };
 
-    constructor(scene: Scene) {
+    constructor(scene: Scene, private readonly acceptsInput: (input: InputObserver) => boolean = () => true) {
         this.scene = scene;
     }
 
@@ -86,7 +86,7 @@ export class PageInteraction {
         }
 
         const handler = (item: [InputObserver, InputInfo]) => {
-            if (!this.isValid || PageInteraction.inputBlocked) return;
+            if (!this.isValid || PageInteraction.inputBlocked || !this.acceptsInput(item[0])) return;
             this.getInteractionElements();
             const elements = this.g$validElements;
             if (elements.length) item[1].consumed = true;

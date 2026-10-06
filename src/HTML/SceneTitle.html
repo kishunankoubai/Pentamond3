@@ -16,7 +16,7 @@
             <div class="selectWithDescriptionOptions">
                 <div class="button" data-page="soloStageSelect" data-xy="[0,0]">ひとりで</div>
                 <div class="button" data-page="multiStageSelect" data-xy="[0,1]">みんなで</div>
-                <div class="button" data-page="tutorial" data-xy="[0,2]">養成所</div>
+                <div class="button" data-page="tutorialInputRegister" data-xy="[0,2]">養成所</div>
                 <div class="button" data-page="statistics" data-xy="[0,3]">統計</div>
                 <div class="button" data-page="others" data-xy="[0,4]">その他</div>
             </div>
@@ -140,12 +140,22 @@
         <div class="back button" data-xy="[0,2]">戻る</div>
     </div>
 
-    <div class="page" id="playerRegister">
-        <div class="label headingLabel">コントローラー登録</div>
-        <div class="text" id="registerText">登録したいコントローラーのボタンを押してください</div>
-        <div id="connectionLabel"></div>
+    <div class="page inputRegistrationPage" id="playerRegister">
+        <div class="label headingLabel">入力機器の登録</div>
+        <div class="text registrationMessage" id="registerText" role="status" aria-live="polite" aria-atomic="true">登録したい入力機器のボタンを押してください</div>
+        <div class="registrationConnections" id="connectionLabel"></div>
         <div class="options">
-            <div class="button" id="registerButton" data-xy="[1,0]">次へ</div>
+            <div class="button registrationNext" id="registerButton" data-xy="[1,0]" aria-disabled="true">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
+    <div class="page inputRegistrationPage" id="tutorialInputRegister">
+        <div class="label headingLabel">入力機器の登録</div>
+        <div class="text registrationMessage" id="tutorialRegisterText" role="status" aria-live="polite" aria-atomic="true">登録したい入力機器のボタンを押してください</div>
+        <div class="registrationConnections" id="tutorialConnectionLabel"></div>
+        <div class="options">
+            <div class="button registrationNext" id="tutorialRegisterNext" data-xy="[1,0]" aria-disabled="true">次へ</div>
         </div>
         <div class="back button" data-xy="[0,1]">戻る</div>
     </div>

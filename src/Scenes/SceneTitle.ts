@@ -21,6 +21,8 @@ import { populateBGMSelectors } from "../BGMTracks";
 import { setupTrickList } from "../TrickList";
 import { setupStatisticsPage } from "../StatisticsPage";
 import { setupTutorialMenu } from "../Tutorial/TutorialMenu";
+import { TutorialInput } from "../Tutorial/TutorialInput";
+import { InputRegistrationView } from "../BeforePlaying/InputRegistrationView";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
@@ -32,7 +34,10 @@ export class SceneTitle extends Scene {
         super("src/HTML/SceneTitle.html");
         this.elementManager = new ElementManager(this);
         this.elementEventSetter = new ElementEventSetter(this.elementManager);
-        this.pageInteraction = new PageInteraction(this);
+        this.pageInteraction = new PageInteraction(this, (input) => {
+            const pageId = this.pageManager.g$currentPageId;
+            return InputRegistrationView.acceptsMenuInput(pageId, input) && TutorialInput.acceptsMenuInput(pageId, input);
+        });
         this.sceneSetters.push(
             this.elementEventSetter,
             new PageInteractionSetter(this.pageInteraction)

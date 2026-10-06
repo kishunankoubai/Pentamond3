@@ -20,12 +20,15 @@
     <div class="page" id="talk" data-layer="1">
         <div id="lessonTalkHint">クリック／決定で次へ</div>
     </div>
-    <div class="page" id="lessonPause" data-layer="2">
-        <div class="label headingLabel">教習を休憩中</div>
-        <div class="options">
-            <div class="button back" data-xy="[0,0]">再開</div>
-            <div class="button" id="lessonRetry" data-xy="[0,1]">はじめから挑戦</div>
-            <div class="button" id="lessonLeave" data-xy="[0,2]">教習項目一覧へ</div>
+    <div class="page pauseMenu" id="lessonPause" data-layer="2">
+        <div class="label headingLabel">ポーズ</div>
+        <div class="options" data-direction="row">
+            <div class="button" data-back="1" data-xy="[0,0]">再開する</div>
+            <div class="button" id="lessonRetry" data-xy="[1,0]">もう一度</div>
+        </div>
+        <div class="options" data-direction="row">
+            <div class="button" id="lessonLeave" data-xy="[0,1]">教習項目一覧へ</div>
+            <div class="button" id="lessonTitle" data-xy="[1,1]">タイトルへ</div>
         </div>
     </div>
 </div>

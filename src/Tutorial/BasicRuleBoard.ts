@@ -76,6 +76,12 @@ export class BasicRuleBoard {
         } else if (id === "penalty") {
             this.targetsToPlace = [];
             this.phase = "penalties";
+            // 一手戻しのあとも残る、役に該当しない3列。消去による変化を見せる。
+            const terrain = this.blocks.g$blockProperties;
+            [[2, 5], [4, 8], [6, 11]].forEach(([left, right], row) => {
+                for (let x = left; x <= right; x++) terrain[x][bottom - row] = ["g", (x + row) % 2 === 0, true];
+            });
+            this.blocks.load(terrain);
         } else {
             this.targetsToPlace = [];
             this.phase = "damageReady";

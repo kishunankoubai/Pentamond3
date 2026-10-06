@@ -51,8 +51,7 @@ export class AdvancedBoard {
         this.queue = [...bag, ...bag, ...bag];
         switch (this.lesson.id) {
             case "next":
-                this.target = new Pentiamond(8, bottom, "I");
-                this.spawnNext();
+                this.prepareNextTarget();
                 break;
             case "holdReset":
             case "juggling":
@@ -92,7 +91,7 @@ export class AdvancedBoard {
     get recoveryConfirmed(): boolean { return this.recoveryMoves.left === 3 && this.recoveryMoves.right === 3; }
     get condition(): string {
         switch (this.lesson.id) {
-            case "next": return "ネクストを確認し、白枠に2個設置しよう";
+            case "next": return `ネクストを確認し、白枠に${this.lesson.count}個設置しよう`;
             case "holdReset": return "下へ6回動かし、ホールド2回で初期位置へ戻そう";
             case "juggling": return "ジャグリングで取り出したモンドを白枠に設置しよう";
             case "rotation": return "滑り移動のあとに回転して、2つの白枠に設置しよう";
@@ -102,7 +101,7 @@ export class AdvancedBoard {
     }
     get progress(): string {
         switch (this.lesson.id) {
-            case "next": case "rotation": return `設置 ${this.placed} / 2`;
+            case "next": case "rotation": return `設置 ${this.placed} / ${this.lesson.count}`;
             case "holdReset": return `下移動 ${this.lowered} / 6　ホールド ${Math.max(0, this.stage - 1)} / 2`;
             case "juggling": return `手順 ${Math.min(4, this.stage)} / 4　設置 ${this.placed > 1 ? 1 : 0} / 1`;
             case "leftPriority": return `左への滑り移動 ${this.leftChosen ? 1 : 0} / 1`;
@@ -205,8 +204,8 @@ export class AdvancedBoard {
         switch (this.lesson.id) {
             case "next":
                 this.stage++;
-                if (this.stage === 2) { this.hand = null; this.phase = "done"; }
-                else { this.target = new Pentiamond(3, bottom, "L"); this.spawnNext(); }
+                if (this.stage === this.lesson.count) { this.hand = null; this.target = null; this.phase = "done"; }
+                else this.prepareNextTarget();
                 break;
             case "juggling":
                 if (this.stage === 4) { this.hand = null; this.phase = "done"; }
@@ -270,6 +269,18 @@ export class AdvancedBoard {
         return this.queue.shift()!;
     }
     private spawnNext(): void { this.spawn(this.takeNext()); }
+    private prepareNextTarget(): void {
+        this.spawnNext();
+        // 前の設置を残し、6種一巡の次の形が実際に届く位置へ白枠を置く。
+        const preview = new BlockManager();
+        this.blocks.removePentiamond(this.hand!);
+        preview.load(this.blocks.g$blockProperties);
+        this.blocks.displayPentiamond(this.hand!);
+        const target = new Pentiamond([8, 3, 13, 8][this.stage], Settings.initialY, this.hand!.g$kind);
+        preview.displayPentiamond(target);
+        while (preview.fall(target)) { /* 現在の地形に対する真下の着地点 */ }
+        this.target = target;
+    }
     private spawn(kind: BlockKind, direction = 0): void {
         this.hand = new Pentiamond(Settings.initialX, Settings.initialY, kind, direction);
         this.blocks.displayPentiamond(this.hand);
