@@ -10,8 +10,12 @@ import { TutorialProgress } from "./TutorialProgress";
 import { TutorialInput } from "./TutorialInput";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
 import { InputRegistrationView } from "../BeforePlaying/InputRegistrationView";
+import { trickLessonOffset, trickLessons } from "./TrickLessons";
+import { ElementManager } from "../Utilities/Element/ElementManager";
 
-export function setupTutorialMenu(scene: Scene): void {
+let trickMenuPage = 0;
+
+export function setupTutorialMenu(scene: Scene, elementManager: ElementManager): void {
     const pageManager = scene.g$pageManager;
     const next = document.getElementById("tutorialRegisterNext")!;
     const registrationView = new InputRegistrationView("tutorialInputRegister");
@@ -72,18 +76,34 @@ export function setupTutorialMenu(scene: Scene): void {
         inputManager.removeEvent(registrationEvent);
         if (registering) { inputManager.resetRegister(); TutorialInput.selected = null; }
     }, 1);
-    const setupList = (pageId: string, listId: string, lessons: readonly { name: string }[], offset: number) => {
+    const setupList = (pageId: string, listId: string, lessons: readonly { name: string }[], offset: number, perPage = lessons.length) => {
         const list = document.getElementById(listId)!;
-        const rowCount = Math.ceil(lessons.length / 2);
+        const rowCount = Math.ceil(perPage / 2);
+        const lists: HTMLElement[] = [];
+        if (perPage < lessons.length) {
+            for (let i = 0; i < Math.ceil(lessons.length / perPage); i++) {
+                const subPage = document.createElement("div");
+                subPage.className = "subPage";
+                subPage.style.display = i === 0 ? "" : "none";
+                const grid = document.createElement("div");
+                grid.className = "lessonList";
+                subPage.appendChild(grid);
+                list.appendChild(subPage);
+                lists.push(grid);
+            }
+        } else lists.push(list);
         const buttons = lessons.map((lesson, localIndex) => {
             const index = offset + localIndex;
             const button = document.createElement("div");
             button.className = "button lessonButton";
-            const [x, y] = [Math.floor(localIndex / rowCount), localIndex % rowCount];
+            const pageIndex = Math.floor(localIndex / perPage);
+            const position = localIndex % perPage;
+            const [x, y] = [Math.floor(position / rowCount), position % rowCount];
             button.dataset.xy = JSON.stringify([x, y]);
             button.style.gridArea = `${y + 1} / ${x + 1}`;
             button.addEventListener("click", () => {
                 if (!TutorialProgress.isUnlocked(index) || sceneManager.g$currentScene !== scene) return;
+                if (perPage < lessons.length) trickMenuPage = pageIndex;
                 if (!TutorialInput.available) {
                     pendingLesson = index;
                     pageManager.openPage("tutorialInputRegister");
@@ -92,7 +112,7 @@ export function setupTutorialMenu(scene: Scene): void {
                 SceneTutorial.requestedIndex = index;
                 sceneManager.change(SceneTutorial);
             });
-            list.appendChild(button);
+            lists[pageIndex].appendChild(button);
             return button;
         });
         const refresh = () => buttons.forEach((button, localIndex) => {
@@ -106,9 +126,19 @@ export function setupTutorialMenu(scene: Scene): void {
             setInteractionEnabled(button, unlocked);
         });
         refresh();
-        scene.g$pageManager.addHandler(`changePage-${pageId}`, refresh);
+        scene.g$pageManager.addHandler(`changePage-${pageId}`, () => {
+            refresh();
+            if (perPage < lessons.length) elementManager.openSubPage(trickMenuPage);
+        });
+        if (perPage < lessons.length) {
+            const event = elementManager.addHandler(`openSubPage-${pageId}`, (subPage: HTMLElement) => {
+                trickMenuPage = Array.from(list.querySelectorAll(".subPage")).indexOf(subPage);
+            });
+            scene.addHandler("sceneEnd", () => elementManager.removeEvent(event), 1);
+        }
     };
     setupList("operateTutorial", "operationLessonList", operationLessons, 0);
     setupList("BasicRule", "basicRuleLessonList", basicRuleLessons, 6);
     setupList("advancedRule", "advancedLessonList", advancedLessons, advancedLessonOffset);
+    setupList("trickTutorial", "trickLessonList", trickLessons, trickLessonOffset, 4);
 }

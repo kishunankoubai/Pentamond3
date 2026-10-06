@@ -148,12 +148,12 @@ export class AdvancedBoard {
         if (operation === "removeLine") {
             const kind = this.hand!.g$kind;
             this.blocks.removePentiamond(this.hand!);
-            const role = this.blocks.removeLine();
+            const trick = this.blocks.removeLine();
             this.undo = null;
             this.erased++;
             this.spawn(kind);
             if (this.hand!.g$visible) this.phase = "done";
-            return { role: role?.name, sound: role ? "消去音0" : undefined };
+            return { trick: trick?.name, sound: trick ? "消去音0" : undefined };
         }
         if (!this.hand?.g$visible) return {};
         if (operation.startsWith("move-")) {

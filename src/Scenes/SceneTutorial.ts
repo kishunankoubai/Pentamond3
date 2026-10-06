@@ -5,7 +5,9 @@ import { gamepadConfigPresets, input as repeatSetting } from "../Settings";
 import { PracticeBoard, PracticePhase } from "../Tutorial/PracticeBoard";
 import { BasicRuleBoard } from "../Tutorial/BasicRuleBoard";
 import { AdvancedBoard } from "../Tutorial/AdvancedBoard";
-import { advancedLessonOffset, advancedLessons } from "../Tutorial/AdvancedLessons";
+import { advancedLessonOffset } from "../Tutorial/AdvancedLessons";
+import { TrickPracticeBoard } from "../Tutorial/TrickPracticeBoard";
+import { trickLessonOffset, trickLessons } from "../Tutorial/TrickLessons";
 import { TutorialProgress } from "../Tutorial/TutorialProgress";
 import { TutorialInput } from "../Tutorial/TutorialInput";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
@@ -45,7 +47,7 @@ const padLabels: Record<OperateName, string> = {
 export class SceneTutorial extends Scene {
     static requestedIndex = 0;
     private readonly lessonInput = TutorialInput.selected;
-    private readonly model: PracticeBoard | BasicRuleBoard | AdvancedBoard;
+    private readonly model: PracticeBoard | BasicRuleBoard | AdvancedBoard | TrickPracticeBoard;
     private readonly canvas = new CanvasManager();
     private readonly interaction = new PageInteraction(this, (input) => input === this.lessonInput);
     private readonly talk = new TalkManager(this);
@@ -65,8 +67,8 @@ export class SceneTutorial extends Scene {
     constructor() {
         super("src/HTML/SceneTutorial.html");
         const index = SceneTutorial.requestedIndex;
-        const validIndex = index >= 0 && index < advancedLessonOffset + advancedLessons.length && TutorialProgress.isUnlocked(index) ? index : 0;
-        this.model = validIndex < 6 ? new PracticeBoard(validIndex) : validIndex < advancedLessonOffset ? new BasicRuleBoard(validIndex) : new AdvancedBoard(validIndex);
+        const validIndex = index >= 0 && index < trickLessonOffset + trickLessons.length && TutorialProgress.isUnlocked(index) ? index : 0;
+        this.model = validIndex < 6 ? new PracticeBoard(validIndex) : validIndex < advancedLessonOffset ? new BasicRuleBoard(validIndex) : validIndex < trickLessonOffset ? new AdvancedBoard(validIndex) : new TrickPracticeBoard(validIndex);
         const elements = new ElementManager(this);
         this.sceneSetters.push(new ElementEventSetter(elements), new PageInteractionSetter(this.interaction), new DynamicTextSetter(this.talk));
         this.talk.masterSetting.frequency = 30;
@@ -76,7 +78,19 @@ export class SceneTutorial extends Scene {
     protected initialize(): void {
         const board = document.getElementById("lessonBoard")!;
         board.append(this.canvas.g$playCanvas, this.canvas.g$nextCanvas);
-        this.setText("lessonHeading", `${this.model instanceof AdvancedBoard ? `応用など ${this.model.index - advancedLessonOffset + 1}` : this.model instanceof BasicRuleBoard ? `基本ルール ${this.model.index - 5}` : `操作方法 ${this.model.index + 1}`}：${this.model.lesson.name}`);
+        this.setText("lessonHeading", `${this.model instanceof TrickPracticeBoard ? `役の揃え方 ${this.model.index - trickLessonOffset + 1}` : this.model instanceof AdvancedBoard ? `応用など ${this.model.index - advancedLessonOffset + 1}` : this.model instanceof BasicRuleBoard ? `基本ルール ${this.model.index - 5}` : `操作方法 ${this.model.index + 1}`}：${this.model.lesson.name}`);
+        if (this.model instanceof TrickPracticeBoard) {
+            document.querySelector(".tutorialScene")!.classList.add("trickLessonScene");
+            const example = document.getElementById("lessonTrickExample")!;
+            example.hidden = false;
+            const label = document.createElement("div");
+            label.className = "lessonSectionHeading";
+            label.textContent = `完成見本：${this.model.trick.name}`;
+            const canvas = CanvasManager.createRowCanvas(this.model.trick.shape);
+            canvas.setAttribute("role", "img");
+            canvas.setAttribute("aria-label", `${this.model.trick.name}の完成形`);
+            example.append(label, canvas);
+        }
         this.interaction.start();
         this.events.add(inputManager.addHandler("inputValid", (item: [InputObserver, InputInfo]) => this.onInput(...item)));
         this.events.add(inputManager.addHandler("inputInvalid", ([input, info]: [InputObserver, InputInfo]) => this.held.get(input)?.delete(info.name)));
@@ -154,7 +168,9 @@ export class SceneTutorial extends Scene {
         this.hideIntroMond = this.model.lesson.id === "move" && this.model.phase === "horizontal";
         this.setText("lessonStatus", "");
         this.render();
-        if (this.model instanceof AdvancedBoard) {
+        if (this.model instanceof TrickPracticeBoard) {
+            await this.say([...this.model.lesson.introduction, "表示された位置へ、順に置いてみましょう。"], token);
+        } else if (this.model instanceof AdvancedBoard) {
             await this.say(this.advancedIntroduction(), token);
         } else if (this.model instanceof BasicRuleBoard) {
             await this.say(this.basicIntroduction(), token);
@@ -250,8 +266,8 @@ export class SceneTutorial extends Scene {
         const outcome = this.model.apply(operation);
         if (outcome.sound) MusicManager.get(outcome.sound)?.play();
         if (outcome.message) this.setText("lessonStatus", outcome.message);
-        else if (outcome.role) this.setText("lessonStatus", `${outcome.role}の列を消去しました。`);
-        else if (this.model.placed > placedBefore) this.setText("lessonStatus", "白枠に設置できました！");
+        else if (outcome.trick) this.setText("lessonStatus", `${outcome.trick}の列を消去しました。`);
+        else if (this.model.placed > placedBefore) this.setText("lessonStatus", this.model instanceof TrickPracticeBoard ? "モンドを設置しました！" : "白枠に設置できました！");
         this.render();
         if (outcome.failed) {
             this.busy = true;
@@ -303,6 +319,15 @@ export class SceneTutorial extends Scene {
 
     private async retryAfterMistake(timedOut = false): Promise<void> {
         const token = this.generation;
+        if (this.model instanceof TrickPracticeBoard) {
+            await this.say(["残った穴と、置き方を確かめて、もう一度やってみましょう。"], token);
+            if (!this.isCurrent(token)) return;
+            this.model.restart();
+            this.setText("lessonStatus", "");
+            this.render();
+            this.releasePractice();
+            return;
+        }
         await this.say([timedOut ? "持ち時間がなくなりました。もう一度挑戦しましょう！"
             : "あらら、課題を達成できませんでした。白枠の形と向きを確かめて、もう一度挑戦してください！"], token);
         if (!this.isCurrent(token)) return;
@@ -313,6 +338,7 @@ export class SceneTutorial extends Scene {
     }
 
     private async explainPhase(): Promise<void> {
+        if (this.model instanceof TrickPracticeBoard) { await this.explainTrickPhase(); return; }
         if (this.model instanceof AdvancedBoard) { await this.explainAdvancedStep(); return; }
         if (this.model instanceof BasicRuleBoard) { await this.explainBasicPhase(); return; }
         const token = this.generation;
@@ -374,8 +400,8 @@ export class SceneTutorial extends Scene {
 
     private varietyExplanation(): string[] {
         if (!(this.model instanceof BasicRuleBoard)) return [];
-        if (this.model.roles === 0) return ["まずは「三つ子山」。3つの山の間に空きがある形です。白枠にモンドを設置しましょう。"];
-        if (this.model.roles === 1) return ["次は「トゲトゲ(下)」。下向きの三角形がひとつおきに並ぶ役です。",
+        if (this.model.tricks === 0) return ["まずは「三つ子山」。3つの山の間に空きがある形です。白枠にモンドを設置しましょう。"];
+        if (this.model.tricks === 1) return ["次は「トゲトゲ(下)」。下向きの三角形がひとつおきに並ぶ役です。",
             `回転と${this.controlMarkup("move-down")}での滑り移動を使って、白枠に合うように設置しましょう。`];
         return ["最後は「地割れ(上)」。左右で三角形の向きが変わり、間に1か所の空きがあります。空きを残すことが大切です。", "白枠にモンドを設置して、役を完成させましょう。"];
     }
@@ -495,6 +521,27 @@ export class SceneTutorial extends Scene {
         if (this.isCurrent(token)) { this.render(); this.releasePractice(); }
     }
 
+    private async explainTrickPhase(): Promise<void> {
+        if (!(this.model instanceof TrickPracticeBoard)) return;
+        const model = this.model;
+        const token = this.generation;
+        if (model.phase === "erasing") {
+            await this.say([`形ができました！${this.controlMarkup("removeLine")}で最下列から順に消去し、できた役を確かめましょう。`], token);
+        } else if (model.phase === "recoveryReview") {
+            await this.say([model.lesson.review, "今度は補助なしで組んでみましょう。"], token);
+            if (!this.isCurrent(token)) return;
+            model.continueAfterObservation();
+            this.setText("lessonStatus", "");
+            this.render();
+        } else if (model.phase === "done") {
+            TutorialProgress.complete(model.index);
+            await this.say([`「${model.lesson.name}」ができました！これにて教習を終了します。お疲れさまでした！`], token);
+            if (this.isCurrent(token)) await this.leave();
+            return;
+        }
+        if (this.isCurrent(token)) this.releasePractice();
+    }
+
     private render(): void {
         if (this.disposed) return;
         this.canvas.targetMondStates = this.model.targets;
@@ -522,7 +569,7 @@ export class SceneTutorial extends Scene {
             damageReview: "変化した地形を見てみよう", recoveryReview: "回復とスコアを見てみよう",
         };
         this.setText("lessonTask", tasks[this.model.phase]);
-        if (this.model instanceof BasicRuleBoard || this.model instanceof AdvancedBoard) {
+        if (this.model instanceof BasicRuleBoard || this.model instanceof AdvancedBoard || this.model instanceof TrickPracticeBoard) {
             this.setText("lessonCondition", this.model.condition);
             this.setText("lessonProgress", this.model.progress);
             this.setText("lessonKnowledge", this.model.knowledge);
@@ -535,7 +582,7 @@ export class SceneTutorial extends Scene {
         else if (allowed.includes("move-down")) controls.push(`${this.controlsFor("move-down")}：下`);
         for (const op of allowed.filter((op) => !op.startsWith("move-"))) controls.push(`${this.controlsFor(op)}：${operationLabels[op]}`);
         if (this.usingController) controls.push("教習中は初期配置を使用します。");
-        this.setText("lessonControls", controls.join("\n"));
+        this.setText("lessonControls", controls.join(this.model instanceof TrickPracticeBoard ? "　" : "\n"));
         const pauseHint = this.usingController ? "ボタン8／9：ポーズ" : "Esc／P：ポーズ";
         this.setText("lessonPauseHint", this.model instanceof BasicRuleBoard && Number.isFinite(this.model.gameTime) ? pauseHint : `時間制限なし ／ ${pauseHint}`);
     }
@@ -561,7 +608,7 @@ export class SceneTutorial extends Scene {
         if (this.model instanceof BasicRuleBoard) this.model.setActive(false);
         this.pageManager.openPage("lessonPause");
     }
-    private async leave(pageId = this.model instanceof AdvancedBoard ? "advancedRule" : this.model instanceof BasicRuleBoard ? "BasicRule" : "operateTutorial"): Promise<void> {
+    private async leave(pageId = this.model instanceof TrickPracticeBoard ? "trickTutorial" : this.model instanceof AdvancedBoard ? "advancedRule" : this.model instanceof BasicRuleBoard ? "BasicRule" : "operateTutorial"): Promise<void> {
         if (this.disposed) return;
         const back = PageManager.getBackIndex(pageId);
         if (back <= 0) return;

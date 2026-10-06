@@ -7,7 +7,7 @@ import * as Settings from "../Settings";
 import { LessonId, operationLessons } from "./OperationLessons";
 
 export type PracticePhase = "horizontal" | "down" | "firstPut" | "autoPut" | "autoPutReview" | "targets" | "undoPut" | "undoBack" | "erasing" | "penalties" | "damageReady" | "damaging" | "damageReview" | "recoveryReview" | "done";
-export type PracticeOutcome = { sound?: string; failed?: boolean; role?: string; advance?: boolean; explain?: boolean; message?: string };
+export type PracticeOutcome = { sound?: string; failed?: boolean; trick?: string; advance?: boolean; explain?: boolean; message?: string };
 const bottom = Settings.playHeight - 1;
 const movement: OperateName[] = ["move-left", "move-right", "move-down", "put"];
 
@@ -89,13 +89,13 @@ export class PracticeBoard {
     apply(operation: OperateName): PracticeOutcome {
         if (!this.allowed.includes(operation)) return {};
         if (operation === "removeLine") {
-            const role = this.blocks.removeLine();
+            const trick = this.blocks.removeLine();
             this.erased++;
             if (this.erased === 5) this.phase = "done";
             // 役なしの列には消去音を鳴らさない。
-            const sound = role ? `消去音${Math.min(6, this.chain++)}` : undefined;
-            if (!role) this.chain = 0;
-            return { role: role?.name ?? "役なし", sound };
+            const sound = trick ? `消去音${Math.min(6, this.chain++)}` : undefined;
+            if (!trick) this.chain = 0;
+            return { trick: trick?.name ?? "役なし", sound };
         }
         if (operation === "unput") {
             if (!this.undo) return {};

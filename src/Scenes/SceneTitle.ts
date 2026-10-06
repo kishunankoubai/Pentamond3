@@ -48,7 +48,7 @@ export class SceneTitle extends Scene {
     protected initialize(): void {
         setupTrickList(this.elementManager);
         setupStatisticsPage(this);
-        setupTutorialMenu(this);
+        setupTutorialMenu(this, this.elementManager);
         this.setPageAnimation();
         this.setPageStart();
         this.setSettingButton();

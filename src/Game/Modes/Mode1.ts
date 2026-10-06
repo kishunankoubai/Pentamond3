@@ -5,7 +5,7 @@ import * as Setting from "../../Settings";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
-import { emptyRemovalPenalty, survivalRoleReward } from "../SurvivalRules";
+import { emptyRemovalPenalty, survivalTrickReward } from "../SurvivalRules";
 
 export class Mode1 extends GameMode {
     constructor(players: GamePlayer[]) {
@@ -205,7 +205,7 @@ export class Mode1 extends GameMode {
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {
                         p.playInfo.line += 1;
                     }
-                    const reward = survivalRoleReward(lastTrick, p.playInfo.chain, p.playInfo.handy);
+                    const reward = survivalTrickReward(lastTrick, p.playInfo.chain, p.playInfo.handy);
                     p.playInfo.score += reward.score;
                     p.damageInfo.attackTask += reward.attack;
                     p.playInfo.recovery += reward.recovery;

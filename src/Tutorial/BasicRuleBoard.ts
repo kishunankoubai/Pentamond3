@@ -4,7 +4,7 @@ import { Pentiamond } from "../BlockOperate/Pentiamond";
 import { GraphicData } from "../CanvasManager";
 import { OperateName } from "../Game/GameMode";
 import { NuisanceMondManager } from "../Game/NuisanceMondManager";
-import { emptyRemovalPenalty, survivalRoleReward } from "../Game/SurvivalRules";
+import { emptyRemovalPenalty, survivalTrickReward } from "../Game/SurvivalRules";
 import * as Settings from "../Settings";
 import { trickInfos } from "../Trick";
 import { basicRuleLessons } from "./BasicRuleLessons";
@@ -22,7 +22,7 @@ export class BasicRuleBoard {
     phase: PracticePhase = "targets";
     placed = 0;
     erased = 0;
-    roles = 0;
+    tricks = 0;
     chain = 0;
     score = 0;
     recovery = 0;
@@ -51,7 +51,7 @@ export class BasicRuleBoard {
     restart(_withIntroduction = false): void {
         this.dispose();
         this.blocks = new BlockManager();
-        this.placed = this.erased = this.roles = this.chain = this.score = this.recovery = this.attack = 0;
+        this.placed = this.erased = this.tricks = this.chain = this.score = this.recovery = this.attack = 0;
         this.penalties = this.penalty = this.penaltyTask = this.elapsed = this.surplus = this.consumed = this.targetIndex = 0;
         this.pendingTarget = this.slid = false;
         this.hold = null;
@@ -72,7 +72,7 @@ export class BasicRuleBoard {
         } else if (id === "variety") this.prepareVariety();
         else if (id === "survival") {
             this.targetsToPlace = [new Pentiamond(7, bottom, "p")];
-            this.prepareRole("一列揃え(上)");
+            this.prepareTrick("一列揃え(上)");
         } else if (id === "penalty") {
             this.targetsToPlace = [];
             this.phase = "penalties";
@@ -121,12 +121,12 @@ export class BasicRuleBoard {
     }
     get progress(): string {
         return this.lesson.id === "penalty" ? `ペナルティ ${this.penalties} / 3` : this.lesson.id === "damage" ? (this.phase === "damageReview" || this.phase === "done" ? "ダメージ体験完了" : this.phase === "damaging" ? "ダメージ体験中" : "ダメージ体験前")
-            : `役 ${this.roles} / ${this.lesson.count}　設置 ${this.placed} / ${this.lesson.id === "chain" ? 3 : this.lesson.count}`;
+            : `役 ${this.tricks} / ${this.lesson.count}　設置 ${this.placed} / ${this.lesson.id === "chain" ? 3 : this.lesson.count}`;
     }
     get knowledge(): string {
         if (this.lesson.id !== "variety") return this.lesson.knowledge;
-        if (this.roles === 0) return "三つ子山：3つの山の間には空きがあります。白枠の向きを合わせ、空きを残しましょう。";
-        if (this.roles === 1) return "トゲトゲ(下)：下向きの三角形がひとつおきに並びます。回転と滑り移動を使い、白枠に合わせましょう。";
+        if (this.tricks === 0) return "三つ子山：3つの山の間には空きがあります。白枠の向きを合わせ、空きを残しましょう。";
+        if (this.tricks === 1) return "トゲトゲ(下)：下向きの三角形がひとつおきに並びます。回転と滑り移動を使い、白枠に合わせましょう。";
         return "地割れ：左右で三角形の向きが変わります。間の1か所の空きは、埋めずに残しましょう。";
     }
     get task(): string {
@@ -137,8 +137,8 @@ export class BasicRuleBoard {
         if (this.phase === "recoveryReview") return "回復した持ち時間と、増えたスコアを見てみよう";
         if (this.phase === "penalties") return this.undo ? "一手戻しでペナルティを受けてみよう" : "まずモンドを1個設置しよう";
         if (this.phase === "erasing") return this.lesson.id === "penalty" ? "役なしの列を続けて消してみよう"
-            : this.lesson.id === "variety" ? `最下列を消して「${variedNames[this.roles]}」を成立させよう` : "設置を挟まず、役のある列を連続して消そう";
-        if (this.lesson.id === "variety") return `${variedNames[this.roles]}：白枠に合わせて設置しよう`;
+            : this.lesson.id === "variety" ? `最下列を消して「${variedNames[this.tricks]}」を成立させよう` : "設置を挟まず、役のある列を連続して消そう";
+        if (this.lesson.id === "variety") return `${variedNames[this.tricks]}：白枠に合わせて設置しよう`;
         if (this.lesson.id === "chain") return "白枠の形・向きに合わせて設置しよう";
         return "白枠に合わせて設置し、最下列を消そう";
     }
@@ -190,7 +190,7 @@ export class BasicRuleBoard {
         this.blocks.displayPentiamond(this.hand);
         while (this.blocks.fall(this.hand)) { /* 真下へ設置 */ }
         const target = this.targetsToPlace[this.targetIndex];
-        if (this.phase === "targets" && (!target || !this.matches(target) || (this.lesson.id === "variety" && this.roles === 1 && !this.slid)))
+        if (this.phase === "targets" && (!target || !this.matches(target) || (this.lesson.id === "variety" && this.tricks === 1 && !this.slid)))
             return { failed: true, sound: "設置音" };
         this.score += 10;
         this.chain = 0;
@@ -228,32 +228,32 @@ export class BasicRuleBoard {
     dispose(): void { this.nuisance?.dispose(); this.nuisance = null; }
 
     private erase(): PracticeOutcome {
-        const role = this.blocks.removeLine();
+        const trick = this.blocks.removeLine();
         this.erased++;
         this.undo = null;
-        if (!role) {
+        if (!trick) {
             const result = emptyRemovalPenalty(this.penaltyTask);
             this.penaltyTask = result.nextTask;
             this.penalty += result.charge;
             if (result.charge > 0) this.penalties++;
             this.chain = 0;
-            if (this.lesson.id !== "penalty") return { failed: true, role: "役なし" };
+            if (this.lesson.id !== "penalty") return { failed: true, trick: "役なし" };
             if (this.penalties >= 3) this.phase = "done";
             return { message: result.charge > 0 ? `役なしの連続消去：持ち時間 −${result.charge}` : "最初の役なし消去：ペナルティなし" };
         }
-        const reward = survivalRoleReward(role, this.chain);
+        const reward = survivalTrickReward(trick, this.chain);
         const sound = `消去音${Math.min(6, this.chain)}`;
         this.chain++;
-        this.roles++;
+        this.tricks++;
         this.score += reward.score;
         this.recovery += reward.recovery;
         this.attack += reward.attack;
         this.penaltyTask = 0;
         // 本編と同様に上限を超えた回復は持ち越さない。
         if (this.lesson.id === "survival") this.surplus += Math.max(0, Math.ceil(30 - this.elapsed / Settings.gameTimeRate) - this.penalty + this.recovery - this.surplus - 30);
-        if (this.roles === this.lesson.count) this.phase = this.lesson.id === "survival" ? "recoveryReview" : "done";
+        if (this.tricks === this.lesson.count) this.phase = this.lesson.id === "survival" ? "recoveryReview" : "done";
         else if (this.lesson.id === "variety") { this.pendingTarget = true; this.phase = "targets"; }
-        return { role: role.name, sound, advance: this.pendingTarget, message: `${role.name}！ 回復 +${reward.recovery}／スコア +${reward.score}` };
+        return { trick: trick.name, sound, advance: this.pendingTarget, message: `${trick.name}！ 回復 +${reward.recovery}／スコア +${reward.score}` };
     }
 
     private spawnNext(): void {
@@ -268,20 +268,20 @@ export class BasicRuleBoard {
     private cutTargets(terrain: BlockProperty[][]): void {
         for (const target of this.targetsToPlace) for (const [x, y] of target.g$states) terrain[x][y][2] = false;
     }
-    private prepareRole(name: string): void {
-        const role = trickInfos.find((role) => role.name === name && (name !== "地割れ(上)" || !role.shape[5][1]))!;
+    private prepareTrick(name: string): void {
+        const trick = trickInfos.find((trick) => trick.name === name && (name !== "地割れ(上)" || !trick.shape[5][1]))!;
         const terrain = this.blocks.g$blockProperties;
-        role.shape.forEach(([d, visible], x) => terrain[x][bottom] = ["g", d, visible]);
+        trick.shape.forEach(([d, visible], x) => terrain[x][bottom] = ["g", d, visible]);
         this.cutTargets(terrain);
         this.blocks.load(terrain);
     }
     private prepareVariety(): void {
         this.blocks = new BlockManager();
         this.targetIndex = 0;
-        this.targetsToPlace = [this.roles === 0 ? new Pentiamond(2, bottom, "L")
-            : this.roles === 1 ? new Pentiamond(7, bottom - 1, "I", 1) : new Pentiamond(13, bottom, "J")];
-        this.prepareRole(variedNames[this.roles]);
-        if (this.roles === 1) {
+        this.targetsToPlace = [this.tricks === 0 ? new Pentiamond(2, bottom, "L")
+            : this.tricks === 1 ? new Pentiamond(7, bottom - 1, "I", 1) : new Pentiamond(13, bottom, "J")];
+        this.prepareTrick(variedNames[this.tricks]);
+        if (this.tricks === 1) {
             const terrain = this.blocks.g$blockProperties;
             for (let x = 0; x < Settings.playWidth; x++) terrain[x][bottom - 1] = ["g", x % 2 === 0, ![7, 8, 9].includes(x)];
             terrain[9][bottom - 1] = ["g", false, true];
