@@ -23,6 +23,8 @@ export function bindPlayerControls(player: GamePlayer, playerIndex: number, even
         ["removeLine", "removeLine", () => player.operator.removeLine()],
     ];
     const operate = (name: string) => {
+        player.clock.synchronize();
+        if (player.loop.g$isStopping) return;
         const binding = bindings.find(([operation, action]) => name === operationKeyCodes[operation] || config[action].includes(name));
         if (!binding) return;
         binding[2]();
@@ -38,13 +40,15 @@ export function bindPlayerControls(player: GamePlayer, playerIndex: number, even
         }),
         input.addHandler("inputInvalid", (info: InputInfo) => suppressedInputs.delete(info.name)),
         player.loop.addHandler("loop", () => {
+            // リプレイは記録済みのリピートも再生するので、追加生成しない。
+            if (input.g$type === "autoKeyboard") return;
             const key = input.getLatestPressingKey(moveKeys.filter((key) => !suppressedInputs.has(key)));
             if (key !== previousKey) lastRepeatTime = 0;
             previousKey = key;
             const pressTime = Date.now() - input.getPressTime(key);
             if (key && pressTime >= Setting.input.delayTime) {
                 if (pressTime - lastRepeatTime >= Setting.input.repeatTime) {
-                    operate(key);
+                    player.clock.schedule(player.clock.now, () => operate(key), 1);
                     lastRepeatTime = pressTime;
                 }
             } else lastRepeatTime = 0;

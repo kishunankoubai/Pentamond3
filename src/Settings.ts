@@ -78,6 +78,7 @@ export const input = {
 };
 //カウントが1減る時間(ms)
 export const gameTimeRate = 500;
+export const defaultMaxGameTime = 150;
 //残り時間わずかの警告を出すgameTime
 export const warningGameTime = 30;
 //ペナルティ

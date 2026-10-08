@@ -3,14 +3,11 @@ import { inputManager } from "../Utilities/Interaction/InputManager";
 import { InputObserver } from "../Utilities/Interaction/InputObserver";
 import { Scene, sceneManager } from "../Utilities/SceneManager";
 import { SceneTutorial } from "../Scenes/SceneTutorial";
-import { operationLessons } from "./OperationLessons";
-import { basicRuleLessons } from "./BasicRuleLessons";
-import { advancedLessonOffset, advancedLessons } from "./AdvancedLessons";
 import { TutorialProgress } from "./TutorialProgress";
 import { TutorialInput } from "./TutorialInput";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
 import { InputRegistrationView } from "../BeforePlaying/InputRegistrationView";
-import { trickLessonOffset, trickLessons } from "./TrickLessons";
+import { tutorialUnits } from "./TutorialUnits";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 
 let trickMenuPage = 0;
@@ -137,8 +134,5 @@ export function setupTutorialMenu(scene: Scene, elementManager: ElementManager):
             scene.addHandler("sceneEnd", () => elementManager.removeEvent(event), 1);
         }
     };
-    setupList("operateTutorial", "operationLessonList", operationLessons, 0);
-    setupList("BasicRule", "basicRuleLessonList", basicRuleLessons, 6);
-    setupList("advancedRule", "advancedLessonList", advancedLessons, advancedLessonOffset);
-    setupList("trickTutorial", "trickLessonList", trickLessons, trickLessonOffset, 4);
+    tutorialUnits.forEach((unit) => setupList(unit.page, unit.list, unit.lessons, unit.offset, unit.perPage));
 }

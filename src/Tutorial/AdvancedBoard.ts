@@ -5,7 +5,7 @@ import { GraphicData } from "../CanvasManager";
 import { OperateName } from "../Game/GameMode";
 import * as Settings from "../Settings";
 import { advancedLessonOffset, advancedLessons } from "./AdvancedLessons";
-import { PracticeOutcome, PracticePhase } from "./PracticeBoard";
+import type { PracticeOutcome, PracticePhase } from "./TutorialTypes";
 
 const bottom = Settings.playHeight - 1;
 const moves: OperateName[] = ["move-left", "move-right", "move-down", "spin-left", "spin-right", "put"];

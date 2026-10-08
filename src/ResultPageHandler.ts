@@ -2,7 +2,6 @@ import { GamePlayer } from "./Game/GamePlayer";
 import { qsAll, qs, sleep } from "./Utils";
 import { Replay } from "./Replay/Replay";
 import { PlaySetting } from "./BeforePlaying/PlaySettingSetter";
-import { sceneManager } from "./Utilities/SceneManager";
 import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 
 /**
@@ -11,19 +10,12 @@ import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 export class ResultPageHandler {
     private static readonly parser = new DOMParser();
 
-    static setEvents() {
-        const pageManager = sceneManager.g$currentPageManager;
-        if (!pageManager) return;
-        const saveButton = qs("#result .saveReplayButton");
-
-        pageManager.addHandler("changePage-result", () => {
-            saveButton.innerText = "リプレイを保存する";
-        });
-    }
-
     static setSaveButton() {
         const saveButton = qs("#result .saveReplayButton");
         let saving = false;
+        // 初期化は新しい結果に対して一度だけ行う。詳細結果から戻った際は維持する。
+        saveButton.innerText = "リプレイを保存する";
+        setInteractionEnabled(saveButton, true);
 
         saveButton.onclick = async () => {
             if (saving) return;

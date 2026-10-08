@@ -6,8 +6,7 @@ import { ReplayDataHandler } from "./Replay/ReplayDataHandler";
 import { ControllerRegisterer } from "./BeforePlaying/ControllerRegisterer";
 import { PlaySettingSetter } from "./BeforePlaying/PlaySettingSetter";
 import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
-import { PlayStatistics } from "./PlayStatistics";
-import { TutorialProgress } from "./Tutorial/TutorialProgress";
+import { PlayData } from "./PlayData";
 
 type DataGroup = "all" | "settings" | "replays" | "play";
 
@@ -54,7 +53,7 @@ export class DeleteDataHandler {
                             : group === "replays"
                               ? "保存済みと直近のリプレイをすべて削除します。 設定とプレイデータは残ります。 この操作は取り消せません。"
                               : group === "play"
-                                ? "情報ページの累計・最高記録と養成所のクリア記録をすべて削除します。 設定とリプレイは残ります。 この操作は取り消せません。"
+                                ? "情報ページの累計・最高記録と養成所のクリア記録をすべて削除します。 初回案内も次の起動時に再び表示されます。 設定とリプレイは残ります。 この操作は取り消せません。"
                                 : "設定を初期値に戻し、プレイデータと保存済み・直近のリプレイをすべて削除します。 この操作は取り消せません。";
                 pageManager.openPage("allDataDeleteAlert");
                 // 開いた直後の決定入力で削除されないよう、コントローラーでも無効化する。
@@ -76,8 +75,7 @@ export class DeleteDataHandler {
                     pageManager.executeEvent("settingsReset");
                 }
                 if (group === "all" || group === "play") {
-                    PlayStatistics.reset();
-                    TutorialProgress.reset();
+                    PlayData.reset();
                 }
                 if (group === "all" || group === "replays") await Replay.deleteAllData();
                 await pageManager.backPage(1);
@@ -106,7 +104,7 @@ export class DeleteDataHandler {
         try { settings = new Blob(DataManager.settingStorageKeys.map((key) => localStorage.getItem(key) ?? "")).size; }
         catch (error) { console.warn("保存データの容量を読み込めませんでした", error); }
         const replays = ReplayDataHandler.getDataSize();
-        const play = PlayStatistics.getDataSize() + TutorialProgress.getDataSize();
+        const play = PlayData.getDataSize();
         for (const [id, size] of [
             ["totalDataSize", settings + replays + play],
             ["settingDataSize", settings],

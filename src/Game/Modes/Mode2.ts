@@ -4,10 +4,11 @@ import { GamePlayer } from "../GamePlayer";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
+import { SimulationClock } from "../../Utilities/Loop/SimulationClock";
 
 export class Mode2 extends GameMode {
-    constructor(players: GamePlayer[]) {
-        super(players);
+    constructor(players: GamePlayer[], clock: SimulationClock) {
+        super(players, clock);
         players.forEach((_, i) => {
             this.addPlayerBehavior(i);
         });
@@ -17,11 +18,13 @@ export class Mode2 extends GameMode {
         this.players.forEach((player) => {
             player.start();
         });
+        this.clock.start();
         if (GraphicSetting.playBackground) {
             playBackground.start();
         }
     }
     stop(): void {
+        this.clock.stop();
         this.players.forEach((player) => {
             player.stop();
         });

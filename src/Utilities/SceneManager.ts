@@ -3,6 +3,8 @@ import { MyEventListener } from "./MyEventListener";
 import { PageManager } from "./Page/PageManager";
 import { SceneSetter } from "./SceneSetter";
 import { spaceJapaneseTextNodes } from "./Text/JapaneseText";
+import { PageNotice } from "./Feedback/PageNotice";
+import { SceneRecovery } from "./Feedback/SceneRecovery";
 
 export abstract class Scene extends MyEventListener {
     /*
@@ -65,6 +67,7 @@ export class SceneManager extends MyEventListener {
     private baseContainer: HTMLElement | null = document.querySelector(".sceneContainer");
     private static instance: SceneManager;
     private changeGeneration = 0;
+    private loadingController: AbortController | null = null;
 
     constructor() {
         if (SceneManager.instance) return SceneManager.instance;
@@ -93,33 +96,59 @@ export class SceneManager extends MyEventListener {
     /**
      * sceneContainerにSceneの要素を入れる
      */
-    private async loadSceneHTML(htmlPath: string, generation: number): Promise<boolean> {
-        const response = await fetch(htmlPath);
+    private async loadSceneHTML(htmlPath: string, signal: AbortSignal): Promise<string> {
+        const response = await fetch(htmlPath, { signal });
         if (!response.ok) throw new Error(`シーンを読み込めませんでした: ${htmlPath} (${response.status})`);
         const html = await response.text();
-        if (generation !== this.changeGeneration) return false;
-        this.resetHTML();
-        this.baseContainer!.innerHTML = html;
-        spaceJapaneseTextNodes(this.baseContainer!);
-        return true;
+        if (!html.includes('class="page')) throw new Error("シーンのHTMLが不正です");
+        return html;
     }
 
     /**
      * 指定されたシーンに変更する
      * @param scene 指定するシーン
      */
-    async change(scene: SceneClass, defaultStart: boolean = true): Promise<void> {
+    async change(scene: SceneClass, defaultStart: boolean = true): Promise<boolean> {
         const generation = ++this.changeGeneration;
-        if (this.currentScene) {
-            this.currentScene.executeEvent("sceneEnd");
+        this.loadingController?.abort();
+        const controller = this.loadingController = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        const previous = this.currentScene;
+        let nextScene: Scene | null = null;
+        let committed = false;
+        try {
+            nextScene = new scene();
+            // 読み込みが成功するまでは、元の画面とその入力処理を残す。
+            const html = await this.loadSceneHTML(nextScene.g$htmlPath, controller.signal);
+            if (generation !== this.changeGeneration) return false;
+            SceneRecovery.close();
+            previous?.executeEvent("sceneEnd");
+            committed = true;
+            PageNotice.detach();
+            this.resetHTML();
+            this.baseContainer!.innerHTML = html;
+            spaceJapaneseTextNodes(this.baseContainer!);
+            this.currentScene = nextScene;
+            PageNotice.attach(this.baseContainer!, nextScene.g$pageManager);
+            nextScene.executeEvent("sceneStart");
+            if (defaultStart) await nextScene.defaultStart();
+            if (generation !== this.changeGeneration) return false;
+            this.executeEvent("sceneChange");
+            return true;
+        } catch (error) {
+            if (generation !== this.changeGeneration) return false;
+            console.warn("画面を切り替えられませんでした", error);
+            if (committed) {
+                try { nextScene?.executeEvent("sceneEnd"); } catch { /* 復帰画面は必ず表示する。 */ }
+                this.currentScene = null;
+                PageNotice.detach();
+            } else previous?.executeEvent("sceneLoadFailed");
+            SceneRecovery.show(!committed && !!previous);
+            return false;
+        } finally {
+            clearTimeout(timeout);
+            if (this.loadingController === controller) this.loadingController = null;
         }
-        const nextScene = new scene();
-        this.currentScene = nextScene;
-        if (!await this.loadSceneHTML(nextScene.g$htmlPath, generation)) return;
-        nextScene.executeEvent("sceneStart");
-        if (defaultStart) await nextScene.defaultStart();
-        if (generation !== this.changeGeneration) return;
-        this.executeEvent("sceneChange");
     }
 
     /**
@@ -128,8 +157,7 @@ export class SceneManager extends MyEventListener {
      */
     async restart(): Promise<void> {
         if (!this.currentScene) return;
-        await this.change(getConstructor(this.currentScene));
-        this.executeEvent("restart");
+        if (await this.change(getConstructor(this.currentScene))) this.executeEvent("restart");
     }
 }
 

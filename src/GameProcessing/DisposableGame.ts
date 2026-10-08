@@ -7,6 +7,7 @@ import type { ReplayData, ReplayRandomSeeds } from "../Replay/Replay";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { createRandomSeed } from "../Utilities/Random/SeededRandom";
 import { PlayStatistics } from "../PlayStatistics";
+import { SimulationClock } from "../Utilities/Loop/SimulationClock";
 
 /**
  * ゲームのセッティングから片付けまでやって捨てられるクラス
@@ -18,6 +19,7 @@ export class DisposableGame {
     readonly playSetting: PlaySetting;
     readonly replayData?: ReplayData;
     readonly randomSeeds: ReplayRandomSeeds;
+    readonly clock = new SimulationClock();
 
     private hasStarted = false;
     private disposed = false;
@@ -59,12 +61,12 @@ export class DisposableGame {
         };
 
         //登録されているinputをもとにplayersを作成する
-        this.players = DisposableGame.createPlayers(this.playSetting, inputs, inputCount, this.randomSeeds);
+        this.players = DisposableGame.createPlayers(this.playSetting, inputs, inputCount, this.randomSeeds, this.clock);
 
         // ゲームを作成
         const CurrentMode = gameModeList[this.playSetting.mode - 1];
         if (!CurrentMode) throw new Error("未対応のゲームモードです");
-        this.game = new CurrentMode(this.players);
+        this.game = new CurrentMode(this.players, this.clock);
         this.game.addHandler("gameFinish", () => this.onGameFinish(), 1);
     }
 
@@ -90,6 +92,7 @@ export class DisposableGame {
     }
 
     setPlaybackSpeed(speed: number) {
+        this.clock.setPlaybackSpeed(speed);
         this.players.forEach((player) => player.setPlaybackSpeed(speed));
     }
 
@@ -119,12 +122,12 @@ export class DisposableGame {
         });
     }
 
-    private static createPlayers(playSetting: PlaySetting, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds) {
+    private static createPlayers(playSetting: PlaySetting, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds, clock: SimulationClock) {
         const players = inputs.map((input, i) =>
             new GamePlayer(input, inputCount, {
                 next: randomSeeds.next[i],
                 nuisance: randomSeeds.nuisance[i],
-            })
+            }, clock)
         );
 
         players.forEach((player, i) => {

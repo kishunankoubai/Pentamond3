@@ -15,7 +15,7 @@ export class GameStartEventSetter {
             try {
                 const playSetting = PlaySettingSetter.getPlaySetting();
                 if (playSetting.playerNumber === 1) ControllerRegisterer.gamepadConfigs = [ControllerSettingManager.getSelectedConfig()];
-                await sceneManager.change(ScenePlay, false);
+                if (!await sceneManager.change(ScenePlay, false)) return;
                 await GameProcessing.startNormal(playSetting);
             } finally { starting = false; }
         }));

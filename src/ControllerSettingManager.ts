@@ -7,6 +7,7 @@ import { PageInteraction } from "./Utilities/Interaction/PageInteraction";
 import { MyEvent } from "./Utilities/MyEventListener";
 import { sceneManager } from "./Utilities/SceneManager";
 import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
+import { PageNotice } from "./Utilities/Feedback/PageNotice";
 
 type ControllerAction = keyof GamepadConfig;
 
@@ -298,6 +299,7 @@ export class ControllerSettingManager {
             else localStorage.setItem(this.storageKey, JSON.stringify([2, this.selectedSlot, slots] satisfies CompactControllerSettings));
         } catch (error) {
             console.warn("コントローラー設定を保存できませんでした", error);
+            PageNotice.notify("コントローラー配置を保存できませんでした。 今回の起動中は反映されますが、 再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
             this.setStatus("設定を保存できませんでした。現在のページでは変更が有効ですが、再読み込みで失われます。");
         }
     }

@@ -2,12 +2,12 @@ import { CanvasManager } from "../CanvasManager";
 import { OperateName } from "../Game/GameMode";
 import { operationKeyCodes } from "../Game/Operations";
 import { gamepadConfigPresets, input as repeatSetting } from "../Settings";
-import { PracticeBoard, PracticePhase } from "../Tutorial/PracticeBoard";
+import type { PracticePhase } from "../Tutorial/TutorialTypes";
+import { TutorialSession } from "../Tutorial/TutorialSession";
+import { tutorialLessonCount } from "../Tutorial/TutorialUnits";
 import { BasicRuleBoard } from "../Tutorial/BasicRuleBoard";
 import { AdvancedBoard } from "../Tutorial/AdvancedBoard";
-import { advancedLessonOffset } from "../Tutorial/AdvancedLessons";
 import { TrickPracticeBoard } from "../Tutorial/TrickPracticeBoard";
-import { trickLessonOffset, trickLessons } from "../Tutorial/TrickLessons";
 import { TutorialProgress } from "../Tutorial/TutorialProgress";
 import { TutorialInput } from "../Tutorial/TutorialInput";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
@@ -47,7 +47,8 @@ const padLabels: Record<OperateName, string> = {
 export class SceneTutorial extends Scene {
     static requestedIndex = 0;
     private readonly lessonInput = TutorialInput.selected;
-    private readonly model: PracticeBoard | BasicRuleBoard | AdvancedBoard | TrickPracticeBoard;
+    private readonly session: TutorialSession;
+    private readonly model: TutorialSession["board"];
     private readonly canvas = new CanvasManager();
     private readonly interaction = new PageInteraction(this, (input) => input === this.lessonInput);
     private readonly talk = new TalkManager(this);
@@ -67,8 +68,9 @@ export class SceneTutorial extends Scene {
     constructor() {
         super("src/HTML/SceneTutorial.html");
         const index = SceneTutorial.requestedIndex;
-        const validIndex = index >= 0 && index < trickLessonOffset + trickLessons.length && TutorialProgress.isUnlocked(index) ? index : 0;
-        this.model = validIndex < 6 ? new PracticeBoard(validIndex) : validIndex < advancedLessonOffset ? new BasicRuleBoard(validIndex) : validIndex < trickLessonOffset ? new AdvancedBoard(validIndex) : new TrickPracticeBoard(validIndex);
+        const validIndex = index >= 0 && index < tutorialLessonCount && TutorialProgress.isUnlocked(index) ? index : 0;
+        this.session = new TutorialSession(validIndex);
+        this.model = this.session.board;
         const elements = new ElementManager(this);
         this.sceneSetters.push(new ElementEventSetter(elements), new PageInteractionSetter(this.interaction), new DynamicTextSetter(this.talk));
         this.talk.masterSetting.frequency = 30;
@@ -76,9 +78,10 @@ export class SceneTutorial extends Scene {
     }
 
     protected initialize(): void {
+        this.addHandler("sceneLoadFailed", () => this.pause());
         const board = document.getElementById("lessonBoard")!;
         board.append(this.canvas.g$playCanvas, this.canvas.g$nextCanvas);
-        this.setText("lessonHeading", `${this.model instanceof TrickPracticeBoard ? `役の揃え方 ${this.model.index - trickLessonOffset + 1}` : this.model instanceof AdvancedBoard ? `応用など ${this.model.index - advancedLessonOffset + 1}` : this.model instanceof BasicRuleBoard ? `基本ルール ${this.model.index - 5}` : `操作方法 ${this.model.index + 1}`}：${this.model.lesson.name}`);
+        this.setText("lessonHeading", `${this.session.unit.name} ${this.model.index - this.session.unit.offset + 1}：${this.model.lesson.name}`);
         if (this.model instanceof TrickPracticeBoard) {
             document.querySelector(".tutorialScene")!.classList.add("trickLessonScene");
             const example = document.getElementById("lessonTrickExample")!;
@@ -97,7 +100,7 @@ export class SceneTutorial extends Scene {
         this.pageManager.addHandler("changePage", (id: string) => {
             this.held.clear();
             this.lastTickAt = Date.now();
-            if (this.model instanceof BasicRuleBoard) this.model.setActive(id === "practice" && !this.busy && !document.hidden);
+            this.session.setActive(id === "practice" && !this.busy && !document.hidden);
             if (id !== "practice") this.observationLoop.stop();
             else if (this.boardWait && !document.hidden) this.observationLoop.start();
             if (id === "lessonPause") {
@@ -157,7 +160,7 @@ export class SceneTutorial extends Scene {
         this.loop.reset();
         this.held.clear();
         this.events.dispose();
-        if (this.model instanceof BasicRuleBoard) this.model.dispose();
+        this.session.dispose();
         this.controller.abort();
         this.interaction.stop();
     }
@@ -231,7 +234,7 @@ export class SceneTutorial extends Scene {
         const now = Date.now();
         const elapsed = this.lastTickAt ? now - this.lastTickAt : 0;
         this.lastTickAt = now;
-        if (this.model instanceof BasicRuleBoard) this.model.setActive(this.canOperate() && !document.hidden);
+        this.session.setActive(this.canOperate() && !document.hidden);
         if (!this.canOperate()) return;
         if (this.model instanceof BasicRuleBoard) {
             if (this.model.phase === "damageReview") {
@@ -239,7 +242,7 @@ export class SceneTutorial extends Scene {
                 void this.afterBoardObservation(() => this.explainPhase());
                 return;
             }
-            const outcome = this.model.tick(elapsed);
+            const outcome = this.session.tick(elapsed);
             this.render();
             if (outcome.failed) {
                 this.busy = true;
@@ -438,7 +441,7 @@ export class SceneTutorial extends Scene {
     private releasePractice(): void {
         this.busy = false;
         this.lastTickAt = Date.now();
-        if (this.model instanceof BasicRuleBoard) this.model.setActive(this.pageManager.g$currentPageId === "practice" && !document.hidden);
+        this.session.setActive(this.pageManager.g$currentPageId === "practice" && !document.hidden);
     }
 
     private advancedIntroduction(): string[] {
@@ -605,16 +608,14 @@ export class SceneTutorial extends Scene {
     private pause(): void {
         if (this.disposed || !["practice", "talk"].includes(this.pageManager.g$currentPageId)) return;
         this.held.clear();
-        if (this.model instanceof BasicRuleBoard) this.model.setActive(false);
+        this.session.setActive(false);
         this.pageManager.openPage("lessonPause");
     }
-    private async leave(pageId = this.model instanceof TrickPracticeBoard ? "trickTutorial" : this.model instanceof AdvancedBoard ? "advancedRule" : this.model instanceof BasicRuleBoard ? "BasicRule" : "operateTutorial"): Promise<void> {
+    private async leave(pageId = this.session.unit.page as string): Promise<void> {
         if (this.disposed) return;
         const back = PageManager.getBackIndex(pageId);
         if (back <= 0) return;
-        this.generation++;
-        this.finishBoardWait(false);
-        this.busy = true;
+        // 読み込みに失敗した場合も、説明・課題を壊さず元の教習に戻れるようにする。
         await this.pageManager.backPage(back);
     }
 }

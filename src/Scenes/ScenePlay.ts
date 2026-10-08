@@ -39,9 +39,12 @@ export class ScenePlay extends Scene {
         this.setupPausePage();
         this.pageInteraction.start();
         setupPlayBackground();
+        this.addHandler(["sceneLoadFailed", "pauseRequested"], () => this.pauseGame());
     }
 
     protected close(): void {
+        // 遷移先の初期化が失敗しても、見えない試合を進めない。
+        GameProcessing.pause();
         playBackground.stop();
         if (this.pauseInputEvent) inputManager.removeEvent(this.pauseInputEvent);
         this.pageInteraction.stop();
@@ -112,14 +115,15 @@ export class ScenePlay extends Scene {
             },
             { signal: this.controller.signal }
         );
+        window.addEventListener("blur", () => this.pauseGame(), { signal: this.controller.signal });
 
         document.getElementById("resumeButton")?.addEventListener("click", async () => {
-            await this.pageManager.backPage(1);
+            if (!await this.pageManager.backPage(1)) return;
             GameProcessing.resume();
             await MusicManager.fadeAllBGM(1, 200);
         });
         document.getElementById("pauseRestartButton")?.addEventListener("click", async () => {
-            await this.pageManager.backPageImmediately(1);
+            if (!await this.pageManager.backPageImmediately(1)) return;
             await this.restartGame();
         });
         document.getElementById("playPrepareButton")?.addEventListener("click", () => this.returnTo("playPrepare"));
@@ -147,9 +151,8 @@ export class ScenePlay extends Scene {
             console.warn(`戻り先のページが履歴にありません: ${pageId}`);
             return;
         }
-        GameProcessing.quit();
         await MusicManager.fadeOutBGM(150);
-        await this.pageManager.backPage(back);
+        if (await this.pageManager.backPage(back)) GameProcessing.quit();
     }
 
     protected restartGame(): Promise<void> {

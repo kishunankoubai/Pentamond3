@@ -1,5 +1,4 @@
 import { globalValues } from "../Global";
-import { ResultPageHandler } from "../ResultPageHandler";
 import { sleep } from "../Utilities/Common";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
@@ -33,7 +32,6 @@ export class SceneResult extends Scene {
     protected initialize(): void {
         this.setPageAnimation();
         this.pageInteraction.start();
-        ResultPageHandler.setEvents();
         MusicManager.playExclusiveBGM("おかたづけ");
         document.getElementById("resultRestartButton")?.addEventListener("click", () => GameProcessing.restartNormal());
         document.getElementById("resultPlayPrepareButton")?.addEventListener("click", () => this.returnTo("playPrepare"));
@@ -61,9 +59,8 @@ export class SceneResult extends Scene {
             console.warn(`戻り先のページが履歴にありません: ${pageId}`);
             return;
         }
-        GameProcessing.quit();
         await MusicManager.fadeOutBGM(150);
-        await this.pageManager.backPage(back);
+        if (await this.pageManager.backPage(back)) GameProcessing.quit();
     }
 
     private returnToClosest(pageIds: string[]): Promise<void> {

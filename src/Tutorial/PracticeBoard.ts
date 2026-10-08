@@ -6,8 +6,7 @@ import { OperateName } from "../Game/GameMode";
 import * as Settings from "../Settings";
 import { LessonId, operationLessons } from "./OperationLessons";
 
-export type PracticePhase = "horizontal" | "down" | "firstPut" | "autoPut" | "autoPutReview" | "targets" | "undoPut" | "undoBack" | "erasing" | "penalties" | "damageReady" | "damaging" | "damageReview" | "recoveryReview" | "done";
-export type PracticeOutcome = { sound?: string; failed?: boolean; trick?: string; advance?: boolean; explain?: boolean; message?: string };
+import type { PracticeOutcome, PracticePhase } from "./TutorialTypes";
 const bottom = Settings.playHeight - 1;
 const movement: OperateName[] = ["move-left", "move-right", "move-down", "put"];
 

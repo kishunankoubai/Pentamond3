@@ -28,7 +28,7 @@ export class TimeManager extends MyEventListener {
 
         if (!this.g$isStopping) {
             this.lastElapsedTime = this.g$elapsedTime;
-            this.intervalStartTime = Date.now();
+            this.intervalStartTime = performance.now();
         }
         this.speedMagnification = speedMagnification;
     }
@@ -41,23 +41,24 @@ export class TimeManager extends MyEventListener {
         this.executeEvent("reset", this);
     }
 
-    start(speedMagnification: number = 1) {
-        if (this.lastStopTime == null) this.lastElapsedTime = this.g$elapsedTime;
-        this.intervalStartTime = Date.now();
-        this.s$speedMagnification = speedMagnification;
+    start(speedMagnification: number = this.speedMagnification) {
+        if (!this.g$isStopping) { this.s$speedMagnification = speedMagnification; return; }
+        this.intervalStartTime = performance.now();
+        if (Number.isFinite(speedMagnification) && speedMagnification > 0) this.speedMagnification = speedMagnification;
         this.lastStopTime = null;
         this.executeEvent("start", this);
     }
 
     stop() {
+        if (this.g$isStopping) return;
         this.lastElapsedTime = this.g$elapsedTime;
-        if (this.lastStopTime == null) this.lastStopTime = Date.now();
+        this.lastStopTime = performance.now();
         this.executeEvent("stop", this);
     }
 
     get g$elapsedTime(): number {
-        if (!this.intervalStartTime) return 0;
-        if (this.lastStopTime) return this.lastElapsedTime;
-        return (Date.now() - this.intervalStartTime) * this.speedMagnification + this.lastElapsedTime;
+        if (this.intervalStartTime === null) return 0;
+        if (this.lastStopTime !== null) return this.lastElapsedTime;
+        return (performance.now() - this.intervalStartTime) * this.speedMagnification + this.lastElapsedTime;
     }
 }

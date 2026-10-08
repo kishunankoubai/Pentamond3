@@ -1,4 +1,5 @@
-import { LoopManager } from "../Utilities/Loop/LoopManager";
+import { SimulationClock } from "../Utilities/Loop/SimulationClock";
+import { SimulationLoop } from "../Utilities/Loop/SimulationLoop";
 import { MondOperator } from "../BlockOperate/MondOperator";
 import { NuisanceMondManager } from "./NuisanceMondManager";
 import { AutoInputObserver } from "../Utilities/Interaction/AutoInputObserver";
@@ -13,7 +14,7 @@ import { MusicManager } from "../Utilities/Music/MusicManager";
 
 export class GamePlayer {
     operator: MondOperator;
-    loop: LoopManager = new LoopManager();
+    readonly loop: SimulationLoop;
     nuisanceMondManager: NuisanceMondManager;
     canvas: CanvasManager = new CanvasManager();
     label: InformationLabelManager;
@@ -219,10 +220,11 @@ export class GamePlayer {
     runningAnimations: Animation[] = [];
     private readonly events = new EventScope();
 
-    constructor(input: InputObserver, playerCount: number, seeds: { next: number; nuisance: number }) {
+    constructor(input: InputObserver, playerCount: number, seeds: { next: number; nuisance: number }, readonly clock: SimulationClock) {
+        this.loop = new SimulationLoop(clock);
         this.operator = new MondOperator(seeds.next);
         this.label = new InformationLabelManager(playerCount);
-        this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance);
+        this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance, clock);
         this.events.add(
             this.nuisanceMondManager.addHandler("finishDamage", () => {
                 this.state.damaging = false;
@@ -257,7 +259,8 @@ export class GamePlayer {
         );
         this.input = input;
         if (this.input instanceof AutoInputObserver) {
-            this.input.setInputGate(() => this.operator.isOperable());
+            this.input.setInputGate(() => !this.state.damaging && !this.state.hasFinished);
+            this.input.attachClock(clock);
         }
         this.playField.classList.add("playField");
         this.playField.appendChild(this.canvas.g$playCanvas);

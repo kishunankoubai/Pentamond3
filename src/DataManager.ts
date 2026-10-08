@@ -8,8 +8,8 @@ import { GraphicSetting } from "./GraphicSetting";
 import { Music } from "./Utilities/Music/Music";
 import { MusicManager } from "./Utilities/Music/MusicManager";
 import { bgmTracks } from "./BGMTracks";
-import { PlayStatistics } from "./PlayStatistics";
-import { TutorialProgress } from "./Tutorial/TutorialProgress";
+import { PlayData } from "./PlayData";
+import { PageNotice } from "./Utilities/Feedback/PageNotice";
 
 export class DataManager {
     private static key = [11, 11];
@@ -29,12 +29,14 @@ export class DataManager {
             localStorage.setItem(DataManager.saveName, DataCompressor.compressArray(data, this.key));
             localStorage.setItem(DataManager.soloBGMKey, globalValues.soloBGM);
             localStorage.setItem("Pentamond3-graphicSetting", JSON.stringify(globalValues.graphic));
-        } catch (error) { console.warn("設定を保存できませんでした。現在のプレイには反映されます。", error); }
+        } catch (error) {
+            console.warn("設定を保存できませんでした。現在のプレイには反映されます。", error);
+            PageNotice.notify("設定を保存できませんでした。 今回の起動中は反映されますが、 再読み込みすると失われる場合があります。 保存領域の空きやブラウザーの設定を確認してください。");
+        }
     }
 
     static read() {
-        PlayStatistics.read();
-        TutorialProgress.read();
+        PlayData.read();
         if (globalValues.nosave) return;
 
         ControllerSettingManager.read();
@@ -67,15 +69,13 @@ export class DataManager {
     }
 
     static deletePlayData() {
-        PlayStatistics.reset();
-        TutorialProgress.reset();
+        PlayData.reset();
         PageManager.resetMemory();
         sceneManager.change(SceneTitle);
     }
 
     static delete() {
-        PlayStatistics.reset();
-        TutorialProgress.reset();
+        PlayData.reset();
         this.resetSettings();
         PageManager.resetMemory();
         sceneManager.change(SceneTitle);

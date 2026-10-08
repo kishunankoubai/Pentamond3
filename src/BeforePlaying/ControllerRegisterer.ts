@@ -110,10 +110,12 @@ export class ControllerRegisterer {
         inputManager.stop();
 
         this.enablePlayerRegisterButtons(false);
-        await pageManager.backPage(backDepth, true);
-        pageManager.openPage("playPrepare");
-        this.enablePlayerRegisterButtons(true);
-        inputManager.start();
+        try {
+            if (await pageManager.backPage(backDepth, true)) pageManager.openPage("playPrepare");
+        } finally {
+            this.enablePlayerRegisterButtons(true);
+            inputManager.start();
+        }
     }
 
     private static enablePlayerRegisterButtons(available: boolean) {

@@ -10,6 +10,17 @@
         <div class="label">(音が出ます)</div>
     </div>
 
+    <div class="page" id="firstLaunchGuide" data-layer="1">
+        <div class="popup">
+            <div class="label headingLabel">はじめての方へ</div>
+            <div class="text">Pentamondは初めてですか？<br />まずは養成所に行ってみよう！</div>
+            <div class="back button" data-xy="[0,1]">閉じる</div>
+            <div class="options">
+                <div class="button" id="firstLaunchTutorialButton" data-xy="[1,0]">養成所へ</div>
+            </div>
+        </div>
+    </div>
+
     <div class="page" id="title">
         <div class="label headingLabel">Pentamond</div>
         <div class="selectWithDescription">
@@ -343,6 +354,7 @@
         </div>
         <div class="subPage">
             <div class="statisticSection">ソロ</div>
+            <div class="text statisticNote">最高スコア・最長時間は持ち時間150の記録です。</div>
             <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="soloSurvivalScore"></span></div>
             <div class="statisticRow"><span>サバイバル：最長プレイ時間</span><span data-statistic="soloSurvivalTime" data-format="time"></span></div>
             <div class="statisticRow"><span>サバイバル：累計回復</span><span data-statistic="soloRecovery"></span></div>
@@ -350,6 +362,7 @@
         </div>
         <div class="subPage">
             <div class="statisticSection">マルチ</div>
+            <div class="text statisticNote">最高スコアは持ち時間150の記録です。</div>
             <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="multiSurvivalScore"></span></div>
             <div class="statisticRow"><span>サバイバル：最大攻撃</span><span data-statistic="multiSurvivalAttack"></span></div>
             <div class="statisticRow"><span>十五列揃え：最速タイム</span><span data-statistic="multiSprintTime" data-format="time"></span></div>

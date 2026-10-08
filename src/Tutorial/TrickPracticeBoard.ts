@@ -7,7 +7,7 @@ import { OperateName } from "../Game/GameMode";
 import * as Settings from "../Settings";
 import { trickInfos } from "../Trick";
 import { createRandomSeed } from "../Utilities/Random/SeededRandom";
-import { PracticeOutcome, PracticePhase } from "./PracticeBoard";
+import type { PracticeOutcome, PracticePhase } from "./TutorialTypes";
 import { trickLessonLayouts } from "./TrickLessonLayouts";
 import { trickLessonOffset, trickLessons } from "./TrickLessons";
 
@@ -97,6 +97,7 @@ export class TrickPracticeBoard {
     }
 
     continueAfterObservation(): void { if (this.phase === "recoveryReview") this.restart(); }
+    dispose(): void { this.operator?.stop(); }
 
     get graphics(): GraphicData {
         if (this.operator) return this.operator.g$graphicData;

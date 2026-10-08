@@ -1,5 +1,6 @@
 import { qsAddEvent } from "../Utils";
 import { sceneManager } from "../Utilities/SceneManager";
+import { defaultMaxGameTime } from "../Settings";
 
 export type PlaySetting = Readonly<EditablePlaySetting>;
 
@@ -18,7 +19,7 @@ export class PlaySettingSetter {
     private static readonly playSetting: EditablePlaySetting = {
         playerNumber: 1,
         mode: 1,
-        maxGameTime: 150,
+        maxGameTime: defaultMaxGameTime,
         handy: [1],
         targetLines: 15,
     };

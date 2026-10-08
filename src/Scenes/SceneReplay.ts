@@ -31,14 +31,15 @@ export class SceneReplay extends ScenePlay {
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) this.pauseGame();
         }, { signal: this.controller.signal });
+        window.addEventListener("blur", () => this.pauseGame(), { signal: this.controller.signal });
 
         document.getElementById("replayResumeButton")?.addEventListener("click", async () => {
-            await this.pageManager.backPage(1);
+            if (!await this.pageManager.backPage(1)) return;
             GameProcessing.resumeReplay();
             await MusicManager.fadeAllBGM(1, 200);
         });
         document.getElementById("replayRestartButton")?.addEventListener("click", async () => {
-            await this.pageManager.backPageImmediately(1);
+            if (!await this.pageManager.backPageImmediately(1)) return;
             await this.restartGame();
         });
         document.getElementById("replayListButton")?.addEventListener("click", () => this.returnToClosest(["replay", "savedReplay"]));

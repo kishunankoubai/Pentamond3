@@ -168,28 +168,29 @@ export class PageManager extends MyEventListener {
      * @param back 戻るページ数
      * @param eventIgnore イベントを無視するか
      */
-    async backPage(back: number, eventIgnore: boolean = false): Promise<void> {
+    async backPage(back: number, eventIgnore: boolean = false): Promise<boolean> {
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
-        if (back <= 0) return;
+        if (back <= 0) return false;
 
         const targetIndex = PageManager.pageMemories.length - 1 - back;
         if (targetIndex < 0) {
             console.warn("戻るページ数が遷移記録を超えています");
-            return;
+            return false;
         }
         const currentMemory = PageManager.pageMemories.at(-1)!;
         const memory = PageManager.pageMemories[targetIndex];
         const layer = this.g$currentPage?.g$layer ?? 0;
-        PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
         let pageManager: PageManager = this;
 
         let prevLayer = 0;
         if (memory.scene !== currentMemory.scene) {
-            await sceneManager.change(memory.scene, false);
+            if (!await sceneManager.change(memory.scene, false)) return false;
             pageManager = sceneManager.g$currentScene!.g$pageManager;
+            PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
             pageManager.setPagesVisibility(memory.displayingPageIds);
             prevLayer = Infinity;
         } else {
+            PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
             this.setPagesVisibility(memory.displayingPageIds);
             prevLayer = this.g$currentPage!.g$layer;
         }
@@ -205,30 +206,32 @@ export class PageManager extends MyEventListener {
                 pageManager.executeEvent(["trueBackPage", `trueBackPage-${memory.principlePageId}`, "trueChangePage", `trueChangePage-${memory.principlePageId}`], memory.principlePageId);
             pageManager.executeEvent(["backPage", `backPage-${memory.principlePageId}`], memory.principlePageId);
         }
+        return true;
     }
 
     /**
      * イベントを無視、closeAnimationを行わず、即座にページを戻る
      * @param back 戻るページ数
      */
-    async backPageImmediately(back: number): Promise<void> {
+    async backPageImmediately(back: number): Promise<boolean> {
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
-        if (back <= 0) return;
+        if (back <= 0) return false;
 
         const targetIndex = PageManager.pageMemories.length - 1 - back;
         if (targetIndex < 0) {
             console.warn("戻るページ数が遷移記録を超えています");
-            return;
+            return false;
         }
         const currentMemory = PageManager.pageMemories.at(-1)!;
         const memory = PageManager.pageMemories[targetIndex];
-        PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
         let pageManager: PageManager = this;
         if (memory.scene !== currentMemory.scene) {
-            await sceneManager.change(memory.scene, false);
+            if (!await sceneManager.change(memory.scene, false)) return false;
             pageManager = sceneManager.g$currentPageManager!;
         }
+        PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
         pageManager.setPagesVisibility(memory.displayingPageIds, true);
+        return true;
     }
 
     /**

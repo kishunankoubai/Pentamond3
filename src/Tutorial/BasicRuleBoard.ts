@@ -8,7 +8,7 @@ import { emptyRemovalPenalty, survivalTrickReward } from "../Game/SurvivalRules"
 import * as Settings from "../Settings";
 import { trickInfos } from "../Trick";
 import { basicRuleLessons } from "./BasicRuleLessons";
-import { PracticeOutcome, PracticePhase } from "./PracticeBoard";
+import type { PracticeOutcome, PracticePhase } from "./TutorialTypes";
 
 const bottom = Settings.playHeight - 1;
 const allMoves: OperateName[] = ["move-left", "move-right", "move-down", "spin-left", "spin-right", "put"];

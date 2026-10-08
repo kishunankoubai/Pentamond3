@@ -1,5 +1,6 @@
 import { ElementManager } from "./ElementManager";
 import { SceneSetter } from "../SceneSetter";
+import { initializePopupElement } from "./PopupElement";
 
 export class ElementEventSetter extends SceneSetter {
     private elementManager: ElementManager;
@@ -23,6 +24,7 @@ export class ElementEventSetter extends SceneSetter {
         this.scene.addHandler("sceneEnd", () => controller.abort(), 1);
         // subPageが後から生成されるページもあるため、全ページに初期化処理を登録する。
         document.querySelectorAll<HTMLElement>(".page").forEach((page) => {
+            initializePopupElement(page);
             this.scene.g$pageManager.addHandler(`changePage-${page.id}`, () => {
                 this.elementManager.initializeSubPage();
             });

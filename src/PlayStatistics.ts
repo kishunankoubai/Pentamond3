@@ -1,6 +1,8 @@
 import type { DisposableGame } from "./GameProcessing/DisposableGame";
 import { globalValues } from "./Global";
 import { UInt32Codec } from "./Utilities/Data/UInt32Codec";
+import { defaultMaxGameTime } from "./Settings";
+import { PageNotice } from "./Utilities/Feedback/PageNotice";
 
 // 保存順は形式v1の一部。順番を変更しない。
 const fields = [
@@ -72,11 +74,13 @@ export class PlayStatistics {
             add("holdCount", p.hold);
             if (game.playSetting.mode === 1) {
                 if (solo) {
-                    max("soloSurvivalScore", p.score);
-                    max("soloSurvivalTime", p.playTime);
+                    if (game.playSetting.maxGameTime === defaultMaxGameTime) {
+                        max("soloSurvivalScore", p.score);
+                        max("soloSurvivalTime", p.playTime);
+                    }
                     add("soloRecovery", p.recovery);
                 } else {
-                    max("multiSurvivalScore", p.score);
+                    if (game.playSetting.maxGameTime === defaultMaxGameTime) max("multiSurvivalScore", p.score);
                     max("multiSurvivalAttack", player.damageInfo.maxAttack);
                 }
             } else if (game.playSetting.mode === 2 && game.playSetting.targetLines === 15 && p.line >= 15) {
@@ -92,6 +96,9 @@ export class PlayStatistics {
         const values = fields.map((field) => this.data[field]);
         while (values.at(-1) === 0) values.pop();
         try { localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values)); }
-        catch (error) { console.warn("プレイ統計を保存できませんでした。今回の起動中は記録を保持します。", error); }
+        catch (error) {
+            console.warn("プレイ統計を保存できませんでした。今回の起動中は記録を保持します。", error);
+            PageNotice.notify("プレイ記録を保存できませんでした。 今回の起動中は保持しますが、 再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
+        }
     }
 }

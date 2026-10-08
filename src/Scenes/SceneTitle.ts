@@ -23,6 +23,7 @@ import { setupStatisticsPage } from "../StatisticsPage";
 import { setupTutorialMenu } from "../Tutorial/TutorialMenu";
 import { TutorialInput } from "../Tutorial/TutorialInput";
 import { InputRegistrationView } from "../BeforePlaying/InputRegistrationView";
+import { PlayData } from "../PlayData";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
@@ -212,6 +213,13 @@ export class SceneTitle extends Scene {
         // 音声の初期化はページ全体への直接クリックで行う。
         // pageStart は data-xy を付けず、キーボード・コントローラーの決定対象にしない。
         let starting = false;
+        document.getElementById("firstLaunchTutorialButton")!.addEventListener("click", async () => {
+            if (this.pageManager.g$currentPageId !== "firstLaunchGuide") return;
+            // 案内を履歴に残さず、通常の養成所と同じ入力登録画面へ進む。
+            if (await this.pageManager.backPage(1, true) && sceneManager.g$currentScene === this) {
+                this.pageManager.openPage("tutorialInputRegister");
+            }
+        });
         document.getElementById("pageStart")!.addEventListener("click", async () => {
             if (starting || this.pageManager.g$currentPageId !== "pageStart") return;
             starting = true;
@@ -223,8 +231,16 @@ export class SceneTitle extends Scene {
             await this.pageManager.getPage("pageStart")?.hasClosed();
             if (sceneManager.g$currentScene !== this) return;
             titlePage.s$visible = true;
+            this.openFirstLaunchGuide();
             await MusicManager.get("つみきのおしろ")?.play();
         });
+    }
+
+    private openFirstLaunchGuide(): void {
+        if (!PlayData.needsFirstLaunchGuide || this.pageManager.g$currentPageId !== "title") return;
+        this.pageManager.openPage("firstLaunchGuide");
+        PlayData.markFirstLaunchGuideShown();
+        document.getElementById("firstLaunchTutorialButton")?.focus();
     }
 
     private setSettingButton() {

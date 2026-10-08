@@ -589,7 +589,10 @@
             font-size: 6cqh;
         }
         & .text {
-            font-size: 5cqh;
+            font-size: 4cqh;
+            text-align: center;
+            line-height: 1.8;
+            max-width: 90%;
         }
         padding: 3cqh;
         border: 0.5cqh #bde8 solid;
@@ -1041,6 +1044,7 @@
 }
 
 #information {
+    & .statisticNote { font-size: 3cqh; }
     & .subPage {
         width: 120cqh;
         gap: 1.5cqh;
@@ -1061,12 +1065,6 @@
 }
 
 #allDataDeleteAlert {
-    & #dataDeleteDescription {
-        font-size: 4cqh;
-        text-align: center;
-        line-height: 1.8;
-        max-width: 90%;
-    }
     & #allDataDeleteConfirmButton {
         background: transparent;
         border: none;

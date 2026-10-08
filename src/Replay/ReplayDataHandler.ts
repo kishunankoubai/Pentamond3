@@ -22,9 +22,9 @@ export class ReplayDataHandler {
     }
 
     static createReplayData({ players, game, playSetting, randomSeeds }: DisposableGame) {
-        const inputData = game.operateMemories.map((operateMemory) => operateMemory.map(({ time, operateName }) => ({ time, keyCode: operationKeyCodes[operateName], type: "downup" })));
+        const inputData = game.operateMemories.map((operateMemory) => operateMemory.map(({ time, operateName, sequence }) => ({ time, sequence, keyCode: operationKeyCodes[operateName], type: "downup" })));
         const finishTime = Math.max(...players.map((player) => player.playInfo.playTime));
-        const finishPlayers = players.map((player, i) => (player.playInfo.playTime == finishTime ? i + 1 : -1)).filter((value) => value != -1);
+        const finishPlayers = game.g$winnerIndices;
 
         const replayData = structuredClone({
             inputData,
@@ -32,7 +32,7 @@ export class ReplayDataHandler {
             finishTime,
             finishPlayers,
             randomSeeds,
-            version: 2,
+            version: 3,
             date: Date.now(),
         }) as ReplayData;
 

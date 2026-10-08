@@ -4,6 +4,8 @@ import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { Monoiamond } from "../BlockOperate/Monoiamond";
 import * as Setting from "../Settings";
 import { SeededRandom } from "../Utilities/Random/SeededRandom";
+import { SimulationClock } from "../Utilities/Loop/SimulationClock";
+import { SimulationLoop } from "../Utilities/Loop/SimulationLoop";
 
 /**
  * じゃまモンドに関連する処理を行う
@@ -19,7 +21,7 @@ export class NuisanceMondManager extends MyEventListener {
     //damage処理中ならtrue
     private damaging: boolean = false;
     //progressを繰り返し実行する用のinterval
-    private loop: LoopManager = new LoopManager();
+    private readonly loop: LoopManager | SimulationLoop;
     //damage用に生成するnuisanceBlockの個数
     private task = 0;
     //一回のdamage中のnuisanceBlockの生成の進行度合い
@@ -35,8 +37,9 @@ export class NuisanceMondManager extends MyEventListener {
      * @param damageBoard 盤面へのダメージ
      * @param finishDamage ダメージ処理終了
      */
-    constructor(blockManager: BlockManager, seed: number) {
+    constructor(blockManager: BlockManager, seed: number, clock?: SimulationClock) {
         super();
+        this.loop = clock ? new SimulationLoop(clock) : new LoopManager();
         this.blockManager = blockManager;
         this.random = new SeededRandom(seed);
         this.loop.addHandler("loop", () => this.damageProcess());
