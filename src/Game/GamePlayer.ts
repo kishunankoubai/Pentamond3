@@ -11,8 +11,16 @@ import * as Setting from "../Settings";
 import { EventScope } from "../Utilities/EventScope";
 import { GraphicSetting } from "../GraphicSetting";
 import { MusicManager } from "../Utilities/Music/MusicManager";
+import { achievementTrickIndex, achievementTricks } from "../Achievements/Definitions";
 
 export class GamePlayer {
+    readonly trickCounts = Array<number>(achievementTricks.length).fill(0);
+
+    recordTrick(trick: TrickInfo): void {
+        const index = achievementTrickIndex(trick.name);
+        if (index >= 0) this.trickCounts[index] += 1;
+    }
+
     operator: MondOperator;
     readonly loop: SimulationLoop;
     nuisanceMondManager: NuisanceMondManager;

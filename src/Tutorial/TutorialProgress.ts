@@ -1,6 +1,7 @@
 import { globalValues } from "../Global";
 import { tutorialLessonCount, tutorialUnits } from "./TutorialUnits";
 import { PageNotice } from "../Utilities/Feedback/PageNotice";
+import { Achievements } from "../Achievements/Achievements";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const lessonCount = tutorialLessonCount;
@@ -29,6 +30,7 @@ export class TutorialProgress {
     static complete(index: number): void {
         if (!Number.isInteger(index) || index < 0 || index >= lessonCount) return;
         this.cleared |= 1 << index;
+        this.reflectAchievements();
         if (globalValues.nosave) return;
         try { localStorage.setItem(this.storageKey, "4:" + Array.from({ length: Math.ceil(lessonCount / 6) }, (_, i) => alphabet[this.cleared >>> (i * 6) & 63]).join("")); }
         catch (error) {
@@ -39,6 +41,12 @@ export class TutorialProgress {
     static reset(): void {
         localStorage.removeItem(this.storageKey);
         this.cleared = 0;
+    }
+    static reflectAchievements(): void {
+        Achievements.reflectTutorial(tutorialUnits.map((unit) => ({
+            id: unit.id,
+            cleared: unit.lessons.every((_, i) => this.isCleared(unit.offset + i)),
+        })));
     }
     static getDataSize(): number {
         try { return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size; }

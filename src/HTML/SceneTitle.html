@@ -21,6 +21,14 @@
         </div>
     </div>
 
+    <div class="page" id="achievementCompletion" data-layer="1">
+        <div class="popup">
+            <div class="label headingLabel">全実績達成！</div>
+            <div class="text">あなたは、すべての実績を達成しました！<br />とてもすごいので、ここに表します。</div>
+            <div class="back button" data-xy="[0,0]" aria-disabled="true">閉じる</div>
+        </div>
+    </div>
+
     <div class="page" id="title">
         <div class="label headingLabel">Pentamond</div>
         <div class="selectWithDescription">
@@ -46,8 +54,8 @@
                 </div>
                 <div>
                     <div class="text">
-                        分からないことがあるときのヘルプ、<br />
-                        リプレイやランキングが見られる統計は<br />
+                        分からないことがあるときのヘルプや、<br />
+                        音楽などの設定は<br />
                         こちらから！
                     </div>
                 </div>
@@ -140,8 +148,9 @@
 
     <div class="page" id="playPrepare">
         <div class="label headingLabel">プレイ準備</div>
-        <div class="options" data-direction="row">
+        <div class="options playPrepareStartRow" data-direction="row">
             <div class="playStart button" data-xy="[1,0]">スタート！</div>
+            <div class="button" id="playPrepareModeHelpButton" data-xy="[2,0]">モード説明</div>
         </div>
         <div class="options" data-direction="row">
             <div class="button" id="playPrepareControllerButton" data-xy="[0,1]">コントローラー</div>
@@ -223,11 +232,23 @@
 
     <div class="page" id="help">
         <div class="label headingLabel">ヘルプ</div>
-        <div class="options">
-            <div class="button" data-page="trickList" data-xy="[0,0]">役一覧</div>
-            <div class="button" data-page="howToPlayBasic" data-xy="[0,1]">基本編</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="trickList" data-xy="[0,0]">役一覧</div>
+                <div class="button" data-page="howToPlayBasic" data-xy="[0,1]">基本編</div>
+                <div class="button" data-page="howToPlayAdvanced" data-xy="[0,2]">応用編</div>
+                <div class="button" data-page="howToOperate" data-xy="[0,3]">操作方法</div>
+                <div class="button" data-page="modeHelp" data-xy="[0,4]">モード説明</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div><div class="text">どんな役があるか見てみよう！<br />形と回復・攻撃の値を確認できるよ！</div></div>
+                <div><div class="text">まずは基本的な遊び方を知ろう！<br />モンドの動かし方や役の消し方など。</div></div>
+                <div><div class="text">ちょっと詳しい仕組みはこちら！<br />ホールドや滑り移動、攻撃の話など。</div></div>
+                <div><div class="text">どのキーやボタンだったっけ？<br />キーボードと初期配置を確認しよう！</div></div>
+                <div><div class="text">各モードの遊び方を見てみよう！<br />勝ち方やプレイ設定の違いなど。</div></div>
+            </div>
         </div>
-        <div class="back button" data-xy="[0,2]">戻る</div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
     </div>
 
     <div class="page" id="trickList">
@@ -240,65 +261,112 @@
         <div class="back button" data-xy="[0,0]">戻る</div>
     </div>
 
-    <div class="page" id="howToPlayBasic">
+    <div class="page helpReference" id="howToPlayBasic">
         <div class="label headingLabel">基本編</div>
-        <div class="subPage">
-            <div class="text">ここでは、Pentamondの基本的な遊び方を説明します</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
         </div>
-        <div class="subPage">
-            <div class="text">
-                Pentamondは盤面の上に出現するブロック（モンドという）を操作してどんどん積み上げていくゲームです<br />
-                モンドは左右に移動したり、回転したりすることができます<br /><br />
-                モンドは下に移動させることもできます<br />
-                真下に移動できないときには斜め下に移動する、"<b>滑り移動</b>"をすることができます<br />
-                （ただし、これらの移動により設置されることはありません）
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
+    <div class="page helpReference" id="howToPlayAdvanced">
+        <div class="label headingLabel">応用編</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
+    <div class="page helpReference" id="howToOperate">
+        <div class="label headingLabel">操作方法</div>
+        <div class="subPage helpContent">
+            <div class="helpTopic">キーボード：プレイ中</div>
+            <div class="helpKeyGrid">
+                <div><span>← / →</span><span>左右移動</span></div>
+                <div><span>↓</span><span>下移動・滑り移動</span></div>
+                <div><span>↑</span><span>設置</span></div>
+                <div><span>C / V</span><span>左回転 / 右回転</span></div>
+                <div><span>B</span><span>一手戻し</span></div>
+                <div><span>Space</span><span>ホールド</span></div>
+                <div><span>Enter</span><span>列の消去</span></div>
+                <div><span>P / Esc</span><span>ポーズ</span></div>
             </div>
+            <div class="text helpNote">設置するとゴーストの位置まで移動して置かれます。下移動だけでは設置されません。</div>
         </div>
-        <div class="subPage">
-            <div class="text">
-                今操作しているモンドの下には影（ゴーストという）が表示されます<br />
-                モンドを"<b>設置</b>"するとこのゴーストの位置に設置されます<br /><br />
-                このとき、盤面の上に新しく次のモンドが出現します<br />
-                それを操作して設置するとさらに新しいモンドが出現します<br />
-                これを繰り返すことで自由にモンドを積み上げることができます
+        <div class="subPage helpContent">
+            <div class="helpTopic">コントローラー：初期設定</div>
+            <img class="helpControllerImage" src="assets/images/descriptions/コントローラータイプ1.png" alt="初期配置：方向キー・左スティックで移動、左肩ボタンで設置、右肩ボタンでホールド。右側の下ボタンで左回転、右ボタンで右回転、左ボタンで一手戻し、上ボタンで消去。中央ボタンでポーズ。" />
+            <div class="text helpNote">左右の肩ボタンは、手前・奥のどちらでも操作できます。</div>
+            <div class="text helpNote">変更した配置は、設定→コントローラーやプレイ準備→コントローラーで確認できます。</div>
+        </div>
+        <div class="subPage helpContent helpMenuContent">
+            <div class="helpTopic">メニューの操作</div>
+            <div class="helpTopic helpMinorTopic">キーボード</div>
+            <div class="helpMenuMappings">
+                <div><span>選択</span><span>矢印キー</span></div>
+                <div><span>決定</span><span>Enter / Space</span></div>
+                <div><span>戻る</span><span>Esc / Backspace</span></div>
             </div>
-        </div>
-        <div class="subPage">
-            <div class="text">
-                しかし、ただ積み上げても意味はありません<br />
-                Pentamondでは、モンドを使って、"<b>役</b>"という決まった形を作ると<br />
-                たくさんのスコアが貰えたり、相手に攻撃できたり……<br />
-                いいことがたくさんあるので、どんどん役を揃えていきましょう<br /><br />
-                役は一列ごとに判定されます<br />
-                役の形はモード選択→ヘルプ→役一覧などから確認できます<br />
+            <div class="helpTopic helpMinorTopic">コントローラー</div>
+            <div class="helpMenuMappings">
+                <div><span>選択</span><span>方向キー・左スティック</span></div>
+                <div><span>決定</span><span>右側の右ボタン（button1）</span></div>
+                <div><span>戻る</span><span>右側の下ボタン（button0）</span></div>
             </div>
+            <div class="text helpNote">最初の「クリックしてスタート！」だけは、ページをクリックしてください。</div>
         </div>
-        <div class="subPage">
-            <div class="text">
-                "<b>消去</b>"を行うと、盤面の一番下の列を消すことができます<br />
-                揃えたブロックの形が役として認められるにはその役を消去する必要があります<br />
-                役が成立している列を連続して消去するとChainというボーナスが貰えます<br />
-                モンドをたくさん積み上げて一気に消すとより高いスコアを目指すことができます
-            </div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
         </div>
-        <div class="subPage">
-            <div class="text">
-                Pentamondの基本的なモードでは制限時間があります<br />
-                この残り時間がなくなるとゲームオーバーです<br />
-                ただし、役を揃えることで残り時間を回復することができます<br />
-                消去はいつでも行うことができますが、役が成立していない列を連続して<br />
-                消去すると残り時間が減らされてしまうので注意しましょう
-            </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
+    <div class="page" id="modeHelp">
+        <div class="label headingLabel">モード説明</div>
+        <div class="options">
+            <div class="button" data-page="soloSurvivalHelp" data-xy="[0,0]">ソロ：サバイバル</div>
+            <div class="button" data-page="soloLineHelp" data-xy="[0,1]">ソロ：十五列揃え</div>
+            <div class="button" data-page="multiSurvivalHelp" data-xy="[0,2]">マルチ：サバイバル</div>
+            <div class="button" data-page="multiLineHelp" data-xy="[0,3]">マルチ：十五列揃え</div>
         </div>
-        <div class="subPage">
-            <div class="text">
-                まとめとしては、モンドを操作して役を揃えそれを消去するゲームです<br /><br />
-                もっと詳しく知りたい場合は応用編をご覧ください<br />
-                各モードの遊び方についてはソロモード編、マルチモード編をご覧ください<br />
-                モンドの操作、設置、消去などの操作方法については<br />
-                モード選択→ヘルプ→操作方法をご覧ください
-            </div>
+        <div class="back button" data-xy="[0,4]">戻る</div>
+    </div>
+
+    <div class="page helpReference" id="soloSurvivalHelp">
+        <div class="label headingLabel">ソロ：サバイバル</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
         </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+    <div class="page helpReference" id="multiSurvivalHelp">
+        <div class="label headingLabel">マルチ：サバイバル</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+    <div class="page helpReference" id="soloLineHelp">
+        <div class="label headingLabel">ソロ：十五列揃え</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+    <div class="page helpReference" id="multiLineHelp">
+        <div class="label headingLabel">マルチ：十五列揃え</div>
         <div class="subPageController">
             <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
             <div class="label subPageLabel"></div>
@@ -314,8 +382,7 @@
                 <div class="button" data-page="replay" data-xy="[0,0]">直近のリプレイ</div>
                 <div class="button" data-page="savedReplay" data-xy="[0,1]">保存したリプレイ</div>
                 <div class="button" data-page="information" data-xy="[0,2]">情報</div>
-                <div class="button" data-page="ranking" data-xy="[0,3]">ランキング</div>
-                <div class="button" data-page="mission" data-xy="[0,4]">ミッション</div>
+                <div class="button" data-page="achievements" data-xy="[0,3]">実績</div>
             </div>
             <div class="selectOptionDescriptions">
                 <div>
@@ -331,14 +398,32 @@
                     <div class="text">今までのこのゲームの意外な記録が見れるよ！</div>
                 </div>
                 <div>
-                    <div class="text">自分が世界で何番目か確認してみよう！</div>
-                </div>
-                <div>
-                    <div class="text">決められたお題に挑戦してみよう！</div>
+                    <div class="text">いろいろな目標に挑戦してみよう！<br />どれだけ実績を集められるかな？</div>
                 </div>
             </div>
         </div>
-        <div class="back button" data-xy="[0,5]">戻る</div>
+        <div class="back button" data-xy="[0,4]">戻る</div>
+    </div>
+
+    <div class="page" id="achievements">
+        <div class="label headingLabel">実績</div>
+        <div class="text" id="achievementTotal"></div>
+        <div class="subPage achievementSummary">
+            <div class="achievementCategory">達成状況</div>
+            <div class="achievementSummaryOverall text" id="achievementSummaryOverall"></div>
+            <div class="achievementSummaryGrades"></div>
+        </div>
+        <div class="achievementDetail" aria-live="polite" aria-atomic="true">
+            <div class="text" id="achievementDescription"></div>
+            <div class="text" id="achievementState"></div>
+            <div class="text" id="achievementNote"></div>
+        </div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,3]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,3]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
     </div>
 
     <div class="page" id="information">
@@ -645,15 +730,15 @@
         <div class="container">
             <div class="container">
                 <div class="label">BGM</div>
-                <div class="button" class="div" data-xy="[0,0]"><p>-</p></div>
+                <div class="button" data-xy="[0,0]">-</div>
                 <div class="label">10</div>
-                <div class="button" class="div" data-xy="[1,0]"><p>+</p></div>
+                <div class="button" data-xy="[1,0]">+</div>
             </div>
             <div class="container">
                 <div class="label">SE</div>
-                <div class="button" class="div" data-xy="[0,1]"><p>-</p></div>
+                <div class="button" data-xy="[0,1]">-</div>
                 <div class="label">10</div>
-                <div class="button" class="div" data-xy="[1,1]"><p>+</p></div>
+                <div class="button" data-xy="[1,1]">+</div>
             </div>
         </div>
         <div class="back button" data-xy="[0,2]">戻る</div>
@@ -662,14 +747,24 @@
     <div class="page" id="bgmSetting">
         <div class="label headingLabel">BGM設定</div>
         <div class="options" data-direction="row">
-            <div class="label">プレイ時BGM：</div>
+            <div class="label">ソロ：</div>
             <div class="selector" data-page="bgmSelector1" data-xy="[0,0]"></div>
         </div>
-        <div class="back button" data-xy="[-1,1]">戻る</div>
+        <div class="options" data-direction="row">
+            <div class="label">マルチ：</div>
+            <div class="selector" data-page="bgmSelector2" data-xy="[0,1]"></div>
+        </div>
+        <div class="back button" data-xy="[-1,2]">戻る</div>
     </div>
 
     <div class="page" id="bgmSelector1">
-        <div class="label headingLabel">BGMを選択してください</div>
+        <div class="label headingLabel">ソロのBGMを選択</div>
+        <div class="scrollableContainer"></div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="bgmSelector2">
+        <div class="label headingLabel">マルチのBGMを選択</div>
         <div class="scrollableContainer"></div>
         <div class="back button" data-xy="[0,5]">戻る</div>
     </div>

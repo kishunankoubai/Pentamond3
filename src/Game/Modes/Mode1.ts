@@ -204,6 +204,7 @@ export class Mode1 extends GameMode {
                 const lastTrick = p.operator.g$lastTrick;
                 const removeSoundIndex = lastTrick ? Math.min(6, p.playInfo.chain) : 0;
                 if (lastTrick) {
+                    p.recordTrick(lastTrick);
                     p.playInfo.penaltyTask = 0;
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {
                         p.playInfo.line += 1;

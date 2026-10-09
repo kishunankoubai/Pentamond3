@@ -7,6 +7,7 @@ import type { ReplayData, ReplayRandomSeeds } from "../Replay/Replay";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { createRandomSeed } from "../Utilities/Random/SeededRandom";
 import { PlayStatistics } from "../PlayStatistics";
+import { Achievements } from "../Achievements/Achievements";
 import { SimulationClock } from "../Utilities/Loop/SimulationClock";
 
 /**
@@ -98,6 +99,7 @@ export class DisposableGame {
 
     private async onGameFinish() {
         PlayStatistics.recordCompletedGame(this);
+        Achievements.recordCompletedGame(this);
         this.onEnding();
         if (this.isReplay()) {
             this.onFinishReplay();

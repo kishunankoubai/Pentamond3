@@ -285,7 +285,7 @@ export class GameProcessing {
     }
 
     private static playGameBGM(playerNumber: number) {
-        return MusicManager.playExclusiveBGM(playerNumber === 1 ? globalValues.soloBGM : "Top of the Pyramid");
+        return MusicManager.playExclusiveBGM(playerNumber === 1 ? globalValues.soloBGM : globalValues.multiBGM);
     }
 
     private static canOperateReplay(): this is GameProcessing & { currentGame: DisposableGame & { replayData: ReplayData } } {

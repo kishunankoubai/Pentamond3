@@ -1,4 +1,4 @@
-/** 曲の追加はこの一覧だけで行う。音源登録と両方の曲選択画面で共有する。 */
+/** 曲の追加はこの一覧だけで行う。音源登録と各曲選択画面で共有する。 */
 export const bgmTracks = [
     { name: "つみきのおしろ", srcVolume: 0.8 },
     { name: "ならべてトライアングル", srcVolume: 0.6 },
@@ -8,7 +8,7 @@ export const bgmTracks = [
 ] as const;
 
 export function populateBGMSelectors(): void {
-    for (const id of ["bgmSelector1", "soundTestSelector"]) {
+    for (const id of ["bgmSelector1", "bgmSelector2", "soundTestSelector"]) {
         const page = document.getElementById(id);
         const container = page?.querySelector(".scrollableContainer");
         if (!container) continue;

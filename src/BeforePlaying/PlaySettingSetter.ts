@@ -1,6 +1,7 @@
 import { qsAddEvent } from "../Utils";
 import { sceneManager } from "../Utilities/SceneManager";
 import { defaultMaxGameTime } from "../Settings";
+import { getModeHelpPageId } from "../HelpPages";
 
 export type PlaySetting = Readonly<EditablePlaySetting>;
 
@@ -79,6 +80,8 @@ export class PlaySettingSetter {
     }
 
     private static render(): void {
+        const modeHelpButton = document.getElementById("playPrepareModeHelpButton");
+        if (modeHelpButton) modeHelpButton.dataset.page = getModeHelpPageId(this.playSetting.mode, this.playSetting.playerNumber);
         const trickListButton = document.getElementById("playPrepareTrickListButton");
         if (trickListButton) trickListButton.hidden = this.playSetting.mode !== 1;
 

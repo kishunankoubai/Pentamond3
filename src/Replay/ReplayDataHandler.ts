@@ -3,6 +3,7 @@ import type { ReplayData } from "./Replay";
 import { replayDataDecryption, replayDataEncryption } from "./DataCompression";
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
 import { operationKeyCodes } from "../Game/Operations";
+import { Achievements } from "../Achievements/Achievements";
 
 export class ReplayDataHandler {
     static readonly storageKey = "Pentamond3-replayData";
@@ -110,6 +111,7 @@ export class ReplayDataHandler {
             return false;
         }
 
+        Achievements.recordReplaySaved();
         return true;
     }
 }

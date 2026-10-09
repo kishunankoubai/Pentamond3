@@ -24,13 +24,18 @@ import { setupTutorialMenu } from "../Tutorial/TutorialMenu";
 import { TutorialInput } from "../Tutorial/TutorialInput";
 import { InputRegistrationView } from "../BeforePlaying/InputRegistrationView";
 import { PlayData } from "../PlayData";
+import { setupHelpPages } from "../HelpPages";
+import { setupAchievementPage } from "../Achievements/AchievementPage";
+import { setupAchievementCompletionNotice } from "../Achievements/CompletionNotice";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
     private elementEventSetter: ElementEventSetter;
     private pageInteraction: PageInteraction;
     private bgmPreviewActive = false;
+    private bgmPreviewSetting: "soloBGM" | "multiBGM" = "soloBGM";
     private readonly soundTest = new SoundTest();
+    private showAchievementCompletionNotice: () => boolean = () => false;
     constructor() {
         super("src/HTML/SceneTitle.html");
         this.elementManager = new ElementManager(this);
@@ -47,11 +52,14 @@ export class SceneTitle extends Scene {
     }
 
     protected initialize(): void {
+        setupHelpPages();
         setupTrickList(this.elementManager);
         setupStatisticsPage(this);
+        setupAchievementPage(this, this.elementManager);
         setupTutorialMenu(this, this.elementManager);
         this.setPageAnimation();
         this.setPageStart();
+        this.showAchievementCompletionNotice = setupAchievementCompletionNotice(this, () => this.openFirstLaunchGuide());
         this.setSettingButton();
         populateBGMSelectors();
         this.setupBGMSetting();
@@ -231,7 +239,7 @@ export class SceneTitle extends Scene {
             await this.pageManager.getPage("pageStart")?.hasClosed();
             if (sceneManager.g$currentScene !== this) return;
             titlePage.s$visible = true;
-            this.openFirstLaunchGuide();
+            if (!this.showAchievementCompletionNotice()) this.openFirstLaunchGuide();
             await MusicManager.get("つみきのおしろ")?.play();
         });
     }
@@ -298,29 +306,37 @@ export class SceneTitle extends Scene {
     }
 
     private setupBGMSetting() {
-        const options = Array.from(document.querySelectorAll<HTMLElement>("#bgmSelector1 .scrollableContainer .button"));
-        options.forEach((option) => option.classList.toggle("selectedValue", option.textContent?.trim() === globalValues.soloBGM));
-        this.pageManager.addHandler("settingsReset", () => {
-            this.elementManager.selectByIndex("bgmSelector1", options.findIndex((option) => option.textContent?.trim() === globalValues.soloBGM));
-        });
-
-        this.elementEventSetter.addHandler("selectorChanged-bgmSelector1", (selector: HTMLElement) => {
-            const selectedBGM = selector.textContent?.trim();
-            if (!selectedBGM || !MusicManager.get(selectedBGM)) return;
-            globalValues.soloBGM = selectedBGM;
-            DataManager.save();
-            this.bgmPreviewActive = true;
-            MusicManager.playExclusiveBGM(selectedBGM);
+        const selectors = [
+            { id: "bgmSelector1", setting: "soloBGM" },
+            { id: "bgmSelector2", setting: "multiBGM" },
+        ] as const;
+        selectors.forEach(({ id, setting }) => {
+            const options = Array.from(document.querySelectorAll<HTMLElement>(`#${id} .scrollableContainer .button`));
+            const updateSelection = () => this.elementManager.selectByIndex(id, options.findIndex((option) => option.dataset.soundTrack === globalValues[setting]));
+            updateSelection();
+            this.pageManager.addHandler("settingsReset", updateSelection);
+            this.elementEventSetter.addHandler(`selectorChanged-${id}`, (selector: HTMLElement) => {
+                const selectedBGM = selector.textContent?.trim();
+                if (!selectedBGM || !MusicManager.get(selectedBGM)) return;
+                globalValues[setting] = selectedBGM;
+                this.bgmPreviewSetting = setting;
+                DataManager.save();
+                this.bgmPreviewActive = true;
+                MusicManager.playExclusiveBGM(selectedBGM);
+            });
         });
 
         this.pageManager.addHandler("changePage", (pageId: string) => {
             if (pageId === "bgmSetting") {
                 this.bgmPreviewActive = true;
-                MusicManager.playExclusiveBGM(globalValues.soloBGM);
+                MusicManager.playExclusiveBGM(globalValues[this.bgmPreviewSetting]);
                 return;
             }
-            if (pageId === "bgmSelector1") {
+            const selected = selectors.find(({ id }) => id === pageId);
+            if (selected) {
+                this.bgmPreviewSetting = selected.setting;
                 this.bgmPreviewActive = true;
+                MusicManager.playExclusiveBGM(globalValues[selected.setting]);
                 return;
             }
             if (!this.bgmPreviewActive) return;

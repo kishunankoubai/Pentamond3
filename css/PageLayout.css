@@ -229,6 +229,20 @@
             color: #d76;
         }
     }
+    & .playPrepareStartRow {
+        gap: 10cqh;
+        & .button {
+            position: relative;
+            width: max-content;
+            flex: none;
+            margin-left: 0;
+            &::before {
+                position: absolute;
+                right: 100%;
+                white-space: pre;
+            }
+        }
+    }
 }
 
 #startEffect {
@@ -369,10 +383,75 @@
     }
 }
 
-#howToPlayBasic {
-    & .subPage .text {
-        width: 130cqh;
-        height: 50cqh;
+/* 説明本文だけを調整し、戻る・ページ送りは共通の見た目を保つ。 */
+.helpReference {
+    & .helpContent {
+        width: 128cqh;
+        height: 60cqh;
+        box-sizing: border-box;
+        justify-content: flex-start;
+        align-items: stretch;
+        gap: 2cqh;
+        padding: 2cqh;
+    }
+    & .helpTopic {
+        font-size: 4.5cqh;
+        color: #289;
+        text-wrap: wrap;
+    }
+    & .helpMinorTopic {
+        font-size: 3.5cqh;
+    }
+    & .helpContent .text {
+        font-size: 3.3cqh;
+        line-height: 1.7;
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+    & .helpContent .helpNote {
+        font-size: 2.8cqh;
+    }
+    & .helpKeyGrid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5cqh 6cqh;
+        & > div {
+            display: grid;
+            grid-template-columns: 17cqh 1fr;
+            gap: 1cqh;
+            padding-bottom: 1.5cqh;
+            border-bottom: 0.2cqh solid #6bd5;
+        }
+        & span {
+            font-size: 3.5cqh;
+            text-wrap: wrap;
+        }
+    }
+    & .helpControllerImage {
+        display: block;
+        width: 100%;
+        height: 40cqh;
+        object-fit: contain;
+    }
+    & .helpMenuMappings {
+        display: grid;
+        justify-content: stretch;
+        gap: 0.5cqh;
+        & > div {
+            display: grid;
+            grid-template-columns: 16cqh 1fr;
+            gap: 3cqh;
+            padding-bottom: 0.4cqh;
+            border-bottom: 0.2cqh solid #6bd5;
+        }
+        & span {
+            font-size: 3.3cqh;
+            line-height: 1.4;
+            text-wrap: wrap;
+        }
+    }
+    & .helpContent.helpMenuContent {
+        gap: 1cqh;
     }
 }
 
@@ -1040,6 +1119,109 @@
                 font-size: 5cqh;
             }
         }
+    }
+}
+
+#achievements {
+    padding-top: 16cqh;
+    justify-content: flex-start;
+    box-sizing: border-box;
+
+    & #achievementTotal {
+        position: absolute;
+        right: 7cqh;
+        top: 17cqh;
+        font-size: 3cqh;
+    }
+    & .achievementSection {
+        width: 116cqh;
+        height: 34cqh;
+        gap: 2cqh;
+    }
+    & .achievementSummary {
+        width: 116cqh;
+        height: 63cqh;
+        gap: 4cqh;
+        justify-content: flex-start;
+    }
+    & .achievementSummaryOverall {
+        width: 100%;
+        font-size: 4.5cqh;
+        padding: 3cqh 0;
+    }
+    & .achievementSummaryGrades {
+        width: 92cqh;
+        display: flex;
+        flex-direction: column;
+        gap: 4cqh;
+    }
+    & .achievementSummaryRow {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 7cqh 10cqh 1fr 22cqh;
+        gap: 3cqh;
+        align-items: center;
+        & span { font-size: 4cqh; }
+        & .achievementTriangle { width: 5cqh; height: 4.4cqh; }
+    }
+    & .bronze { --trophy-color: #ba793f; }
+    & .silver { --trophy-color: #a1b1c3; }
+    & .gold { --trophy-color: #e5b833; }
+    & .achievementTriangle {
+        display: block;
+        width: 8cqh;
+        height: 7cqh;
+        clip-path: polygon(50% 0, 100% 100%, 0 100%);
+        background: linear-gradient(135deg, #ffffff90, transparent 45%, #00000030), var(--trophy-color);
+    }
+    & .achievementCategory {
+        width: 100%;
+        text-align: left;
+        font-size: 4cqh;
+        color: #289;
+    }
+    & .achievementGrid {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        grid-template-rows: repeat(2, 11cqh);
+        justify-items: center;
+        gap: 1cqh 3cqh;
+    }
+    & .achievementIcon {
+        position: relative;
+        margin: 0;
+        width: 11cqh;
+        height: 10cqh;
+        display: flex;
+        border-radius: 1cqh;
+        border: 0.4cqh solid transparent;
+        box-sizing: border-box;
+        &::before { display: none; }
+        &:focus {
+            border: 0.4cqh solid #ff90be;
+            background-color: #ff90be18;
+        }
+        &.unachieved .achievementTriangle { opacity: 0.28; }
+    }
+    & .achievementDetail {
+        width: 116cqh;
+        height: 29cqh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 1cqh;
+        padding-top: 2cqh;
+        border-top: 0.3cqh solid #6bd5;
+        & .text {
+            width: 100%;
+            text-align: left;
+            font-size: 3.7cqh;
+            line-height: 1.6;
+            overflow-wrap: anywhere;
+        }
+        & #achievementState { font-size: 3cqh; }
+        & #achievementNote { font-size: 2.8cqh; }
     }
 }
 

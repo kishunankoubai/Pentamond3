@@ -15,7 +15,8 @@ export class DataManager {
     private static key = [11, 11];
     private static saveName = "contemporary";
     private static soloBGMKey = "Pentamond3-soloBGM";
-    static readonly settingStorageKeys = ["contemporary", "Pentamond3-soloBGM", "Pentamond3-graphicSetting", "Pentamond3-volumeSetting", ControllerSettingManager.storageKey];
+    private static multiBGMKey = "Pentamond3-multiBGM";
+    static readonly settingStorageKeys = ["contemporary", "Pentamond3-soloBGM", "Pentamond3-multiBGM", "Pentamond3-graphicSetting", "Pentamond3-volumeSetting", ControllerSettingManager.storageKey];
     private static availableBGMs = new Set<string>(bgmTracks.map(({ name }) => name));
 
     static save() {
@@ -28,6 +29,7 @@ export class DataManager {
         try {
             localStorage.setItem(DataManager.saveName, DataCompressor.compressArray(data, this.key));
             localStorage.setItem(DataManager.soloBGMKey, globalValues.soloBGM);
+            localStorage.setItem(DataManager.multiBGMKey, globalValues.multiBGM);
             localStorage.setItem("Pentamond3-graphicSetting", JSON.stringify(globalValues.graphic));
         } catch (error) {
             console.warn("設定を保存できませんでした。現在のプレイには反映されます。", error);
@@ -51,6 +53,8 @@ export class DataManager {
             }
             const soloBGM = localStorage.getItem(DataManager.soloBGMKey);
             if (soloBGM && this.availableBGMs.has(soloBGM)) globalValues.soloBGM = soloBGM;
+            const multiBGM = localStorage.getItem(DataManager.multiBGMKey);
+            if (multiBGM && this.availableBGMs.has(multiBGM)) globalValues.multiBGM = multiBGM;
             const graphicSetting = localStorage.getItem("Pentamond3-graphicSetting");
             if (graphicSetting) {
                 try {
@@ -88,6 +92,7 @@ export class DataManager {
         globalValues.bgmVolume = 10;
         globalValues.seVolume = 10;
         globalValues.soloBGM = "ならべてトライアングル";
+        globalValues.multiBGM = "Top of the Pyramid";
         globalValues.graphic = { putShake: true, removeShake: true, playBackground: true };
         Music.s$masterBGMVolume = 1;
         Music.s$masterSEVolume = 1;
