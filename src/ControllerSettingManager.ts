@@ -8,6 +8,8 @@ import { MyEvent } from "./Utilities/MyEventListener";
 import { sceneManager } from "./Utilities/SceneManager";
 import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 import { PageNotice } from "./Utilities/Feedback/PageNotice";
+import { formatControllerInput } from "./ControllerInputLabels";
+import { spaceJapanesePunctuation } from "./Utilities/Text/JapaneseText";
 
 type ControllerAction = keyof GamepadConfig;
 
@@ -25,7 +27,7 @@ const actionLabels: Record<ControllerAction, string> = {
 };
 
 const actions = Object.keys(actionLabels) as ControllerAction[];
-const maxBindingsPerAction = 3;
+const maxBindingsPerAction = 4;
 
 type StoredControllerSettings = {
     version: 1;
@@ -147,7 +149,7 @@ export class ControllerSettingManager {
         this.selectedSlot = slot;
         this.save();
         this.render();
-        this.setStatus(slot === 0 ? "初期配置を使用します。" : `編集用${slot}を使用します。操作を選ぶと割り当てを編集できます。`);
+        this.setStatus(slot === 0 ? "初期配置を使用します。" : `編集用${slot}を使用します。 操作を選ぶと編集できます（1操作につき${maxBindingsPerAction}入力まで）。`);
     }
 
     private static selectPlayerSlot(playerIndex: number, slot: number): void {
@@ -268,7 +270,15 @@ export class ControllerSettingManager {
             const label = button.querySelector<HTMLElement>(".controllerMappingLabel");
             const value = button.querySelector<HTMLElement>(".controllerMappingValue");
             if (label) label.textContent = actionLabels[action];
-            if (value) value.textContent = config[action].length ? config[action].map((input) => this.formatInput(input)).join(" / ") : "登録なし";
+            if (value) {
+                value.replaceChildren();
+                (config[action].length ? config[action] : [null]).forEach((input) => {
+                    const binding = document.createElement("span");
+                    binding.className = "controllerMappingInput";
+                    binding.textContent = input ? this.formatInput(input) : "登録なし";
+                    value.appendChild(binding);
+                });
+            }
             button.classList.toggle("readOnlyMapping", this.selectedSlot === 0);
         });
         const resetButton = document.getElementById("controllerSettingReset");
@@ -284,7 +294,7 @@ export class ControllerSettingManager {
 
     private static setStatus(message: string): void {
         const status = document.getElementById("controllerSettingStatus");
-        if (status) status.textContent = message;
+        if (status) status.textContent = spaceJapanesePunctuation(message);
     }
 
     private static save(): void {
@@ -350,10 +360,6 @@ export class ControllerSettingManager {
     }
 
     private static formatInput(input: string): string {
-        const button = input.match(/^button:(\d+)$/);
-        if (button) return `ボタン${button[1]}`;
-        const stick = input.match(/^stick:([+-])(\d+)$/);
-        if (stick) return `スティック${stick[2]}${stick[1] === "+" ? "＋" : "－"}`;
-        return input;
+        return formatControllerInput(input);
     }
 }

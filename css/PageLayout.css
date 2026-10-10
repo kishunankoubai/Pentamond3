@@ -729,16 +729,18 @@
 
 #controllerSetting {
     justify-content: flex-start;
-    padding-top: 14cqh;
+    padding-top: 18cqh;
     box-sizing: border-box;
 
     & .controllerPresetRow {
         display: flex;
-        gap: 3cqh;
+        gap: 7cqh;
 
         & .button {
+            position: relative;
             margin-left: 0;
-            font-size: 3.2cqh;
+            font-size: 4.5cqh;
+            &::before { position: absolute; right: 100%; font-size: 4.5cqh; }
         }
 
         & .selectedValue {
@@ -748,50 +750,60 @@
     }
 
     & #controllerSettingStatus {
-        margin: 1.5cqh 0;
-        min-height: 4cqh;
-        font-size: 4cqh;
-        /* color: #567; */
+        margin: 2cqh 0;
+        min-height: 5cqh;
+        max-width: 128cqh;
+        font-size: 3.2cqh;
         color: #6bd;
     }
 
     & .controllerMappingGrid {
         display: grid;
-        grid-template-columns: repeat(2, 70cqh);
-        gap: 1.2cqh 4cqh;
+        width: 128cqh;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.7cqh 8cqh;
 
         & .controllerMappingButton {
+            position: relative;
             margin-left: 0;
-            height: 7cqh;
+            min-width: 0;
+            height: 8.5cqh;
+            padding: 0.3cqh 0;
+            box-sizing: border-box;
             display: grid;
-            grid-template-columns: 14cqh 1fr;
+            grid-template-columns: 13cqh minmax(0, 1fr);
+            gap: 1cqh;
             align-items: center;
-            border: 0.35cqh solid #6bd8;
-            border-radius: 1.2cqh;
-            background-color: #eefb;
+            border: none;
+            border-bottom: 0.3cqh solid #6bd5;
 
             &::before {
-                display: none;
+                position: absolute;
+                right: 100%;
+                font-size: 4.5cqh;
             }
 
             &:focus {
-                background-color: #ff90be88;
+                border-bottom: 0.3cqh solid #ff90be;
+                & .controllerMappingLabel { color: inherit; }
             }
 
             & span {
-                font-size: 2.8cqh;
+                font-size: 2.9cqh;
             }
 
             & .controllerMappingLabel {
-                color: #567;
+                color: #6bd;
                 text-align: left;
-                padding-left: 1.5cqh;
             }
 
             & .controllerMappingValue {
-                color: #d76;
-                text-align: right;
-                padding-right: 1.5cqh;
+                color: inherit;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                gap: 0.5cqh 1.5cqh;
+                & .controllerMappingInput { color: inherit; white-space: nowrap; line-height: 1.2; }
             }
 
             &.waitingInput {
@@ -799,15 +811,14 @@
                 background-color: #fff0f6;
             }
 
-            &.readOnlyMapping {
-                opacity: 0.75;
-            }
         }
     }
 
     & #controllerSettingReset {
-        margin: 1.5cqh 0 0;
-        font-size: 4cqh;
+        position: relative;
+        margin: 2cqh 0 0;
+        font-size: 4.5cqh;
+        &::before { position: absolute; right: 100%; font-size: 4.5cqh; }
         background: none;
         border-color: #22222200;
         &:focus {
@@ -823,31 +834,44 @@
 
 #controllerBindingSetting {
     & .controllerBindingPopup {
+        /* 見出し・戻るの領域を確保し、最大4入力でも本文と重ならない。 */
+        box-sizing: border-box;
+        justify-content: flex-start;
+        padding: 16cqh 5cqh 13cqh;
+        gap: 2cqh;
+
         & #controllerBindingStatus {
-            font-size: 4cqh;
+            font-size: 3.2cqh;
+            min-height: 6cqh;
+            flex-shrink: 0;
         }
 
         & #controllerBindingList {
-            max-height: 42cqh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            scrollbar-gutter: stable;
+            width: 100%;
+            min-height: 27cqh;
+            flex-shrink: 0;
             gap: 0.5cqh;
 
             & .controllerBindingDelete {
+                position: relative;
                 margin-left: 0;
                 font-size: 4cqh;
+                line-height: 1.4;
+                &::before { position: absolute; right: 100%; font-size: 4cqh; }
             }
 
             & .controllerBindingEmpty {
                 font-size: 4cqh;
-                color: #888;
+                color: #6bd;
             }
         }
 
         & #controllerBindingAdd {
+            position: relative;
             margin-left: 0;
             font-size: 4cqh;
+            flex-shrink: 0;
+            &::before { position: absolute; right: 100%; font-size: 4cqh; }
 
             &[aria-disabled="true"] {
                 opacity: 0.35;
@@ -1049,36 +1073,48 @@
 }
 
 #soundTest {
-    padding-top: 16cqh;
-    justify-content: start;
+    padding: 14cqh 0 11cqh;
+    box-sizing: border-box;
+    justify-content: center;
     & .soundTestPanel {
         display: flex;
         flex-direction: column;
-        gap: 6cqh;
-        width: 90%;
+        gap: 7cqh;
+        width: 128cqh;
     }
     & #soundTestStatus {
-        font-size: 5cqh;
+        width: 100%;
+        font-size: 4cqh;
+        line-height: 1.6;
         text-align: center;
-        min-height: 4cqh;
+        min-height: 8cqh;
     }
     & .soundTestTrackSelection {
         gap: 3cqh;
+        width: 100%;
         & .label,
         & .selector {
             font-size: 5cqh;
         }
         & .selector {
             color: #ee8888;
-            margin-left: 0cqh;
+            margin-left: 0;
+            position: relative;
+            max-width: 100cqh;
+            text-wrap: wrap;
+            text-align: center;
+            &::before { position: absolute; right: 100%; font-size: 5cqh; }
         }
     }
     & .soundTestControls {
-        gap: 3cqh;
+        gap: 8cqh;
         & .button {
-            font-size: 5cqh;
+            position: relative;
+            font-size: 4.8cqh;
             &::before {
-                font-size: 5cqh;
+                position: absolute;
+                right: 100%;
+                font-size: 4.8cqh;
             }
         }
     }
@@ -1092,33 +1128,55 @@
 }
 
 #dataSetting {
-    padding-top: 17cqh;
-    justify-content: start;
-    gap: 2cqh;
+    padding-top: 19cqh;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    gap: 3cqh;
     & #dataInformation {
+        width: 124cqh;
         display: flex;
         flex-direction: column;
-        gap: 1cqh;
-        & .label,
-        & span {
-            font-size: 4.5cqh;
-        }
-        margin-bottom: 1cqh;
+        gap: 2cqh;
+    }
+    & .dataManagementRow {
+        display: grid;
+        grid-template-columns: 47cqh 28cqh minmax(0, 1fr);
+        gap: 4cqh;
+        width: 100%;
+        height: 12cqh;
+        border-bottom: 0.3cqh solid #6bd5;
+    }
+    & .dataManagementLabel {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8cqh;
+        font-size: 4.5cqh;
+        & .dataManagementNote { font-size: 3cqh; text-align: left; }
+    }
+    & .dataManagementSize {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1.5cqh;
+        & span { font-size: 4.5cqh; }
+    }
+    & .button:not(.back) {
+        position: relative;
+        margin-left: 0;
+        justify-self: end;
+        font-size: 4.5cqh;
+        &::before { position: absolute; right: 100%; font-size: 4.5cqh; }
+    }
+    & .dataManagementTotal {
+        & .dataManagementLabel { color: #289; font-size: 5.5cqh; }
+        & .button { color: #ee8888; }
+        & .button:focus { color: #ff90be; }
     }
     & #dataDeleteStatus {
-        font-size: 4cqh;
+        font-size: 3.5cqh;
         text-align: center;
         min-height: 3.5cqh;
         max-width: 90%;
-    }
-    & .options {
-        gap: 1.5cqh;
-        & .button {
-            font-size: 5cqh;
-            &::before {
-                font-size: 5cqh;
-            }
-        }
     }
 }
 

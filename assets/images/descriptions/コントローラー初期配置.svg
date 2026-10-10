@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 440" role="img" aria-labelledby="title description">
+  <title id="title">コントローラーの初期配置</title>
+  <desc id="description">方向キーと左スティックは左右と下で移動、上で設置。 L1、L2、R1、R2はホールド。 丸下ボタンで左回転、丸右ボタンで右回転、丸左ボタンで一手戻し、丸上ボタンで消去。 中央左・中央右ボタンでポーズ。</desc>
+  <g font-family="sans-serif" font-size="32" fill="#228899" text-anchor="middle">
+    <path d="M352 111 H688 C717 112 733 132 742 164 L781 306 C791 342 784 368 761 377 C737 386 716 370 696 343 L658 297 Q631 311 602 311 H438 Q409 311 382 297 L344 343 C324 370 303 386 279 377 C256 368 249 342 259 306 L298 164 C307 132 323 112 352 111Z" fill="#e6f4fa" stroke="#66bbdd" stroke-width="4"/>
+    <rect x="328" y="83" width="90" height="27" rx="10" fill="#c7e8f2" stroke="#66bbdd" stroke-width="3"/>
+    <rect x="622" y="83" width="90" height="27" rx="10" fill="#c7e8f2" stroke="#66bbdd" stroke-width="3"/>
+    <text x="520" y="40">L1・L2・R1・R2：ホールド</text>
+    <path d="M355 50 L375 80 M685 50 L665 80" fill="none" stroke="#66bbdd" stroke-width="3"/>
+    <path d="M363 146 H388 V172 H415 V197 H388 V224 H363 V197 H337 V172 H363Z" fill="#b5dbe8" stroke="#66bbdd" stroke-width="3"/>
+    <text x="376" y="167" font-size="19">↑</text><text x="376" y="218" font-size="19">↓</text>
+    <text x="349" y="192" font-size="19">←</text><text x="402" y="192" font-size="19">→</text>
+    <circle cx="436" cy="271" r="35" fill="#c7e8f2" stroke="#66bbdd" stroke-width="3"/>
+    <text x="436" y="279">↑</text>
+    <circle cx="607" cy="271" r="35" fill="#c7e8f2" stroke="#66bbdd" stroke-width="3"/>
+    <rect x="475" y="168" width="32" height="18" rx="7" fill="#66bbdd"/><rect x="533" y="168" width="32" height="18" rx="7" fill="#66bbdd"/>
+    <g fill="#ffca3e" stroke="#e5b833" stroke-width="2"><circle cx="665" cy="150" r="16"/><circle cx="695" cy="181" r="16"/><circle cx="665" cy="212" r="16"/><circle cx="635" cy="181" r="16"/></g>
+    <text x="160" y="131">上：設置</text><text x="160" y="164">左右・下：移動</text>
+    <path d="M295 172 L331 180" fill="none" stroke="#66bbdd" stroke-width="3"/>
+    <text x="150" y="261">左スティック</text><text x="150" y="296">上：設置</text><text x="150" y="331">左右・下：移動</text>
+    <path d="M290 281 L398 273" fill="none" stroke="#66bbdd" stroke-width="3"/>
+    <g font-size="27"><text x="885" y="112">丸上：消去</text><text x="885" y="156">丸右：右回転</text><text x="885" y="200">丸下：左回転</text><text x="885" y="244">丸左：一手戻し</text></g>
+    <path d="M745 106 L686 146 M745 150 L716 181 M745 194 L687 212 M745 238 L634 201" fill="none" stroke="#66bbdd" stroke-width="2"/>
+    <path d="M491 193 L520 350 L549 193 M520 350 V367" fill="none" stroke="#66bbdd" stroke-width="2"/><text x="520" y="409">中央左・中央右：ポーズ</text>
+  </g>
+</svg>

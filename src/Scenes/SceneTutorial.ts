@@ -63,12 +63,12 @@ const padLabels: Record<OperateName, string> = {
     "move-left": "スティック／方向キー←",
     "move-right": "スティック／方向キー→",
     "move-down": "スティック／方向キー↓",
-    put: "L1／L2 (4／6)",
-    "spin-left": "ボタン0",
-    "spin-right": "ボタン1",
-    hold: "R1／R2 (5／7)",
-    unput: "ボタン2",
-    removeLine: "ボタン3",
+    put: "方向キー上／左スティック上",
+    "spin-left": "丸下ボタン",
+    "spin-right": "丸右ボタン",
+    hold: "L1／L2／R1／R2 (4／6／5／7)",
+    unput: "丸左ボタン",
+    removeLine: "丸上ボタン",
 };
 
 export class SceneTutorial extends Scene {
@@ -701,7 +701,7 @@ export class SceneTutorial extends Scene {
         for (const op of allowed.filter((op) => !op.startsWith("move-"))) controls.push(`${this.controlsFor(op)}：${operationLabels[op]}`);
         if (this.usingController) controls.push("教習中は初期配置を使用します。");
         this.setText("lessonControls", controls.join(this.model instanceof TrickPracticeBoard ? "　" : "\n"));
-        const pauseHint = this.usingController ? "ボタン8／9：ポーズ" : "Esc／P：ポーズ";
+        const pauseHint = this.usingController ? "中央左／中央右ボタン：ポーズ" : "Esc／P：ポーズ";
         this.setText("lessonPauseHint", this.model instanceof BasicRuleBoard && Number.isFinite(this.model.gameTime) ? pauseHint : `時間制限なし ／ ${pauseHint}`);
     }
 
