@@ -4,6 +4,7 @@ import { InputInfo, InputObserver } from "./InputObserver";
 import { MyEvent } from "../MyEventListener";
 import { MusicManager } from "../Music/MusicManager";
 import { initializeInteractionElements, isInteractionEnabled } from "../Element/InteractionElement";
+import { InputActivation } from "./InputActivation";
 
 type InteractionElement = {
     element: HTMLElement;
@@ -24,6 +25,7 @@ export class PageInteraction {
     private inputEvents: MyEvent[] = [];
     private readonly focusHandler = (event: FocusEvent) => {
         if (event.target instanceof HTMLElement && event.target.matches("[data-xy]")) {
+            this.scene.g$pageManager.rememberFocus(event.target);
             MusicManager.get("フォーカス")?.play();
         }
     };
@@ -32,6 +34,7 @@ export class PageInteraction {
             MusicManager.get("ボタン")?.play();
         }
     };
+    private readonly pointerHandler = () => { PageInteraction.firstFocus = false; };
 
     constructor(scene: Scene, private readonly acceptsInput: (input: InputObserver) => boolean = () => true) {
         this.scene = scene;
@@ -55,6 +58,7 @@ export class PageInteraction {
         this.isValid = true;
         document.addEventListener("focusin", this.focusHandler);
         document.addEventListener("click", this.clickHandler);
+        document.addEventListener("pointerdown", this.pointerHandler);
     }
 
     stop() {
@@ -62,6 +66,7 @@ export class PageInteraction {
         this.isValid = false;
         document.removeEventListener("focusin", this.focusHandler);
         document.removeEventListener("click", this.clickHandler);
+        document.removeEventListener("pointerdown", this.pointerHandler);
         inputManager.removeEvent(this.inputEvents);
         this.inputEvents = [];
     }
@@ -80,7 +85,7 @@ export class PageInteraction {
 
         if (PageInteraction.firstFocus) {
             const elements = this.g$validElements;
-            if (elements.length) elements[0].element.focus();
+            if (!this.scene.g$pageManager.g$isReturning && elements.length) elements[0].element.focus();
 
             PageInteraction.firstFocus = false;
         }
@@ -181,7 +186,7 @@ export class PageInteraction {
         if (this.backElement) {
             if (["KeyX", "Escape", "Backspace", "button:0"].includes(inputName)) {
                 PageInteraction.firstFocus = true;
-                this.backElement.element.click();
+                InputActivation.run(() => this.backElement!.element.click());
                 return;
             }
         }
@@ -208,7 +213,7 @@ export class PageInteraction {
 
         if (["Enter", "Space", "KeyZ", "button:1"].includes(inputName)) {
             PageInteraction.firstFocus = true;
-            activeElement.element.click();
+            InputActivation.run(() => activeElement.element.click());
         }
     }
 }

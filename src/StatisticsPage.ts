@@ -8,7 +8,7 @@ export function setupStatisticsPage(scene: Scene): void {
         document.querySelectorAll<HTMLElement>("#information [data-statistic]").forEach((element) => {
             const value = data[element.dataset.statistic as PlayStatisticKey];
             element.textContent = element.dataset.format === "time"
-                ? (value ? `${(value / 1000).toFixed(3)} 秒` : "—")
+                ? (value ? (value / 1000).toFixed(2) : "—")
                 : value.toLocaleString("ja-JP");
         });
     };

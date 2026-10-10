@@ -11,6 +11,7 @@ export class ElementEventSetter extends SceneSetter {
     }
 
     protected progressSet(): void {
+        this.scene.g$pageManager.addHandler("restoreFocusSubPage", (index: number) => this.elementManager.openSubPage(index));
         const controller = new AbortController();
         // 個別ボタンの設定処理が済んでから遷移する。動的なボタンにも適用する。
         document.querySelector(".sceneContainer")?.addEventListener("click", (event) => {

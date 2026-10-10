@@ -3,11 +3,16 @@ import { LifeCounter } from "../Flags";
 import { MyEventListener } from "../MyEventListener";
 import { Page } from "./Page";
 import { Scene, SceneClass, sceneManager } from "../SceneManager";
+import { initializeInteractionElements, isInteractionEnabled } from "../Element/InteractionElement";
+import { InputActivation } from "../Interaction/InputActivation";
+
+type PageFocus = { id: string; coordinate: string; index: number; subPageIndex: number };
 
 type PageMemory = {
     scene: SceneClass;
     displayingPageIds: string[];
     principlePageId: string;
+    focus?: PageFocus;
 };
 
 export class PageManager extends MyEventListener {
@@ -26,6 +31,7 @@ export class PageManager extends MyEventListener {
     private static pageMemories: PageMemory[] = [];
     private readonly sceneClass: SceneClass;
     private hasOpenedPage = false;
+    private returning = false;
 
     private initializeFlag: LifeCounter = new LifeCounter(1);
     private pages: Page[] = [];
@@ -47,6 +53,35 @@ export class PageManager extends MyEventListener {
     }
     get g$currentPage(): Page | undefined {
         return this.getPage(this.g$currentPageId);
+    }
+
+    get g$isReturning(): boolean {
+        return this.returning;
+    }
+
+    /** 履歴ごとに記録し、何階層戻ってもそのページの選択位置を保つ。 */
+    rememberFocus(element: Element | null): void {
+        const memory = PageManager.pageMemories.at(-1);
+        const page = this.g$currentPage?.g$element;
+        if (!memory || memory.scene !== this.sceneClass || !page || !(element instanceof HTMLElement) || !page.contains(element)) return;
+        const elements = Array.from(page.querySelectorAll<HTMLElement>("[data-xy]"));
+        const index = elements.indexOf(element);
+        if (index < 0) return;
+        const subPageIndex = Array.from(page.querySelectorAll<HTMLElement>(".subPage")).findIndex((subPage) => subPage.getClientRects().length > 0);
+        memory.focus = { id: element.id, coordinate: element.dataset.xy!, index, subPageIndex };
+    }
+
+    private restoreFocus(focus?: PageFocus): void {
+        const page = this.g$currentPage?.g$element;
+        if (!page) return;
+        if (focus && focus.subPageIndex >= 0) this.executeEvent("restoreFocusSubPage", focus.subPageIndex);
+        initializeInteractionElements(page);
+        const elements = Array.from(page.querySelectorAll<HTMLElement>("[data-xy]"));
+        const valid = (element: HTMLElement) => element.getClientRects().length > 0 && !element.classList.contains("closing") && isInteractionEnabled(element);
+        const remembered = focus?.id
+            ? elements.find((element) => element.id === focus.id)
+            : focus && elements[focus.index]?.dataset.xy === focus.coordinate ? elements[focus.index] : undefined;
+        (remembered && valid(remembered) ? remembered : elements.find(valid))?.focus();
     }
 
     /**
@@ -91,6 +126,7 @@ export class PageManager extends MyEventListener {
      * @param displayPageIds 表示するページのidの配列
      */
     private setPagesVisibility(displayPageIds: string[], closeImmediately: boolean = false): void {
+        this.rememberFocus(document.activeElement);
         // 同じページを複数回開いても履歴上は一つとして扱う。
         displayPageIds = [...new Set(displayPageIds)];
         if (displayPageIds.some((id) => !this.getPage(id))) throw Error("指定されたページが存在しません");
@@ -169,6 +205,8 @@ export class PageManager extends MyEventListener {
      * @param eventIgnore イベントを無視するか
      */
     async backPage(back: number, eventIgnore: boolean = false): Promise<boolean> {
+        // シーン読み込みのawaitを挟んでも、戻る操作の入力手段を引き継ぐ。
+        const restoreInputFocus = InputActivation.active;
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
         if (back <= 0) return false;
 
@@ -195,17 +233,25 @@ export class PageManager extends MyEventListener {
             prevLayer = this.g$currentPage!.g$layer;
         }
 
-        if (!eventIgnore) {
-            pageManager.executeEvent(["changePage", `changePage-${memory.principlePageId}`], memory.principlePageId);
-            const closePageIds = getFilteredArray(currentMemory.displayingPageIds, memory.displayingPageIds);
-            if (closePageIds.length) this.executeEvent("closePage");
-            closePageIds.forEach((pageId) => {
-                this.executeEvent(`closePage-${pageId}`);
-            });
-            if (layer >= prevLayer)
-                pageManager.executeEvent(["trueBackPage", `trueBackPage-${memory.principlePageId}`, "trueChangePage", `trueChangePage-${memory.principlePageId}`], memory.principlePageId);
-            pageManager.executeEvent(["backPage", `backPage-${memory.principlePageId}`], memory.principlePageId);
-        }
+        const restoredMemory = PageManager.pageMemories.at(-1)!;
+        const focus = memory.focus;
+        restoredMemory.focus = focus;
+        pageManager.returning = true;
+        try {
+            if (!eventIgnore) {
+                pageManager.executeEvent(["changePage", `changePage-${memory.principlePageId}`], memory.principlePageId);
+                const closePageIds = getFilteredArray(currentMemory.displayingPageIds, memory.displayingPageIds);
+                if (closePageIds.length) this.executeEvent("closePage");
+                closePageIds.forEach((pageId) => {
+                    this.executeEvent(`closePage-${pageId}`);
+                });
+                if (layer >= prevLayer)
+                    pageManager.executeEvent(["trueBackPage", `trueBackPage-${memory.principlePageId}`, "trueChangePage", `trueChangePage-${memory.principlePageId}`], memory.principlePageId);
+                pageManager.executeEvent(["backPage", `backPage-${memory.principlePageId}`], memory.principlePageId);
+            }
+            // 動的な一覧やサブページの更新を済ませてから復元する。
+            if (restoreInputFocus && PageManager.pageMemories.at(-1) === restoredMemory) pageManager.restoreFocus(focus);
+        } finally { pageManager.returning = false; }
         return true;
     }
 
@@ -214,6 +260,7 @@ export class PageManager extends MyEventListener {
      * @param back 戻るページ数
      */
     async backPageImmediately(back: number): Promise<boolean> {
+        const restoreInputFocus = InputActivation.active;
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
         if (back <= 0) return false;
 
@@ -231,6 +278,8 @@ export class PageManager extends MyEventListener {
         }
         PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
         pageManager.setPagesVisibility(memory.displayingPageIds, true);
+        PageManager.pageMemories.at(-1)!.focus = memory.focus;
+        if (restoreInputFocus) pageManager.restoreFocus(memory.focus);
         return true;
     }
 

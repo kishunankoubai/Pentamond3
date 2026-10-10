@@ -27,10 +27,12 @@ export class PageInteractionSetter extends SceneSetter {
         const observer = new MutationObserver(() => initializeInteractionElements(container));
         observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-xy", "aria-disabled", "disabled"] });
         container.addEventListener("mouseover", (event) => {
+            if (document.body.classList.contains("cursorHidden")) return;
             const element = findElement(event);
             if (element && isInteractionEnabled(element)) element.focus({ preventScroll: true });
         }, options);
         container.addEventListener("mouseout", (event) => {
+            if (document.body.classList.contains("cursorHidden")) return;
             const element = findElement(event);
             if (element && !(event.relatedTarget instanceof Node && element.contains(event.relatedTarget)) && document.activeElement === element) element.blur();
         }, options);
@@ -44,7 +46,11 @@ export class PageInteractionSetter extends SceneSetter {
             if (element) PageInteraction.updateLastOperateTime();
             if (element?.classList.contains("rangeContainer")) element.focus();
         }, { ...options, capture: true });
-        document.addEventListener("mousemove", () => document.body.classList.remove("cursorHidden"), options);
+        document.addEventListener("mousemove", (event) => {
+            document.body.classList.remove("cursorHidden");
+            const element = findElement(event);
+            if (element && isInteractionEnabled(element)) element.focus({ preventScroll: true });
+        }, options);
         this.scene.addHandler("sceneEnd", () => {
             controller.abort();
             observer.disconnect();
