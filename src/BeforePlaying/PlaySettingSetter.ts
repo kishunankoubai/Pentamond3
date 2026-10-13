@@ -82,8 +82,33 @@ export class PlaySettingSetter {
     private static render(): void {
         const modeHelpButton = document.getElementById("playPrepareModeHelpButton");
         if (modeHelpButton) modeHelpButton.dataset.page = getModeHelpPageId(this.playSetting.mode, this.playSetting.playerNumber);
+        // 両段のボタンを同じ列に配置し、見た目と方向入力の座標を一致させる。
+        const prepare = document.getElementById("playPrepare");
+        if (prepare) prepare.dataset.mode = String(this.playSetting.mode);
         const trickListButton = document.getElementById("playPrepareTrickListButton");
-        if (trickListButton) trickListButton.hidden = this.playSetting.mode !== 1;
+        if (trickListButton) {
+            trickListButton.hidden = this.playSetting.mode !== 1;
+            trickListButton.dataset.xy = "[0,2]";
+        }
+        const back = prepare?.querySelector<HTMLElement>(".back");
+        if (back) back.dataset.xy = this.playSetting.mode === 1 ? "[-1,3]" : "[-1,2]";
+        const controls = document.getElementById("playPrepareControllerButton");
+        if (controls) controls.textContent = this.playSetting.playerNumber === 1 ? "操作設定" : "コントローラー";
+        const summary = document.getElementById("playPrepareSummary");
+        if (summary) {
+            const { mode, playerNumber, maxGameTime, targetLines, handy } = this.playSetting;
+            summary.replaceChildren();
+            const rule = document.createElement("div");
+            rule.className = "prepareRule";
+            rule.textContent = `${mode === 1 ? "サバイバル" : "十五列揃え"} ／ ${playerNumber === 1 ? "ひとりで" : `${playerNumber}人で`} ／ ${mode === 1 ? `持ち時間 ${maxGameTime === Infinity ? "∞" : maxGameTime}` : `${targetLines}列`}`;
+            summary.appendChild(rule);
+            if (mode === 1) {
+                const handicaps = document.createElement("div");
+                handicaps.className = "prepareHandicaps";
+                handicaps.textContent = "ハンデ　" + Array.from({ length: playerNumber }, (_, i) => `P${i + 1} ×${(handy[i] ?? 1).toFixed(1)}`).join("　");
+                summary.appendChild(handicaps);
+            }
+        }
 
         document.querySelectorAll<HTMLElement>("#survivalPlaySetting [data-max-time]").forEach((button) => {
             const value = button.dataset.maxTime === "Infinity" ? Infinity : Number(button.dataset.maxTime);

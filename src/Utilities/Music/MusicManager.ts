@@ -27,7 +27,11 @@ export class MusicManager {
             if (candidate.data.type === "BGM" && candidate !== music) candidate.stop();
         });
         music.setVolume(1);
-        try { await music.play(); }
+        try {
+            await music.ensurePlaying();
+            // サウンドテストから同じ曲を引き継ぐ場合も、通常BGMのループへ戻す。
+            music.setLoop(music.data.loop);
+        }
         catch (error) { console.warn(`BGM「${name}」を再生できませんでした`, error); }
     }
 

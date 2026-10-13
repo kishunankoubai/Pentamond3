@@ -64,19 +64,19 @@ export class SoundTest {
                 this.resetShuffle();
                 void this.playTrack(true);
             } else if (pageId !== "soundTestSelector" && this.active) {
-                this.close();
-                void MusicManager.playExclusiveBGM("つみきのおしろ");
+                // 戻り先が同じ曲なら、そのまま引き継ぐ。別の曲はMusicManagerが停止する。
+                this.close(false);
             }
         });
         this.render();
     }
 
-    close(): void {
+    close(stopMusic = true): void {
         this.active = false;
         this.playing = false;
         this.loading = false;
         ++this.generation;
-        this.music?.stop();
+        if (stopMusic) this.music?.stop();
         this.music = undefined;
     }
 

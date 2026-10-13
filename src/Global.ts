@@ -8,5 +8,10 @@ export const globalValues = {
         putShake: true,
         removeShake: true,
         playBackground: true,
+        damageEffects: true,
+        timeWarningEffect: true,
+        playNotifications: true,
+        reducedMotion: false,
+        blockSymbols: false,
     },
 };

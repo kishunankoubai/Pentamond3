@@ -68,7 +68,11 @@ export class ControllerRegisterer {
         });
         qsAddEvent("#playPrepareControllerButton", "click", () => {
             const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
-            pageManager.openPage(playerNumber === 1 ? "controllerSetting" : "playerControllerSetting");
+            pageManager.openPage(playerNumber === 1 ? "operationSetting" : "playerControllerSetting");
+        });
+        pageManager.addHandler("changePage-playPrepare", () => {
+            const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
+            this.gamepadConfigs = playerNumber === 1 ? [ControllerSettingManager.getSelectedConfig()] : ControllerSettingManager.getPlayerConfigs(playerNumber);
         });
         qsAddEvent("#playerControllerSetting .back", "click", () => {
             const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;

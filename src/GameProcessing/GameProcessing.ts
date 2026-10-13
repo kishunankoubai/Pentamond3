@@ -226,7 +226,8 @@ export class GameProcessing {
         inputManager.removeVirtualInputs();
 
         ResultPageHandler.updateResultLabels(game.game.g$resultText);
-        ResultPageHandler.setSaveButton();
+        ResultPageHandler.setSaveButton(game);
+        ResultPageHandler.updateHighlights(game);
         ResultPageHandler.updateDetailedResultPage(game);
     }
 
@@ -244,6 +245,7 @@ export class GameProcessing {
 
         ResultPageHandler.updateResultLabels(game.game.g$resultText);
         ResultPageHandler.OverWriteTime(game.replayData.finishTime);
+        ResultPageHandler.updateHighlights(game);
         ResultPageHandler.updateDetailedResultPage(game);
     }
 
@@ -310,10 +312,18 @@ export class GameProcessing {
         const speed = document.getElementById("replayPlaybackSpeed");
         if (status) status.textContent = this.currentGame?.g$isPlaying && this.replayControlsEnabled ? "再生中" : "停止中";
         if (speed) speed.textContent = `×${this.g$replaySpeed}`;
+        this.updateReplayTimeDisplay();
 
         const controls = document.getElementById("replayControls");
         controls?.classList.toggle("disabled", !this.replayControlsEnabled);
         const resume = document.getElementById("replayResumeButton");
         if (resume) setInteractionEnabled(resume, this.replayControlsEnabled && !this.currentGame?.g$hasFinished);
+    }
+
+    static updateReplayTimeDisplay(): void {
+        const display = document.getElementById("replayElapsedTime");
+        if (!display || !this.isReplaying()) return;
+        const duration = this.currentGame.replayData.finishTime;
+        display.textContent = `${(Math.min(duration, this.currentGame.clock.now) / 1000).toFixed(2)} / ${(duration / 1000).toFixed(2)}`;
     }
 }

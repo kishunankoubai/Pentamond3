@@ -2,11 +2,12 @@
     <div class="page" id="result">
         <div class="label headingLabel">結果画面</div>
         <div class="resultLabel label"></div>
+        <div class="resultSummary"></div>
+        <div class="resultHighlights" role="status" aria-live="polite"></div>
         <div class="options" data-direction="row">
             <div class="restart button" id="resultRestartButton" data-xy="[0,0]">もう一度</div>
             <div class="button" id="resultPlayPrepareButton" data-xy="[1,0]">プレイ準備</div>
-            <div class="button" id="resultModeSelectButton" data-xy="[2,0]">モード選択</div>
-            <div class="button" data-xy="[3,0]" data-page="detailedResult">詳細結果</div>
+            <div class="button" data-xy="[2,0]" data-page="detailedResult">詳細結果</div>
         </div>
         <div class="options" data-direction="row">
             <div class="saveReplayButton button" data-xy="[1,1]">リプレイを保存する</div>
@@ -19,6 +20,8 @@
     <div class="page" id="replayResult">
         <div class="label headingLabel">結果画面</div>
         <div class="resultLabel label"></div>
+        <div class="resultSummary"></div>
+        <div class="resultHighlights"></div>
         <div class="options" data-direction="row">
             <div class="replayStart button" id="replayRestartButton" data-xy="[0,0]">もう一度</div>
             <div class="button" id="replayListButton" data-xy="[1,0]">リプレイ一覧へ</div>

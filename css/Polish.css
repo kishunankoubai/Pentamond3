@@ -1,0 +1,946 @@
+/* 色と共通操作の大きさは維持し、情報の階層と読みやすさを整える。 */
+:root {
+    --ink: #6bd;
+    --heading-ink: #228899;
+    --panel: #f4faffed;
+    --panel-border: #8cc8db;
+}
+body {
+    background-color: #f9fcff;
+}
+body::before {
+    opacity: 0.035;
+}
+.text,
+.label,
+.helpContent,
+.lessonGuide,
+.statisticRow,
+.controllerMappingLabel,
+.achievementCategory,
+.achievementDetail,
+.resultSummary {
+    text-shadow:
+        0 0 0.12cqh #fff,
+        0.07cqh 0.07cqh 0 #417c9359;
+}
+.button,
+.selector {
+    position: relative;
+    margin-left: 0;
+    text-shadow:
+        0 0 0.14cqh #fff,
+        0.08cqh 0.08cqh 0 #805a3a88;
+}
+.button::before,
+.selector::before {
+    content: "★";
+    position: static;
+    display: inline-block;
+    font-size: 1em;
+    width: 1em;
+    margin: 0 0.12em 0 -1.12em;
+    vertical-align: baseline;
+    white-space: normal;
+    pointer-events: none;
+}
+.replaySaveButton::before,
+.replayDeleteButton::before {
+    width: max-content;
+    margin: 0;
+    white-space: nowrap;
+}
+.button:focus,
+.selector:focus {
+    border-bottom-color: #ff90be;
+    text-shadow:
+        0 0 0.14cqh #fff,
+        0.08cqh 0.08cqh 0 #a94b7388;
+}
+.selectedValue:not(:focus) {
+    color: #228899 !important;
+    border-bottom-color: #228899 !important;
+    background-color: #dceff7;
+    box-shadow: inset 0 0 0 0.2cqh #78bbcd;
+    border-radius: 0.6cqh;
+}
+.selectedValue:focus {
+    color: #ff90be !important;
+    background-color: #dceff7;
+    box-shadow: inset 0 0 0 0.2cqh #78bbcd;
+    border-radius: 0.6cqh;
+}
+.button[data-controller-slot],
+.button[data-keyboard-custom],
+.button[data-max-time] {
+    padding-inline: 1.25cqh;
+    padding-inline-start: calc(1.25cqh + 1.12em);
+    border-radius: 0.6cqh;
+}
+.selector { padding-inline: 1.12em; }
+.button[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: default;
+    pointer-events: none;
+}
+.back {
+    position: absolute;
+}
+.headingLabel {
+    width: calc(100% - 10cqh);
+    padding: 0.8cqh 5cqh;
+    text-align: left;
+    font-size: 7cqh;
+    background: linear-gradient(90deg, #ddf2fa, #edf7fcdd);
+    border-color: #8cc8db;
+    box-shadow: 0 0.3cqh 0.6cqh #40708014;
+}
+.page:has(.popup) {
+    background: #172d4933;
+}
+.page:has(.popup) .popup {
+    background: #eff8ff;
+    border-color: #8cc8db;
+    box-shadow: 0 1cqh 4cqh #17304b33;
+}
+.page:has(.popup) .popup > .headingLabel {
+    left: 5cqh;
+    right: 5cqh;
+    width: auto;
+    padding: 1cqh 3cqh;
+    font-size: 5.5cqh;
+}
+.popup .text {
+    text-wrap: wrap;
+}
+
+.selectWithDescription {
+    width: max-content;
+    max-width: 140cqh;
+    gap: 5cqh;
+    align-items: center;
+}
+.selectWithDescriptionOptions {
+    flex: none;
+    margin-left: 0;
+    gap: 4cqh;
+    min-width: 0;
+    align-items: flex-end;
+}
+.selectOptionDescriptions {
+    flex: none;
+    width: 77cqh;
+}
+.selectOptionDescriptions > div {
+    min-height: 30cqh;
+    padding: 3cqh;
+    box-sizing: border-box;
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    background: var(--panel);
+    margin-left: 10cqh;
+}
+.selectOptionDescriptions .text {
+    margin: 0;
+    font-size: 4cqh;
+    line-height: 1.65;
+    text-wrap: nowrap;
+}
+.selectOptionDescriptions * {
+    animation-name: none;
+}
+.selectOptionDescriptions > div {
+    animation: descriptionAppear 240ms ease-out both;
+}
+@keyframes descriptionAppear {
+    from { opacity: 0; transform: translateX(1.5cqh); }
+    to { opacity: 1; transform: translateX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .selectOptionDescriptions > div { animation: descriptionFade 120ms ease-out both; }
+}
+@keyframes descriptionFade { from { opacity: 0; } to { opacity: 1; } }
+
+#pageStart {
+    gap: 3cqh;
+    cursor: pointer;
+    background: radial-gradient(ellipse at 50% 35%, #dcf5ffcc, #f7fbff80 65%);
+}
+.startEmblem {
+    width: 20cqh;
+    height: 20cqh;
+    filter: drop-shadow(0 0.6cqh 0.5cqh #286b8733);
+}
+.startWordmark {
+    color: #228899;
+    font-family: "RocknRoll One", Arial;
+    font-size: 15cqh;
+    letter-spacing: -0.4cqh;
+    line-height: 1.15;
+    text-shadow:
+        0 0.4cqh 0 #fff,
+        0 0.8cqh 0 #cce8f1;
+}
+.startWordmark > span {
+    font: inherit;
+    letter-spacing: inherit;
+    paint-order: stroke fill;
+    -webkit-text-stroke: 0.08cqh #52617855;
+}
+/* 盤面の6色を、淡い背景にも読める色へ馴染ませる。 */
+.startWordmark [data-mond="L"] { color: #d45469; }
+.startWordmark [data-mond="J"] { color: #c77c30; }
+.startWordmark [data-mond="p"] { color: #aa901d; }
+.startWordmark [data-mond="q"] { color: #3d9c78; }
+.startWordmark [data-mond="U"] { color: #537dcc; }
+.startWordmark [data-mond="I"] { color: #a768ac; }
+.startInvitation {
+    margin-top: 5cqh;
+    display: flex;
+    flex-direction: column;
+    gap: 2cqh;
+    padding: 2cqh 6cqh;
+    border-radius: 2cqh;
+    background: #fff9;
+    border: 0.3cqh solid #badfe9;
+}
+#pageStart .label#pageStartLabel {
+    font-size: 5cqh;
+    color: #228899;
+}
+#pageStart .label.startSoundNotice {
+    font-size: 3cqh;
+}
+
+#playPrepare {
+    gap: 4.5cqh;
+    padding-top: 12cqh;
+}
+#playPrepare .options {
+    display: grid;
+    grid-template-columns: repeat(2, 43cqh);
+    justify-items: center;
+    gap: 4.5cqh 8cqh;
+}
+#playPrepareTrickListButton {
+    grid-column: 1 / -1;
+}
+#playPrepareTrickListButton[hidden] {
+    display: none;
+}
+#playPrepare .playPrepareStartRow .button::before {
+    position: static;
+    right: auto;
+    white-space: normal;
+}
+.playPrepareSummary {
+    width: 120cqh;
+    padding: 2cqh 4cqh;
+    background: var(--panel);
+    border: 0.3cqh solid var(--panel-border);
+    border-radius: 1.5cqh;
+    text-align: center;
+}
+.prepareRule {
+    font-size: 3.7cqh;
+    color: #228899;
+}
+.prepareHandicaps {
+    margin-top: 1cqh;
+    font-size: 3cqh;
+}
+#playPrepare .options .button {
+    margin-left: 0;
+    font-size: 5cqh;
+}
+#playPrepare .playPrepareStartRow .playStart {
+    font-size: 6cqh;
+}
+
+.pauseMenu {
+    background-color: #edf6ffed;
+    gap: 5cqh;
+}
+.pauseMenu .pausePrimary {
+    margin-bottom: 2cqh;
+    padding: 2cqh 7cqh;
+    border-radius: 2cqh;
+    background: #fff;
+    border: 0.3cqh solid #bbdfe9;
+}
+.pauseMenu .pausePrimary .button {
+    font-size: 6cqh;
+}
+.pauseMenu .pauseSecondary .button {
+    font-size: 4.7cqh;
+}
+.pauseMenu .pauseSecondary {
+    gap: 10cqh;
+}
+
+#result,
+#replayResult {
+    padding: 17cqh 8cqh 5cqh;
+    justify-content: flex-start;
+    gap: 3cqh;
+}
+#result .resultLabel,
+#replayResult .resultLabel {
+    font-size: 8cqh;
+    line-height: 1.25;
+}
+#result .options,
+#replayResult .options {
+    gap: 8cqh;
+    margin: 0;
+}
+#result .options .button,
+#replayResult .options .button {
+    font-size: 4.7cqh;
+}
+.resultSummary {
+    display: flex;
+    justify-content: center;
+    width: 116cqh;
+    gap: 5cqh;
+    padding: 2cqh;
+    border-radius: 1.5cqh;
+    border: 0.3cqh solid var(--panel-border);
+    background: var(--panel);
+}
+.resultSummaryCell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5cqh;
+    min-width: 27cqh;
+}
+.resultSummaryCell span:first-child {
+    font-size: 2.8cqh;
+    color: #228899;
+}
+.resultSummaryCell span:last-child {
+    font-size: 4cqh;
+    font-family: "RocknRoll One", Arial;
+}
+.resultHighlights {
+    width: 116cqh;
+    min-height: 12cqh;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1cqh 3cqh;
+    align-content: center;
+}
+.recordBadge {
+    font-size: 3cqh;
+    padding: 0.8cqh 1.5cqh;
+    background: #fff6df;
+    border: 0.25cqh solid #e1bb64;
+    border-radius: 1cqh;
+}
+.achievementEarned {
+    display: flex;
+    gap: 1.5cqh;
+    width: 100%;
+}
+.achievementEarned span:last-child {
+    font-size: 2.8cqh;
+}
+.achievementEarned .achievementTriangle {
+    display: block;
+    flex: none;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    background: linear-gradient(135deg, #fff09a, #ca961b);
+    width: 3cqh;
+    height: 2.6cqh;
+}
+#detailedResult .subPage {
+    width: 132cqh;
+    padding: 3cqh;
+    background: var(--panel);
+    border-radius: 2cqh;
+    border: 0.3cqh solid #bbdfe9;
+    gap: 4cqh;
+}
+#detailedResult .subPage .text {
+    font-size: 3.3cqh;
+    line-height: 1.7;
+}
+#detailedResult .resultAccomplishments {
+    flex-direction: column;
+    align-items: flex-start;
+}
+#detailedResult .resultAccomplishments .text {
+    font-size: 3.6cqh;
+}
+
+.helpReference .helpContent {
+    background: var(--panel);
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    padding: 3cqh 4cqh;
+}
+.helpContent .text {
+    line-height: 1.75;
+}
+.helpTopic {
+    color: #228899;
+}
+.helpReference .helpKeyGrid {
+    gap: 1.5cqh 5cqh;
+}
+.helpReference .helpKeyGrid > div {
+    grid-template-columns: 25cqh minmax(0, 1fr);
+    padding-bottom: 1cqh;
+}
+.helpReference .helpKeyGrid span {
+    font-size: 3cqh;
+    line-height: 1.5;
+    text-wrap: wrap;
+}
+.helpReference .helpControllerImage {
+    height: 32cqh;
+    flex: none;
+}
+#howToOperate .helpContent {
+    height: 64cqh;
+}
+.helpReference .helpMenuMappings {
+    gap: 0.5cqh;
+}
+.helpReference .helpMenuContent {
+    gap: 1cqh;
+}
+.helpReference .helpMenuContent .helpNote {
+    font-size: 2.8cqh;
+    line-height: 1.5;
+}
+#information .subPage {
+    padding: 3cqh 4cqh;
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    background: var(--panel);
+}
+#achievements .achievementDetail {
+    padding: 2cqh 3cqh;
+    border-radius: 1.5cqh;
+    background: var(--panel);
+    height: 31cqh;
+}
+#achievements .achievementDetail #achievementNote {
+    font-size: 2.7cqh;
+    line-height: 1.65;
+}
+#achievements .achievementIcon {
+    border: 0.25cqh solid #cadce4;
+    background: #fff8;
+}
+#achievements .achievementIcon.unachieved {
+    border-style: dashed;
+}
+#achievements .achievementIcon.unachieved .achievementTriangle {
+    opacity: 0.5;
+}
+#achievements .achievementIcon:focus {
+    border-color: #ff90be;
+}
+#achievementProgress {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2cqh;
+}
+#achievementProgress[hidden] {
+    display: none;
+}
+#achievementProgressText {
+    font-size: 2.7cqh;
+    min-width: 25cqh;
+}
+.progressTrack {
+    width: 35cqh;
+    height: 1.3cqh;
+    background: #dde8ee;
+    border-radius: 1cqh;
+    overflow: hidden;
+}
+#achievementProgressFill {
+    height: 100%;
+    background: #6bd;
+    border-radius: inherit;
+}
+
+#keyboardSetting {
+    justify-content: flex-start;
+    padding-top: 18cqh;
+}
+#keyboardSetting .controllerPresetOptions {
+    gap: 9cqh;
+}
+#keyboardSetting .controllerPresetOptions .button {
+    font-size: 4.5cqh;
+}
+#keyboardSetting .controllerSettingStatus {
+    margin: 2cqh 0;
+    min-height: 5cqh;
+    max-width: 128cqh;
+    font-size: 3cqh;
+}
+#keyboardSetting .controllerMappingGrid {
+    display: grid;
+    width: 128cqh;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7cqh 8cqh;
+}
+#keyboardSetting .controllerMappingButton {
+    margin-left: 0;
+    min-height: 8.5cqh;
+    padding: 0.7cqh 0;
+    display: grid;
+    grid-template-columns: 13cqh minmax(0, 1fr);
+    gap: 1cqh;
+    border-bottom: 0.3cqh solid #6bd5;
+}
+#keyboardSetting .controllerMappingLabel {
+    color: #6bd;
+    font-size: 2.9cqh;
+    text-align: left;
+}
+#keyboardSetting .controllerMappingValue {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5cqh 1.5cqh;
+    color: inherit;
+}
+#keyboardSetting .controllerMappingInput {
+    font-size: 2.9cqh;
+    color: inherit;
+    white-space: nowrap;
+}
+#keyboardSetting .mappingReset {
+    font-size: 4.5cqh;
+    margin-top: 2cqh;
+}
+#keyboardSetting .controllerMappingButton:focus {
+    border-bottom-color: #ff90be;
+}
+.controllerMappingGrid {
+    border-radius: 1.5cqh;
+    background: #fff9;
+    padding: 0 2cqh;
+}
+.controllerMappingInput {
+    padding: 0.2cqh 0.6cqh;
+    border-radius: 0.5cqh;
+    background: none;
+}
+#keyboardBindingSetting .bindingPopup {
+    justify-content: flex-start;
+    padding: 16cqh 5cqh 13cqh;
+    gap: 2cqh;
+}
+#keyboardBindingSetting .bindingStatus {
+    font-size: 3.2cqh;
+    min-height: 6cqh;
+}
+#keyboardBindingList {
+    display: flex;
+    width: 100%;
+    min-height: 27cqh;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1cqh;
+}
+#keyboardBindingList .button {
+    font-size: 4cqh;
+}
+#keyboardBindingAdd {
+    font-size: 4cqh;
+}
+.waitingInput {
+    background: #fff0f7;
+    border-bottom-color: #ff90be;
+}
+#graphicSetting {
+    gap: 0.6cqh;
+    padding-top: 18cqh;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    align-items: center;
+}
+#graphicSetting > .options {
+    min-height: 5.6cqh;
+    margin-top: 0;
+    margin-right: 0;
+    width: 108cqh;
+    display: grid;
+    grid-template-columns: 66cqh 15cqh 15cqh;
+    gap: 6cqh;
+}
+#graphicSetting .graphicMaster {
+    border-bottom: 0.2cqh solid #bbdfe9;
+    padding-bottom: 1cqh;
+    margin-bottom: 1cqh;
+}
+#graphicSetting .graphicSubSetting .label {
+    padding-left: 5cqh;
+}
+#graphicSetting .graphicIndependent {
+    border-top: 0.2cqh solid #bbdfe9;
+    padding-top: 1cqh;
+    margin-top: 2cqh;
+}
+#graphicSetting .options .label {
+    text-align: left;
+    font-size: 4cqh;
+}
+#graphicSetting .options .button {
+    margin-left: 0;
+    font-size: 4cqh;
+    text-align: center;
+}
+#graphicSetting .options .button:focus {
+    color: #ff90be;
+}
+#graphicSetting .options .button.selectedValue {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+/* 両方の配置画面で星専用の列を確保し、文字とパネルの縁を避ける。 */
+#controllerSetting .controllerMappingGrid .controllerMappingButton,
+#keyboardSetting .controllerMappingGrid .controllerMappingButton {
+    grid-template-columns: 3.5cqh 13cqh minmax(0, 1fr);
+    gap: 1cqh;
+}
+#controllerSetting .controllerMappingGrid .controllerMappingButton::before,
+#keyboardSetting .controllerMappingGrid .controllerMappingButton::before {
+    position: static;
+    right: auto;
+    transform: none;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    align-self: center;
+    font-size: 2.9cqh;
+    margin: 0;
+}
+#controllerSetting .controllerMappingLabel,
+#keyboardSetting .controllerMappingLabel {
+    justify-self: start;
+    grid-column: 2;
+    grid-row: 1;
+}
+#controllerSetting .controllerMappingValue,
+#keyboardSetting .controllerMappingValue {
+    grid-column: 3;
+    grid-row: 1;
+}
+#controllerSetting .controllerMappingButton:focus .controllerMappingLabel,
+#keyboardSetting .controllerMappingButton:focus .controllerMappingLabel {
+    color: inherit;
+}
+#controllerSetting .controllerMappingValue .controllerMappingInput,
+#keyboardSetting .controllerMappingValue .controllerMappingInput {
+    background: none;
+}
+#controllerSetting .controllerPresetOptions .button::before,
+#playerControllerSetting .button::before,
+#controllerBindingSetting .button::before,
+#dataSetting .button::before,
+#soundTest .button::before,
+#soundTest .selector::before {
+    position: static;
+    right: auto;
+    font-size: 1em;
+}
+.lessonList .lessonButton {
+    text-align: center;
+}
+#survivalPlaySetting,
+#linePlaySetting {
+    padding-top: 19cqh;
+}
+#survivalPlaySetting .playSettingPanel,
+#linePlaySetting .playSettingPanel {
+    width: 124cqh;
+    padding: 3cqh 4cqh;
+    box-sizing: border-box;
+    gap: 3cqh;
+    background: var(--panel);
+    border: 0.3cqh solid var(--panel-border);
+    border-radius: 2cqh;
+}
+#survivalPlaySetting .playSettingSectionTitle,
+#linePlaySetting .playSettingSectionTitle {
+    color: #228899;
+    font-size: 4cqh;
+}
+#survivalPlaySetting .button:not(.back),
+#linePlaySetting .button:not(.back) {
+    height: auto;
+    padding-block: 0.6cqh;
+    margin-bottom: 0;
+    font-size: 3.5cqh;
+}
+#survivalPlaySetting .maxTimeOptions {
+    gap: 5cqh;
+    margin-top: 1cqh;
+}
+#survivalPlaySetting .handySettingSection {
+    gap: 1cqh;
+    padding-top: 2cqh;
+    border-top: 0.2cqh solid #bbdfe9;
+}
+#survivalPlaySetting .handyRow {
+    width: 100%;
+    gap: 3.5cqh;
+    min-height: 7cqh;
+}
+#survivalPlaySetting .handyRow .playerSettingLabel {
+    color: #228899;
+}
+#survivalPlaySetting .handyRow .handyValue,
+#linePlaySetting .settingValue {
+    color: #6bd;
+    background: #e5f2fa;
+    border-radius: 1cqh;
+    padding: 0.5cqh 1cqh;
+}
+#linePlaySetting .lineTargetSetting {
+    margin-top: 12cqh;
+    gap: 4cqh;
+    padding-block: 5cqh;
+}
+#linePlaySetting .lineTargetSetting .options {
+    gap: 5cqh;
+}
+#dataInformation {
+    background: var(--panel);
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    padding: 1cqh 3cqh;
+}
+#dataSetting .dataManagementTotal {
+    background: #e5f2fa;
+    border-radius: 1cqh;
+}
+
+#play .playField {
+    position: relative;
+    gap: 1.2cqh;
+    padding-left: 1.5cqh;
+}
+#play .boardView {
+    height: 95%;
+    position: relative;
+    flex: none;
+    aspect-ratio: 1 / 1.973;
+}
+#play .boardView .playCanvas {
+    height: 100%;
+    width: 100%;
+    display: block;
+    border-radius: 0.6cqh;
+}
+.clearedRowFlash {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(100% / 20.5);
+    background: var(--clear-color, #fff);
+    border: 0.15cqh solid var(--clear-color, #fff);
+    box-shadow: 0 0 1cqh var(--clear-color, #fff);
+    pointer-events: none;
+}
+.clearedRowFlash[hidden] {
+    display: none;
+}
+#play .playField .informationLabelBase {
+    min-width: 0;
+    padding-top: 2cqh;
+    margin-left: 0;
+    gap: 2.5cqh;
+}
+.informationLabelHeader {
+    text-shadow: none;
+}
+.informationLabelContent {
+    text-shadow: 0 0.1cqh #fff;
+}
+.informationLabel.hasChain .informationLabelContent {
+    color: #f298b4;
+    transform: scale(1.12);
+}
+.lowTime .informationLabel[data-label="time"] .informationLabelContent {
+    color: #d66;
+}
+.playFeedback {
+    position: absolute;
+    right: 1.5cqh;
+    bottom: 2cqh;
+    width: 40%;
+    pointer-events: none;
+    z-index: 2;
+}
+#play .playField:not(.multiplayerField) .playFeedback {
+    left: calc(100% + 2cqh);
+    right: auto;
+    width: 29cqh;
+    bottom: 3cqh;
+}
+.playFeedbackMessages {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7cqh;
+}
+.feedbackMessage,
+.pendingAttack {
+    background: #f0faffee;
+    border: 0.25cqh solid #76bace;
+    border-radius: 1cqh;
+    padding: 1cqh;
+    text-wrap: wrap;
+}
+.feedbackMessage {
+    animation: feedbackAppear var(--feedback-duration, 200ms) ease-out;
+}
+.feedbackTitle {
+    font-size: 2.8cqh;
+    color: #228899;
+    text-wrap: wrap;
+}
+.feedbackValue {
+    font-size: 2.2cqh;
+    color: #487c91;
+    line-height: 1.7;
+    white-space: pre-line;
+    text-wrap: nowrap;
+}
+.feedbackReward {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8cqh;
+    font: inherit;
+    color: inherit;
+}
+.feedbackReward span {
+    font: inherit;
+    color: inherit;
+    white-space: nowrap;
+}
+.feedbackMessage.penalty,
+.pendingAttack.incoming {
+    border-color: #e29898;
+    background: #fff2f2ee;
+}
+.feedbackMessage.penalty .feedbackTitle {
+    color: #bc697a;
+}
+.pendingAttack {
+    font-size: 2.4cqh;
+    margin-bottom: 1cqh;
+    white-space: pre-line;
+}
+.pendingAttack[hidden] {
+    display: none;
+}
+.tutorialScene #lessonNextLabel {
+    display: none;
+}
+.feedbackPaused .feedbackMessage {
+    animation-play-state: paused;
+}
+.reducedPlayMotion .feedbackMessage {
+    animation: none;
+}
+.playFeedback[hidden] { display: none; }
+#play .multiplayerField .playFeedback {
+    width: 24%;
+    right: 0.5cqh;
+}
+#play .multiplayerField .feedbackMessage:not(:last-child) {
+    display: none;
+}
+#play .multiplayerField .informationLabelBase {
+    gap: calc(5cqh / var(--player-count));
+    padding-top: 1cqh;
+}
+#play .compactPlayField .playFeedback {
+    top: calc(100% + 1cqh);
+    bottom: auto;
+    width: calc(100% - 1cqh);
+}
+#play .compactPlayField .feedbackMessage:not(:last-child) {
+    display: none;
+}
+#play .multiplayerField .feedbackTitle {
+    font-size: calc(5.5cqh / var(--player-count));
+}
+#play .multiplayerField .feedbackValue,
+#play .multiplayerField .pendingAttack {
+    font-size: calc(5cqh / var(--player-count));
+}
+#play .multiplayerField:not(.compactPlayField) .feedbackReward {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+}
+#replayControls,
+#replayControls.disabled {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 250ms ease-out, visibility 250ms;
+    max-width: 145cqh;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    border-width: 0.3cqh;
+    gap: 0.5cqh 2cqh;
+}
+#replayControls.visible { opacity: 1; visibility: visible; }
+#replayControls.visible.disabled { opacity: 0.5; }
+#replayElapsedTime {
+    font-family: "RocknRoll One", Arial;
+    font-variant-numeric: tabular-nums;
+}
+@keyframes feedbackAppear {
+    from {
+        opacity: 0;
+        transform: translateY(0.5cqh);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* 小さいウィンドウでは説明を優先し、飾りと余白を減らす。共通のページ送りは縮めない。 */
+@media (max-width: 900px), (max-height: 600px) {
+    .selectWithDescription {
+        gap: 5cqh;
+    }
+    .selectOptionDescriptions > div {
+        padding: 3cqh;
+    }
+    .selectOptionDescriptions .text {
+        font-size: 4cqh;
+        line-height: 1.65;
+    }
+    .helpReference .helpContent .text {
+        font-size: 3.3cqh;
+        line-height: 1.6;
+    }
+    .helpReference .helpContent .helpNote {
+        font-size: 2.8cqh;
+    }
+    .helpContent {
+        gap: 1.5cqh;
+    }
+    #detailedResult .subPage {
+        flex-wrap: wrap;
+        gap: 2cqh 4cqh;
+    }
+}

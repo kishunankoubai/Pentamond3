@@ -72,7 +72,6 @@ export class InformationLabelManager {
 
     set s$visible(options: VisibilityOptions) {
         Object.entries(options).forEach(([key, value]) => {
-            console.log(key, value);
             this.labels[key as keyof typeof this.labels].setVisibility(value);
         });
     }
@@ -104,6 +103,7 @@ class Label {
         this.header.style.display = "none";
 
         this.label.classList.add("informationLabel");
+        this.label.dataset.label = title.toLowerCase();
         this.label.appendChild(this.header);
         this.label.appendChild(this.text);
 
@@ -127,6 +127,7 @@ class Label {
         if (this.text.textContent === text) return;
 
         this.text.textContent = text;
+        if (this.title === "Chain") this.label.classList.toggle("hasChain", Number(text) > 1);
 
         if (!this.isFirstUpdated) {
             this.header.style.display = "";

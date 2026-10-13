@@ -109,6 +109,7 @@ export class Mode1 extends GameMode {
 
         p.label.s$visible = { gameTime: true, playTime: false, line: false, lastTrick: true, chain: true, score: true };
         const updateLabel = () => {
+            p.feedback.updatePending(p.damageInfo.attackTask, p.damageInfo.damageTask + p.damageInfo.temporaryDamageTask, p.state.damaging);
             p.label.updateContents({
                 gameTime: p.playInfo.gameTime + "",
                 playTime: "",
@@ -126,7 +127,8 @@ export class Mode1 extends GameMode {
                 updateLabel();
                 p.updateGameTime();
 
-                if (p.playInfo.gameTime <= Setting.warningGameTime) {
+                p.g$element.classList.toggle("lowTime", p.playInfo.gameTime <= Setting.warningGameTime);
+                if (p.playInfo.gameTime <= Setting.warningGameTime && GraphicSetting.timeWarningEffect) {
                     if (p.animations.timeWarning.playState != "running") {
                         p.animations.timeWarning.play();
                     }
@@ -138,7 +140,7 @@ export class Mode1 extends GameMode {
                 }
 
                 if (p.damageInfo.damageTask && p.loop.g$elapsedTime - p.damageInfo.lastDamageTime >= Setting.damageWaitingTime) {
-                    if (p.animations.warning.playState != "running") {
+                    if (p.animations.warning.playState != "running" && GraphicSetting.damageEffects) {
                         p.animations.caution.cancel();
                         p.animations.warning.play();
                     }
@@ -153,6 +155,8 @@ export class Mode1 extends GameMode {
 
                 p.playInfo.penaltyTask = Math.max(p.playInfo.penaltyTask - 1, 0);
                 if (p.damageInfo.damageTask) {
+                    const offset = Math.min(p.damageInfo.damageTask, p.damageInfo.attackTask);
+                    if (offset > 0) p.feedback.show("相殺", `攻撃 ${offset}`, "attack");
                     if (p.damageInfo.damageTask > p.damageInfo.attackTask) {
                         console.log(`Player ${index + 1} damage has offset : ${p.damageInfo.attackTask}`);
                         p.damageInfo.damageTask -= p.damageInfo.attackTask;
@@ -177,6 +181,7 @@ export class Mode1 extends GameMode {
                     p.damageInfo.totalDamage += p.damageInfo.damageTask;
                 }
                 if (p.damageInfo.attackTask) {
+                    if (this.players.length > 1) p.feedback.show("攻撃！", `${p.damageInfo.attackTask} を送った`, "attack");
                     p.damageInfo.maxAttack = Math.max(p.damageInfo.maxAttack, p.damageInfo.attackTask);
                     console.log(`Player ${index + 1} has attacked: ${p.damageInfo.attackTask}`);
                     this.players.forEach((player, i) => {
@@ -194,6 +199,7 @@ export class Mode1 extends GameMode {
                 p.playInfo.score -= 10;
                 p.playInfo.penalty += Setting.penalty.unput;
                 p.playInfo.unput += 1;
+                p.feedback.show("一手戻し", `持ち時間 −${Setting.penalty.unput}`, "penalty");
             }),
 
             p.operator.addHandler("hold", () => {
@@ -216,6 +222,8 @@ export class Mode1 extends GameMode {
                     p.playInfo.chain += 1;
                     p.playInfo.maxChain = Math.max(p.playInfo.maxChain, p.playInfo.chain);
                     p.playInfo.trickCount += 1;
+                    p.feedback.flashRow(removeSoundIndex);
+                    p.feedback.showRewards(reward.score, reward.recovery);
                     if (GraphicSetting.removeShake) {
                         p.animations.removeLineWithTrick.play();
                     }
@@ -224,6 +232,7 @@ export class Mode1 extends GameMode {
                     p.playInfo.penalty += penalty.charge;
                     p.playInfo.penaltyTask = penalty.nextTask;
                     p.playInfo.chain = 0;
+                    if (penalty.charge > 0) p.feedback.show("役なし消去", `持ち時間 −${penalty.charge}`, "penalty");
                     if (GraphicSetting.removeShake) {
                         p.animations.removeLineWithoutTrick.play();
                     }

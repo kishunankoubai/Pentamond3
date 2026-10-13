@@ -5,11 +5,13 @@ import type { GamePlayer } from "./GamePlayer";
 import type { OperateName } from "./GameMode";
 import { operationKeyCodes } from "./Operations";
 import type { InputInfo } from "../Utilities/Interaction/InputObserver";
+import { KeyboardSettingManager } from "../KeyboardSettingManager";
 
 /** モードによらない操作・押しっぱなし処理。入力の観測はUtilitiesに任せる。 */
 export function bindPlayerControls(player: GamePlayer, playerIndex: number, events: EventScope): void {
     const config = ControllerRegisterer.gamepadConfigs[playerIndex] ?? Setting.gamepadConfigPresets[0];
     const input = player.input;
+    const keyboardKeys = Object.fromEntries(Object.keys(operationKeyCodes).map((operation) => [operation, input.g$type === "keyboard" ? KeyboardSettingManager.keysFor(operation as OperateName) : [operationKeyCodes[operation as OperateName]]])) as Record<OperateName, string[]>;
     const suppressedInputs = new Set(input.g$validInputNames.filter((name) => input.getLatest(name)?.consumed));
     const bindings: [OperateName, keyof Setting.GamepadConfig, () => void][] = [
         ["move-left", "moveLeft", () => player.operator.move("left")],
@@ -25,14 +27,14 @@ export function bindPlayerControls(player: GamePlayer, playerIndex: number, even
     const operate = (name: string) => {
         player.clock.synchronize();
         if (player.loop.g$isStopping) return;
-        const binding = bindings.find(([operation, action]) => name === operationKeyCodes[operation] || config[action].includes(name));
+        const binding = bindings.find(([operation, action]) => keyboardKeys[operation].includes(name) || config[action].includes(name));
         if (!binding) return;
         binding[2]();
         player.updateCanvas();
     };
     let previousKey = "";
     let lastRepeatTime = 0;
-    const moveKeys = ["ArrowLeft", "ArrowRight", "ArrowDown", ...config.moveLeft, ...config.moveRight, ...config.moveDown];
+    const moveKeys = [...keyboardKeys["move-left"], ...keyboardKeys["move-right"], ...keyboardKeys["move-down"], ...config.moveLeft, ...config.moveRight, ...config.moveDown];
     events.add(
         input.addHandler("inputValid", (info: InputInfo) => {
             if (info.consumed) { suppressedInputs.add(info.name); return; }

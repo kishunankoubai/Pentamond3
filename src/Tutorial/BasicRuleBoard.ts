@@ -14,7 +14,7 @@ const bottom = Settings.playHeight - 1;
 const allMoves: OperateName[] = ["move-left", "move-right", "move-down", "spin-left", "spin-right", "put"];
 const variedNames = ["三つ子山", "トゲトゲ(下)", "地割れ(上)"];
 
-/** 教材の白枠・固定6種一巡。役判定とダメージ処理は本編をそのまま利用する。 */
+/** 教材の黄色の枠・固定6種一巡。役判定とダメージ処理は本編をそのまま利用する。 */
 export class BasicRuleBoard {
     readonly lesson;
     blocks = new BlockManager();
@@ -125,8 +125,8 @@ export class BasicRuleBoard {
     }
     get knowledge(): string {
         if (this.lesson.id !== "variety") return this.lesson.knowledge;
-        if (this.tricks === 0) return "三つ子山：3つの山の間には空きがあります。白枠の向きを合わせ、空きを残しましょう。";
-        if (this.tricks === 1) return "トゲトゲ(下)：下向きの三角形がひとつおきに並びます。回転と滑り移動を使い、白枠に合わせましょう。";
+        if (this.tricks === 0) return "三つ子山：3つの山の間には空きがあります。黄色の枠の向きを合わせ、空きを残しましょう。";
+        if (this.tricks === 1) return "トゲトゲ(下)：下向きの三角形がひとつおきに並びます。回転と滑り移動を使い、黄色の枠に合わせましょう。";
         return "地割れ：左右で三角形の向きが変わります。間の1か所の空きは、埋めずに残しましょう。";
     }
     get task(): string {
@@ -138,9 +138,9 @@ export class BasicRuleBoard {
         if (this.phase === "penalties") return this.undo ? "一手戻しでペナルティを受けてみよう" : "まずモンドを1個設置しよう";
         if (this.phase === "erasing") return this.lesson.id === "penalty" ? "役なしの列を続けて消してみよう"
             : this.lesson.id === "variety" ? `最下列を消して「${variedNames[this.tricks]}」を成立させよう` : "設置を挟まず、役のある列を連続して消そう";
-        if (this.lesson.id === "variety") return `${variedNames[this.tricks]}：白枠に合わせて設置しよう`;
-        if (this.lesson.id === "chain") return "白枠の形・向きに合わせて設置しよう";
-        return "白枠に合わせて設置し、最下列を消そう";
+        if (this.lesson.id === "variety") return `${variedNames[this.tricks]}：黄色の枠に合わせて設置しよう`;
+        if (this.lesson.id === "chain") return "黄色の枠の形・向きに合わせて設置しよう";
+        return "黄色の枠に合わせて設置し、最下列を消そう";
     }
 
     get graphics(): GraphicData {

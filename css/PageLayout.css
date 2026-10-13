@@ -740,7 +740,6 @@
             position: relative;
             margin-left: 0;
             font-size: 4.5cqh;
-            &::before { position: absolute; right: 100%; font-size: 4.5cqh; }
         }
 
         & .selectedValue {
@@ -818,7 +817,6 @@
         position: relative;
         margin: 2cqh 0 0;
         font-size: 4.5cqh;
-        &::before { position: absolute; right: 100%; font-size: 4.5cqh; }
         background: none;
         border-color: #22222200;
         &:focus {
@@ -857,7 +855,6 @@
                 margin-left: 0;
                 font-size: 4cqh;
                 line-height: 1.4;
-                &::before { position: absolute; right: 100%; font-size: 4cqh; }
             }
 
             & .controllerBindingEmpty {
@@ -871,7 +868,6 @@
             margin-left: 0;
             font-size: 4cqh;
             flex-shrink: 0;
-            &::before { position: absolute; right: 100%; font-size: 4cqh; }
 
             &[aria-disabled="true"] {
                 opacity: 0.35;
@@ -1103,7 +1099,6 @@
             max-width: 100cqh;
             text-wrap: wrap;
             text-align: center;
-            &::before { position: absolute; right: 100%; font-size: 5cqh; }
         }
     }
     & .soundTestControls {
@@ -1111,11 +1106,6 @@
         & .button {
             position: relative;
             font-size: 4.8cqh;
-            &::before {
-                position: absolute;
-                right: 100%;
-                font-size: 4.8cqh;
-            }
         }
     }
     & .button:not(.back) {
@@ -1165,7 +1155,6 @@
         margin-left: 0;
         justify-self: end;
         font-size: 4.5cqh;
-        &::before { position: absolute; right: 100%; font-size: 4.5cqh; }
     }
     & .dataManagementTotal {
         & .dataManagementLabel { color: #289; font-size: 5.5cqh; }
@@ -1258,7 +1247,6 @@
         &::before { display: none; }
         &:focus {
             border: 0.4cqh solid #ff90be;
-            background-color: #ff90be18;
         }
         &.unachieved .achievementTriangle { opacity: 0.28; }
     }

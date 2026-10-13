@@ -4,19 +4,22 @@
         <div id="replayControls">
             <span id="replayPlaybackStatus">停止中</span>
             <span id="replayPlaybackSpeed">×1</span>
+            <span id="replayElapsedTime">0.00 / 0.00</span>
             <span class="replayControlHelp">← →…速度変更　決定ボタン…再生／停止</span>
         </div>
     </div>
 
-    <div class="page pauseMenu" id="replayPause" data-layer="1">
+    <div class="page pauseMenu" id="replayPause" data-layer="1" data-default-focus="#replayResumeButton">
         <div class="label headingLabel">ポーズ</div>
-        <div class="options" data-direction="row">
+        <div class="options pausePrimary" data-direction="row">
             <div class="button" id="replayResumeButton" data-xy="[0,0]">再開する</div>
-            <div class="button" id="replayRestartButton" data-xy="[1,0]">もう一度</div>
         </div>
-        <div class="options" data-direction="row">
-            <div class="button" id="replayListButton" data-xy="[0,1]">リプレイ一覧へ</div>
-            <div class="button" id="replayTitleButton" data-xy="[1,1]">タイトルへ</div>
+        <div class="options pauseSecondary" data-direction="row">
+            <div class="button" id="replayRestartButton" data-xy="[0,1]">もう一度</div>
+            <div class="button" id="replayListButton" data-xy="[1,1]">リプレイ一覧へ</div>
+        </div>
+        <div class="options pauseSecondary" data-direction="row">
+            <div class="button" id="replayTitleButton" data-xy="[0,2]">タイトルへ</div>
         </div>
     </div>
 

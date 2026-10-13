@@ -82,6 +82,10 @@ export class PageInteraction {
 
         this.getInteractionElements();
         if (!this.interactionElements.length) return;
+        const defaultFocus = this.scene.g$pageManager.g$currentPage?.g$element.dataset.defaultFocus;
+        if (defaultFocus && !this.scene.g$pageManager.g$isReturning) {
+            this.g$validElements.find(({ element }) => element.matches(defaultFocus))?.element.focus({ preventScroll: true });
+        }
 
         if (PageInteraction.firstFocus) {
             const elements = this.g$validElements;

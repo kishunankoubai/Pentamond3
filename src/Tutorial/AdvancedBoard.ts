@@ -91,10 +91,10 @@ export class AdvancedBoard {
     get recoveryConfirmed(): boolean { return this.recoveryMoves.left === 3 && this.recoveryMoves.right === 3; }
     get condition(): string {
         switch (this.lesson.id) {
-            case "next": return `ネクストを確認し、白枠に${this.lesson.count}個設置しよう`;
+            case "next": return `ネクストを確認し、黄色の枠に${this.lesson.count}個設置しよう`;
             case "holdReset": return "下へ6回動かし、ホールド2回で初期位置へ戻そう";
-            case "juggling": return "ジャグリングで取り出したモンドを白枠に設置しよう";
-            case "rotation": return "滑り移動のあとに回転して、2つの白枠に設置しよう";
+            case "juggling": return "ジャグリングで取り出したモンドを黄色の枠に設置しよう";
+            case "rotation": return "滑り移動のあとに回転して、2つの黄色の枠に設置しよう";
             case "leftPriority": return "左右に滑れる場所で、下入力による左への滑り移動を体験しよう";
             case "blockedSpawn": return "初期位置の詰まりを、一手戻しと消去で1回ずつ解消しよう";
         }
@@ -118,10 +118,10 @@ export class AdvancedBoard {
     get task(): string {
         if (this.phase === "done") return "クリア！";
         switch (this.lesson.id) {
-            case "next": return this.stage === 0 ? "NEXTの一番上を見てから、今のモンドを白枠に設置しよう" : "予告されていたモンドが出現！新しい白枠に設置しよう";
+            case "next": return this.stage === 0 ? "NEXTの一番上を見てから、今のモンドを黄色の枠に設置しよう" : "予告されていたモンドが出現！新しい黄色の枠に設置しよう";
             case "holdReset": return this.stage === 0 ? "下へ6回動かして、初期位置から離れよう" : this.stage === 1 ? "ホールドして、いったん別のモンドと入れ替えよう" : "もう一度ホールドして、元のモンドを上へ戻そう";
-            case "juggling": return ["まずは今のモンドを設置しよう", "ホールドして、出現したモンドを取っておこう", "一手戻しで、最初の設置を元に戻そう", "もう一度ホールドして、ネクストだったモンドを取り出そう", "取り出せました！白枠に設置しよう"][this.stage];
-            case "rotation": return this.stage === 0 ? "回転で形を変え、下入力で滑り込み、回転して白枠に合わせよう" : "1回左回転し、下入力で滑り込んでから右回転しよう";
+            case "juggling": return ["まずは今のモンドを設置しよう", "ホールドして、出現したモンドを取っておこう", "一手戻しで、最初の設置を元に戻そう", "もう一度ホールドして、ネクストだったモンドを取り出そう", "取り出せました！黄色の枠に設置しよう"][this.stage];
+            case "rotation": return this.stage === 0 ? "回転で形を変え、下入力で滑り込み、回転して黄色の枠に合わせよう" : "1回左回転し、下入力で滑り込んでから右回転しよう";
             case "leftPriority": return this.leftChosen ? "左に滑りましたね！その場所に設置しよう" : "下へ進み、灰色の三角形に当たったときの滑る向きを見よう";
             case "blockedSpawn": return this.stage === 0 ? "そのまま設置して、初期位置が埋まる場面を見よう" : this.stage === 1 ? "一手戻しして、出現できるようにしよう"
                 : this.stage === 2 ? "左と右へそれぞれ3回動かし、設置前の操作できる状態に戻ったことを確かめよう" : "今度は最下列を消去して、出現できるようにしよう";
@@ -271,7 +271,7 @@ export class AdvancedBoard {
     private spawnNext(): void { this.spawn(this.takeNext()); }
     private prepareNextTarget(): void {
         this.spawnNext();
-        // 前の設置を残し、6種一巡の次の形が実際に届く位置へ白枠を置く。
+        // 前の設置を残し、6種一巡の次の形が実際に届く位置へ黄色の枠を置く。
         const preview = new BlockManager();
         this.blocks.removePentiamond(this.hand!);
         preview.load(this.blocks.g$blockProperties);

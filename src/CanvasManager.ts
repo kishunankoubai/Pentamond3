@@ -3,6 +3,7 @@ import { MondState } from "./BlockOperate/Monoiamond";
 import { Pentiamond } from "./BlockOperate/Pentiamond";
 import * as Setting from "./Settings";
 import { arrayPlus } from "./Utils";
+import { globalValues } from "./Global";
 
 export type GraphicData = {
     blockProperties: BlockProperty[][] | null;
@@ -127,9 +128,9 @@ export class CanvasManager {
         }
 
         if (isGhost) {
-            context.strokeStyle = Setting.mondGrid.ghost.color;
+            context.strokeStyle = "#d7eaffdd";
             context.fillStyle = Setting.blockColor.ghost[property[0]];
-            context.lineWidth = Setting.mondGrid.ghost.width;
+            context.lineWidth = 7 * scale;
         } else {
             context.strokeStyle = Setting.mondGrid.normal.color;
             context.fillStyle = Setting.blockColor.normal[property[0]];
@@ -137,7 +138,7 @@ export class CanvasManager {
         }
         context.lineJoin = "bevel";
         if (isTarget) {
-            context.strokeStyle = "#ffffff";
+            context.strokeStyle = "#ffd84d";
             context.lineWidth = 9;
         }
         context.lineCap = "round";
@@ -149,8 +150,25 @@ export class CanvasManager {
         context.lineTo(p2[0], p2[1]);
         context.lineTo(p3[0], p3[1]);
         context.closePath();
+        context.setLineDash([]);
         if (!isTarget) context.fill();
         context.stroke();
+        context.setLineDash([]);
+        if (globalValues.graphic.blockSymbols && !isGhost && !isTarget && property[0] !== "g") {
+            const marks = { L: "●", J: "┃", p: "+", q: "◆", U: "○", I: "=" };
+            context.save();
+            context.font = `bold ${27 * scale}px Arial`;
+            context.textAlign = "center";
+            context.textBaseline = "middle";
+            context.lineWidth = 4 * scale;
+            context.strokeStyle = "#222233cc";
+            context.fillStyle = "#ffffff";
+            const x = position[0] + Setting.blockWidth * scale / 2;
+            const y = position[1] + Setting.blockHeight * scale * (property[1] ? 2 / 3 : 1 / 3);
+            context.strokeText(marks[property[0]], x, y);
+            context.fillText(marks[property[0]], x, y);
+            context.restore();
+        }
     }
 
     private paintBackground() {
@@ -191,6 +209,13 @@ export class CanvasManager {
         this.nct.clearRect(0, 0, this.nextCanvas.width, this.nextCanvas.height);
         this.paintNextBackground();
         this.paintNext();
+        this.nct.save();
+        this.nct.font = "bold 48px Arial";
+        this.nct.fillStyle = "#bbddff";
+        this.nct.textAlign = "center";
+        this.nct.fillText("HOLD", this.nextCanvas.width / 2, 55);
+        this.nct.fillText("NEXT", this.nextCanvas.width / 2, Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + Setting.next.gap * 0.64);
+        this.nct.restore();
     }
 
     private paintNextBackground() {

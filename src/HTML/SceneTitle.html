@@ -5,9 +5,21 @@
     </div>
 
     <div class="page" id="pageStart">
-        <!-- prettier-ignore -->
-        <div class="label autoDynamicText" id="pageStartLabel">クリックしてスタート！</div>
-        <div class="label">(音が出ます)</div>
+        <!-- pモンドの回転状態1。低解像度のアイコンを拡大せず、5つの正三角形を描く。 -->
+        <svg class="startEmblem" viewBox="-3 -3 126 110" aria-hidden="true" focusable="false">
+            <g fill="#ffff00" stroke="#a8a34b" stroke-width="1.5" stroke-linejoin="round">
+                <polygon points="0,0 60,0 30,51.9615" />
+                <polygon points="60,0 30,51.9615 90,51.9615" />
+                <polygon points="60,0 120,0 90,51.9615" />
+                <polygon points="30,51.9615 90,51.9615 60,103.923" />
+                <polygon points="90,51.9615 60,103.923 120,103.923" />
+            </g>
+        </svg>
+        <div class="startWordmark" aria-label="Pentamond"><span data-mond="L">P</span><span data-mond="J">e</span><span data-mond="p">n</span><span data-mond="q">t</span><span data-mond="U">a</span><span data-mond="I">m</span><span data-mond="L">o</span><span data-mond="J">n</span><span data-mond="p">d</span></div>
+        <div class="startInvitation">
+            <div class="label" id="pageStartLabel">クリックしてスタート！</div>
+            <div class="label startSoundNotice">音が出ます</div>
+        </div>
     </div>
 
     <div class="page" id="firstLaunchGuide" data-layer="1">
@@ -50,13 +62,12 @@
                     <div class="text">まずは遊び方を覚えよう！</div>
                 </div>
                 <div>
-                    <div class="text">今までどれだけプレイしたか覗いてみよう！</div>
+                    <div class="text">今までどれだけ遊んだか、<br />覗いてみよう！</div>
                 </div>
                 <div>
                     <div class="text">
-                        分からないことがあるときのヘルプや、<br />
-                        音楽などの設定は<br />
-                        こちらから！
+                        困ったときのヘルプや、<br />
+                        音楽などの設定はこちらから！
                     </div>
                 </div>
             </div>
@@ -74,11 +85,12 @@
                 <div>
                     <div class="text">
                         困ったときはここを読んでね！<br />
-                        役一覧、操作方法、ゲームやルールの説明など。
+                        役一覧や操作方法、<br />
+                        ルールの説明など。
                     </div>
                 </div>
                 <div>
-                    <div class="text">音楽、コントローラー、ゲームルールなどを変更できるよ！</div>
+                    <div class="text">音楽や操作の配置、<br />ゲームルールを変更できるよ！</div>
                 </div>
             </div>
         </div>
@@ -96,7 +108,7 @@
                 <div>
                     <div class="text">
                         基本的なモード。<br />
-                        タイムがなくなるまで役を揃え続けよう！
+                        タイムがなくなるまで、<br />役を揃え続けよう！
                     </div>
                 </div>
                 <div>
@@ -121,7 +133,7 @@
                 <div>
                     <div class="text">
                         基本的な対戦モード。<br />
-                        役を揃えて最後まで生き残り続けよう！
+                        役を揃えて、<br />最後まで生き残ろう！
                     </div>
                 </div>
                 <div>
@@ -148,9 +160,10 @@
 
     <div class="page" id="playPrepare">
         <div class="label headingLabel">プレイ準備</div>
+        <div class="playPrepareSummary" id="playPrepareSummary"></div>
         <div class="options playPrepareStartRow" data-direction="row">
-            <div class="playStart button" data-xy="[1,0]">スタート！</div>
-            <div class="button" id="playPrepareModeHelpButton" data-xy="[2,0]">モード説明</div>
+            <div class="playStart button" data-xy="[0,0]">スタート！</div>
+            <div class="button" id="playPrepareModeHelpButton" data-xy="[1,0]">モード説明</div>
         </div>
         <div class="options" data-direction="row">
             <div class="button" id="playPrepareControllerButton" data-xy="[0,1]">コントローラー</div>
@@ -242,16 +255,16 @@
             </div>
             <div class="selectOptionDescriptions">
                 <div>
-                    <div class="text">どんな役があるか見てみよう！<br />形と回復・攻撃の値を確認できるよ！</div>
+                    <div class="text">どんな役があるか見てみよう！<br />形と回復・攻撃の値がわかるよ！</div>
                 </div>
                 <div>
                     <div class="text">まずは基本的な遊び方を知ろう！</div>
                 </div>
                 <div>
-                    <div class="text">ちょっと詳しい仕組みはこちら！<br />ホールドや滑り移動、攻撃の話など。</div>
+                    <div class="text">ちょっと詳しい仕組みはこちら！<br />ホールドや滑り移動、<br />攻撃の話など。</div>
                 </div>
                 <div>
-                    <div class="text">どうやって操作するかを確認しよう！</div>
+                    <div class="text">どうやって操作するか、<br />確認しよう！</div>
                 </div>
                 <div>
                     <div class="text">各モードの遊び方を見てみよう！</div>
@@ -296,14 +309,16 @@
         <div class="subPage helpContent">
             <div class="helpTopic">キーボード：プレイ中</div>
             <div class="helpKeyGrid">
-                <div><span>← / →</span><span>左右移動</span></div>
-                <div><span>↓</span><span>下移動・滑り移動</span></div>
-                <div><span>↑</span><span>設置</span></div>
-                <div><span>C / V</span><span>左回転 / 右回転</span></div>
-                <div><span>B</span><span>一手戻し</span></div>
-                <div><span>Space</span><span>ホールド</span></div>
-                <div><span>Enter</span><span>列の消去</span></div>
-                <div><span>P / Esc</span><span>ポーズ</span></div>
+                <div><span>左移動</span><span data-keyboard-help="moveLeft">←</span></div>
+                <div><span>右移動</span><span data-keyboard-help="moveRight">→</span></div>
+                <div><span>下移動・滑り移動</span><span data-keyboard-help="moveDown">↓</span></div>
+                <div><span>設置</span><span data-keyboard-help="put">↑</span></div>
+                <div><span>左回転</span><span data-keyboard-help="spinLeft">C</span></div>
+                <div><span>右回転</span><span data-keyboard-help="spinRight">V</span></div>
+                <div><span>一手戻し</span><span data-keyboard-help="unput">B</span></div>
+                <div><span>ホールド</span><span data-keyboard-help="hold">Space</span></div>
+                <div><span>列の消去</span><span data-keyboard-help="removeLine">Enter</span></div>
+                <div><span>ポーズ</span><span data-keyboard-help="pause">P / Esc</span></div>
             </div>
             <div class="text helpNote">設置するとゴーストの位置まで移動して置かれます。下移動だけでは設置されません。</div>
         </div>
@@ -315,7 +330,7 @@
                 alt="初期配置：方向キー・左スティックの左右と下で移動、上で設置。 L1・L2・R1・R2でホールド。 丸下ボタンで左回転、丸右ボタンで右回転、丸左ボタンで一手戻し、丸上ボタンで消去。 中央左・中央右ボタンでポーズ。"
             />
             <div class="text helpNote">左右の肩ボタンは、手前・奥のどちらでも操作できます。</div>
-            <div class="text helpNote">変更した配置は、設定→コントローラーやプレイ準備→コントローラーで確認できます。</div>
+            <div class="text helpNote">変更した配置は、 設定→操作設定→コントローラーで確認できます。</div>
         </div>
         <div class="subPage helpContent helpMenuContent">
             <div class="helpTopic">メニューの操作</div>
@@ -401,15 +416,15 @@
             <div class="selectOptionDescriptions">
                 <div>
                     <div class="text">
-                        最近のプレイを最大で10件まで見れるよ！<br />
+                        最近のプレイを、<br />最大で10件まで見れるよ！<br />
                         保存しないと消えちゃうので注意！
                     </div>
                 </div>
                 <div>
-                    <div class="text">お気に入りのプレイを最大で10件まで保存できるよ！</div>
+                    <div class="text">お気に入りのプレイを、<br />最大で10件まで保存できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">今までのこのゲームの意外な記録が見れるよ！</div>
+                    <div class="text">今までのプレイの、<br />いろいろな記録が見れるよ！</div>
                 </div>
                 <div>
                     <div class="text">いろいろな目標に挑戦してみよう！<br />どれだけ実績を集められるかな？</div>
@@ -430,6 +445,10 @@
         <div class="achievementDetail" aria-live="polite" aria-atomic="true">
             <div class="text" id="achievementDescription"></div>
             <div class="text" id="achievementState"></div>
+            <div class="achievementProgress" id="achievementProgress" hidden>
+                <div class="text" id="achievementProgressText"></div>
+                <div class="progressTrack" aria-hidden="true"><div id="achievementProgressFill"></div></div>
+            </div>
             <div class="text" id="achievementNote"></div>
         </div>
         <div class="subPageController">
@@ -532,27 +551,63 @@
                 <div class="button" data-page="dataSetting" data-xy="[0,1]">データ管理</div>
                 <div class="button" data-page="gameSetting" data-xy="[0,2]">ゲーム設定</div>
                 <div class="button" data-page="graphicSetting" data-xy="[0,3]">グラフィック</div>
-                <div class="button" data-page="controllerSetting" data-xy="[0,4]">コントローラー</div>
+                <div class="button" data-page="operationSetting" data-xy="[0,4]">操作設定</div>
             </div>
             <div class="selectOptionDescriptions">
                 <div>
-                    <div class="text">音量や流れるBGMを変更できるよ！</div>
+                    <div class="text">音量や流れるBGMを、<br />変更できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">保存されているデータの消去ができるよ！</div>
+                    <div class="text">保存されているデータを、<br />確認・消去できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">各ゲームモードのゲームルールを設定できるよ！</div>
+                    <div class="text">各モードの持ち時間や、<br />クリア条件を設定できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">一部演出をOFFにして低負荷にできるよ！</div>
+                    <div class="text">演出や盤面の表示を、<br />調節できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">コントローラーのボタン割り当てを変更できるよ！</div>
+                    <div class="text">キーボードやコントローラーの<br />配置を変更できるよ！</div>
                 </div>
             </div>
         </div>
         <div class="back button" data-xy="[0,5]">戻る</div>
+    </div>
+
+    <div class="page" id="operationSetting">
+        <div class="label headingLabel">操作設定</div>
+        <div class="selectWithDescription">
+            <div class="selectWithDescriptionOptions">
+                <div class="button" data-page="keyboardSetting" data-xy="[0,0]">キーボード</div>
+                <div class="button" data-page="controllerSetting" data-xy="[0,1]">コントローラー</div>
+            </div>
+            <div class="selectOptionDescriptions">
+                <div><div class="text">プレイ中のキーを変更できるよ！<br />メニューと養成所では、<br />初期配置を使います。</div></div>
+                <div><div class="text">ボタンやスティックの<br />配置を変更できるよ！<br />編集用に3つ保存できます。</div></div>
+            </div>
+        </div>
+        <div class="back button" data-xy="[0,2]">戻る</div>
+    </div>
+
+    <div class="page mappingSetting" id="keyboardSetting">
+        <div class="label headingLabel">キーボード設定</div>
+        <div class="controllerPresetOptions options" data-direction="row">
+            <div class="button" data-keyboard-custom="false" data-xy="[0,0]">初期配置</div>
+            <div class="button" data-keyboard-custom="true" data-xy="[1,0]">編集用</div>
+        </div>
+        <div class="text controllerSettingStatus" id="keyboardSettingStatus">編集用を選ぶと変更できます。 メニューと養成所は初期配置を使います。</div>
+        <div class="controllerMappingGrid"></div>
+        <div class="button mappingReset" id="keyboardSettingReset" data-xy="[1,6]">選択中の配置を初期化</div>
+        <div class="back button" data-xy="[0,6]">戻る</div>
+    </div>
+    <div class="page" id="keyboardBindingSetting" data-layer="1">
+        <div class="popup bindingPopup">
+            <div class="label headingLabel" id="keyboardBindingTitle">キーの割り当て</div>
+            <div class="text bindingStatus" id="keyboardBindingStatus">削除するキーを選ぶか、 新しい入力を追加してください。</div>
+            <div class="controllerBindingList" id="keyboardBindingList"></div>
+            <div class="button bindingAdd" id="keyboardBindingAdd" data-xy="[0,4]">入力を追加</div>
+            <div class="back button" data-xy="[0,5]">戻る</div>
+        </div>
     </div>
 
     <div class="page" id="gameSetting">
@@ -563,8 +618,8 @@
                 <div class="button" data-page="linePlaySetting" data-xy="[0,1]">十五列揃え</div>
             </div>
             <div class="selectOptionDescriptions">
-                <div><div class="text">制限時間とプレイヤーごとのハンデを設定します。</div></div>
-                <div><div class="text">クリアに必要な一列揃えの回数を設定します。</div></div>
+                <div><div class="text">持ち時間と、<br />各プレイヤーのハンデを<br />設定します。</div></div>
+                <div><div class="text">クリアに必要な、<br />一列揃えの回数を設定します。</div></div>
             </div>
         </div>
         <div class="back button" data-xy="[0,2]">戻る</div>
@@ -728,10 +783,10 @@
                     <div class="text">BGM・SE音量を変更できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">プレイ中に流れるBGMを変更できるよ！</div>
+                    <div class="text">プレイ中に流れるBGMを、<br />変更できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">Pentamondで使用されているBGMたちを聴けるよ！</div>
+                    <div class="text">Pentamondで流れる<br />BGMたちを聴けるよ！</div>
                 </div>
             </div>
         </div>
@@ -808,22 +863,47 @@
 
     <div class="page" id="graphicSetting">
         <div class="label headingLabel">グラフィック設定</div>
-        <div class="options" data-direction="row">
+        <div class="options graphicMaster" data-direction="row">
+            <div class="label">プレイ中の動きを抑える</div>
+            <div class="button" id="reducedMotionOn" data-xy="[0,0]">ON</div>
+            <div class="button" id="reducedMotionOff" data-xy="[1,0]">OFF</div>
+        </div>
+        <div class="options graphicSubSetting" data-direction="row">
             <div class="label">設置時演出</div>
-            <div class="button" id="putShakeOn" data-xy="[0,0]">ON</div>
-            <div class="button" id="putShakeOff" data-xy="[1,0]">OFF</div>
+            <div class="button" id="putShakeOn" data-xy="[0,1]">ON</div>
+            <div class="button" id="putShakeOff" data-xy="[1,1]">OFF</div>
         </div>
-        <div class="options" data-direction="row">
+        <div class="options graphicSubSetting" data-direction="row">
             <div class="label">消去時演出</div>
-            <div class="button" id="removeShakeOn" data-xy="[0,1]">ON</div>
-            <div class="button" id="removeShakeOff" data-xy="[1,1]">OFF</div>
+            <div class="button" id="removeShakeOn" data-xy="[0,2]">ON</div>
+            <div class="button" id="removeShakeOff" data-xy="[1,2]">OFF</div>
+        </div>
+        <div class="options graphicSubSetting" data-direction="row">
+            <div class="label">プレイ時背景</div>
+            <div class="button" id="playBackgroundOn" data-xy="[0,3]">ON</div>
+            <div class="button" id="playBackgroundOff" data-xy="[1,3]">OFF</div>
+        </div>
+        <div class="options graphicSubSetting" data-direction="row">
+            <div class="label">ダメージ時演出</div>
+            <div class="button" id="damageEffectsOn" data-xy="[0,4]">ON</div>
+            <div class="button" id="damageEffectsOff" data-xy="[1,4]">OFF</div>
+        </div>
+        <div class="options graphicSubSetting" data-direction="row">
+            <div class="label">残り時間警告</div>
+            <div class="button" id="timeWarningEffectOn" data-xy="[0,5]">ON</div>
+            <div class="button" id="timeWarningEffectOff" data-xy="[1,5]">OFF</div>
+        </div>
+        <div class="options graphicIndependent" data-direction="row">
+            <div class="label">プレイ通知</div>
+            <div class="button" id="playNotificationsOn" data-xy="[0,6]">ON</div>
+            <div class="button" id="playNotificationsOff" data-xy="[1,6]">OFF</div>
         </div>
         <div class="options" data-direction="row">
-            <div class="label">プレイ時背景</div>
-            <div class="button" id="playBackgroundOn" data-xy="[0,2]">ON</div>
-            <div class="button" id="playBackgroundOff" data-xy="[1,2]">OFF</div>
+            <div class="label">ブロックの識別模様</div>
+            <div class="button" id="blockSymbolsOn" data-xy="[0,7]">ON</div>
+            <div class="button" id="blockSymbolsOff" data-xy="[1,7]">OFF</div>
         </div>
-        <div class="back button" data-xy="[0,3]">戻る</div>
+        <div class="back button" data-xy="[0,8]">戻る</div>
     </div>
 
     <div class="page" id="dataSetting">

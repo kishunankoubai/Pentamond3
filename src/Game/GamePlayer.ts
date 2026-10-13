@@ -12,6 +12,7 @@ import { EventScope } from "../Utilities/EventScope";
 import { GraphicSetting } from "../GraphicSetting";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { achievementTrickIndex, achievementTricks } from "../Achievements/Definitions";
+import { PlayFeedback } from "./PlayFeedback";
 
 export class GamePlayer {
     readonly trickCounts = Array<number>(achievementTricks.length).fill(0);
@@ -26,6 +27,7 @@ export class GamePlayer {
     nuisanceMondManager: NuisanceMondManager;
     canvas: CanvasManager = new CanvasManager();
     label: InformationLabelManager;
+    readonly feedback: PlayFeedback;
     input: InputObserver;
     playField: HTMLDivElement = document.createElement("div");
     playInfo = {
@@ -213,8 +215,7 @@ export class GamePlayer {
                 },
                 {
                     opacity: 0,
-                    rotate: "720deg",
-                    scale: 0,
+                    scale: 0.98,
                 },
             ],
             {
@@ -232,6 +233,7 @@ export class GamePlayer {
         this.loop = new SimulationLoop(clock);
         this.operator = new MondOperator(seeds.next);
         this.label = new InformationLabelManager(playerCount);
+        this.feedback = new PlayFeedback(clock, playerCount);
         this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance, clock);
         this.events.add(
             this.nuisanceMondManager.addHandler("finishDamage", () => {
@@ -248,7 +250,8 @@ export class GamePlayer {
             }),
             this.nuisanceMondManager.addHandler("damageBoard", () => {
                 this.playInfo.penalty += 1;
-                this.animations.damageBoard.play();
+                if (GraphicSetting.damageEffects) this.animations.damageBoard.play();
+                this.feedback.show("ダメージ", "持ち時間 −1", "penalty");
             }),
             this.nuisanceMondManager.addHandler("progress", () => {
                 this.canvas.readData(this.operator.g$graphicData);
@@ -271,9 +274,18 @@ export class GamePlayer {
             this.input.attachClock(clock);
         }
         this.playField.classList.add("playField");
-        this.playField.appendChild(this.canvas.g$playCanvas);
+        const board = document.createElement("div");
+        board.className = "boardView";
+        board.append(this.canvas.g$playCanvas, this.feedback.rowFlash);
+        this.playField.appendChild(board);
         this.playField.appendChild(this.canvas.g$nextCanvas);
         this.playField.appendChild(this.label.g$element);
+        this.playField.appendChild(this.feedback.element);
+        if (playerCount > 1) {
+            this.playField.classList.add("multiplayerField");
+            this.playField.style.setProperty("--player-count", String(playerCount));
+            if (playerCount >= 3) this.playField.classList.add("compactPlayField");
+        }
         this.canvas.paint();
         Object.values(this.animations).forEach((animation) => {
             animation.cancel();
@@ -293,6 +305,7 @@ export class GamePlayer {
         if (this.state.hasFinished) {
             return;
         }
+        this.playField.classList.remove("feedbackPaused");
         this.loop.start();
         if (!this.state.damaging) {
             this.operator.start();
@@ -306,6 +319,7 @@ export class GamePlayer {
     }
 
     stop() {
+        this.playField.classList.add("feedbackPaused");
         this.loop.stop();
         this.operator.stop();
         this.nuisanceMondManager.stop();
@@ -321,11 +335,13 @@ export class GamePlayer {
         this.nuisanceMondManager.setPlaybackSpeed(speed);
         if (this.input instanceof AutoInputObserver) this.input.setPlaybackSpeed(speed);
         Object.values(this.animations).forEach((animation) => (animation.playbackRate = speed));
+        this.playField.style.setProperty("--feedback-duration", `${200 / speed}ms`);
     }
 
     dispose(): void {
         this.stop();
         this.events.dispose();
+        this.feedback.dispose();
         this.nuisanceMondManager.dispose();
         Object.values(this.animations).forEach((animation) => animation.cancel());
         this.runningAnimations = [];
@@ -355,7 +371,7 @@ export class GamePlayer {
         }
         this.damageInfo.lastDamageTime = this.loop.g$elapsedTime;
         this.damageInfo.damageTask += damageTask;
-        this.animations.caution.play();
+        if (GraphicSetting.damageEffects) this.animations.caution.play();
     }
 
     private proceedTemporaryDamageTask() {
@@ -366,7 +382,7 @@ export class GamePlayer {
             this.damageInfo.damageTask += this.damageInfo.temporaryDamageTask;
             this.damageInfo.temporaryDamageTask = 0;
             this.damageInfo.lastDamageTime = this.loop.g$elapsedTime;
-            this.animations.caution.play();
+            if (GraphicSetting.damageEffects) this.animations.caution.play();
         }
     }
 
@@ -375,6 +391,7 @@ export class GamePlayer {
             return;
         }
         this.state.damaging = true;
+        this.feedback.show("ダメージ", `攻撃 ${this.damageInfo.damageTask} を受ける`, "penalty");
         this.operator.stop();
         this.nuisanceMondManager.damage(this.damageInfo.damageTask);
         this.nuisanceMondManager.start();

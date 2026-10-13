@@ -14,7 +14,6 @@ import { PageInteractionSetter } from "../Utilities/Interaction/PageInteractionS
 import { Music } from "../Utilities/Music/Music";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { Scene, sceneManager } from "../Utilities/SceneManager";
-import { ScenePlay } from "./ScenePlay";
 import { ControllerSettingManager } from "../ControllerSettingManager";
 import { SoundTest } from "../SoundTest";
 import { populateBGMSelectors } from "../BGMTracks";
@@ -27,12 +26,14 @@ import { PlayData } from "../PlayData";
 import { setupHelpPages } from "../HelpPages";
 import { setupAchievementPage } from "../Achievements/AchievementPage";
 import { setupAchievementCompletionNotice } from "../Achievements/CompletionNotice";
+import { KeyboardSettingManager } from "../KeyboardSettingManager";
+import { applyPageTransitions } from "../Utilities/Element/PageTransitions";
+import { PageManager } from "../Utilities/Page/PageManager";
 
 export class SceneTitle extends Scene {
     private elementManager: ElementManager;
     private elementEventSetter: ElementEventSetter;
     private pageInteraction: PageInteraction;
-    private bgmPreviewActive = false;
     private bgmPreviewSetting: "soloBGM" | "multiBGM" = "soloBGM";
     private readonly soundTest = new SoundTest();
     private showAchievementCompletionNotice: () => boolean = () => false;
@@ -62,14 +63,15 @@ export class SceneTitle extends Scene {
         this.showAchievementCompletionNotice = setupAchievementCompletionNotice(this, () => this.openFirstLaunchGuide());
         this.setSettingButton();
         populateBGMSelectors();
-        this.setupBGMSetting();
         this.soundTest.setup(this, this.elementManager, this.elementEventSetter);
-        this.setStageButton();
+        // 試聴を停止した後で、戻り先のメニューBGMを再生する。
+        this.setupBGMSetting();
         this.pageInteraction.start();
         // BeforePlaying
         PlaySettingSetter.setEvents();
         ControllerRegisterer.setEvents();
         ControllerSettingManager.setup();
+        KeyboardSettingManager.setup();
 
         // データ消去イベントの設定
         DeleteDataHandler.setEvents();
@@ -88,6 +90,7 @@ export class SceneTitle extends Scene {
         DeleteDataHandler.close();
         ControllerRegisterer.clearEvents();
         ControllerSettingManager.close();
+        KeyboardSettingManager.close();
         this.pageInteraction.stop();
     }
 
@@ -96,126 +99,9 @@ export class SceneTitle extends Scene {
     }
 
     private setPageAnimation() {
-        this.pageManager.g$pages.forEach((page) => {
-            page.setOpenAnimation(
-                [
-                    {
-                        filter: "blur(0.5cqh)",
-                        transform: "translate(0, -0.3cqh)",
-                        opacity: 0,
-                    },
-                    {
-                        transform: "",
-                        opacity: 1,
-                    },
-                ],
-                {
-                    duration: 400,
-                    direction: "normal",
-                    iterations: 1,
-                    easing: "ease-in-out",
-                }
-            );
-            page.setCloseAnimation(
-                [
-                    {
-                        opacity: 1,
-                    },
-                    {
-                        filter: "blur(1cqh)",
-                        scale: 1.2,
-                        opacity: 0,
-                    },
-                ],
-                {
-                    duration: 300,
-                    direction: "normal",
-                    iterations: 1,
-                    easing: "ease-in",
-                }
-            );
-        });
-
-        const pageStart = this.pageManager.getPage("pageStart")!;
-        pageStart.setOpenAnimation(
-            [
-                {
-                    opacity: "0",
-                },
-                {
-                    opacity: "1",
-                },
-            ],
-            {
-                duration: 500,
-                direction: "normal",
-                iterations: 1,
-                easing: "ease-in",
-            }
-        );
-        pageStart.setCloseAnimation(
-            [
-                {
-                    opacity: "1",
-                },
-                {
-                    backgroundColor: "#222222",
-                    color: "#22222200",
-                    filter: "blur(1cqh)",
-                    opacity: "1",
-                },
-                {
-                    backgroundColor: "#222222",
-                    color: "#22222200",
-                    opacity: "0",
-                },
-            ],
-            {
-                duration: 800,
-                direction: "normal",
-                iterations: 1,
-                easing: "ease-in",
-            }
-        );
+        applyPageTransitions(this);
     }
 
-    private setStageButton() {
-        document.querySelectorAll<HTMLElement>("[data-stage]").forEach((button) => {
-            const stageNumber = Number.parseInt(button.dataset.stage || "0");
-            button.addEventListener("click", async () => {
-                const stageSelect = this.pageManager.getPage("stageSelect")!;
-                stageSelect.g$element.querySelector<HTMLElement>(".headingLabel")!.style.borderBottom = "none";
-                stageSelect.setCloseAnimation(
-                    [
-                        {},
-                        {
-                            clipPath: "circle(100% at 50% 50%)",
-                            backgroundColor: "#333355",
-                            color: "#333355",
-                        },
-                        {
-                            filter: "blur(1cqh)",
-                        },
-                        {
-                            backgroundColor: "#333355",
-                            color: "#333355",
-                            clipPath: "circle(0% at 50% 50%)",
-                            filter: "blur(1cqh)",
-                        },
-                    ],
-                    {
-                        duration: 1000,
-                        direction: "normal",
-                        iterations: 1,
-                        easing: "ease-in",
-                    }
-                );
-                this.pageManager.sceneClose();
-                await this.pageManager.getPage("stageSelect")?.hasClosed();
-                await sceneManager.change(ScenePlay);
-            });
-        });
-    }
 
     private setPageStart() {
         // 音声の初期化はページ全体への直接クリックで行う。
@@ -321,27 +207,24 @@ export class SceneTitle extends Scene {
                 globalValues[setting] = selectedBGM;
                 this.bgmPreviewSetting = setting;
                 DataManager.save();
-                this.bgmPreviewActive = true;
                 MusicManager.playExclusiveBGM(selectedBGM);
             });
         });
 
         this.pageManager.addHandler("changePage", (pageId: string) => {
             if (pageId === "bgmSetting") {
-                this.bgmPreviewActive = true;
                 MusicManager.playExclusiveBGM(globalValues[this.bgmPreviewSetting]);
                 return;
             }
             const selected = selectors.find(({ id }) => id === pageId);
             if (selected) {
                 this.bgmPreviewSetting = selected.setting;
-                this.bgmPreviewActive = true;
                 MusicManager.playExclusiveBGM(globalValues[selected.setting]);
                 return;
             }
-            if (!this.bgmPreviewActive) return;
-            this.bgmPreviewActive = false;
-            MusicManager.playExclusiveBGM("つみきのおしろ");
+            if (pageId === "soundTest" || pageId === "soundTestSelector" || !Music.g$initialized) return;
+            const inOthers = pageId === "others" || PageManager.getBackIndex("others") > 0;
+            MusicManager.playExclusiveBGM(inOthers ? "さよならさんかく" : "つみきのおしろ");
         });
     }
 }

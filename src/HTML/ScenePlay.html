@@ -3,16 +3,18 @@
         <div id="playBackground"></div>
     </div>
 
-    <div class="page pauseMenu" id="pause" data-layer="1">
+    <div class="page pauseMenu" id="pause" data-layer="1" data-default-focus="#resumeButton">
         <div class="label headingLabel">ポーズ</div>
-        <div class="container" data-direction="row">
+        <div class="container pausePrimary" data-direction="row">
             <div class="button" id="resumeButton" data-xy="[0,0]">再開する</div>
-            <div class="restart button" id="pauseRestartButton" data-xy="[1,0]">もう一度</div>
-            <div class="button" id="playPrepareButton" data-xy="[2,0]">プレイ準備</div>
         </div>
-        <div class="container" data-direction="row">
-            <div class="button" id="modeSelectButton" data-xy="[0,1]">モード選択</div>
-            <div class="button" id="titleButton" data-xy="[1,1]">タイトルへ</div>
+        <div class="container pauseSecondary" data-direction="row">
+            <div class="restart button" id="pauseRestartButton" data-xy="[0,1]">もう一度</div>
+            <div class="button" id="playPrepareButton" data-xy="[1,1]">プレイ準備</div>
+        </div>
+        <div class="container pauseSecondary" data-direction="row">
+            <div class="button" id="modeSelectButton" data-xy="[0,2]">モード選択</div>
+            <div class="button" id="titleButton" data-xy="[1,2]">タイトルへ</div>
         </div>
     </div>
 

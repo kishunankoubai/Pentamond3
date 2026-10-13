@@ -10,13 +10,14 @@ import { MusicManager } from "./Utilities/Music/MusicManager";
 import { bgmTracks } from "./BGMTracks";
 import { PlayData } from "./PlayData";
 import { PageNotice } from "./Utilities/Feedback/PageNotice";
+import { KeyboardSettingManager } from "./KeyboardSettingManager";
 
 export class DataManager {
     private static key = [11, 11];
     private static saveName = "contemporary";
     private static soloBGMKey = "Pentamond3-soloBGM";
     private static multiBGMKey = "Pentamond3-multiBGM";
-    static readonly settingStorageKeys = ["contemporary", "Pentamond3-soloBGM", "Pentamond3-multiBGM", "Pentamond3-graphicSetting", "Pentamond3-volumeSetting", ControllerSettingManager.storageKey];
+    static readonly settingStorageKeys = ["contemporary", "Pentamond3-soloBGM", "Pentamond3-multiBGM", "Pentamond3-graphicSetting", "Pentamond3-volumeSetting", ControllerSettingManager.storageKey, KeyboardSettingManager.storageKey];
     private static availableBGMs = new Set<string>(bgmTracks.map(({ name }) => name));
 
     static save() {
@@ -42,6 +43,7 @@ export class DataManager {
         if (globalValues.nosave) return;
 
         ControllerSettingManager.read();
+        KeyboardSettingManager.read();
         try {
             const compressedData = localStorage.getItem(DataManager.saveName);
             if (compressedData) {
@@ -60,7 +62,7 @@ export class DataManager {
                 try {
                     const graphic = JSON.parse(graphicSetting);
                     if (graphic && typeof graphic === "object") {
-                        const settings: (keyof typeof globalValues.graphic)[] = ["putShake", "removeShake", "playBackground"];
+                        const settings = Object.keys(globalValues.graphic) as (keyof typeof globalValues.graphic)[];
                         settings.forEach((setting) => {
                             if (typeof graphic[setting] === "boolean") globalValues.graphic[setting] = graphic[setting];
                         });
@@ -89,11 +91,12 @@ export class DataManager {
     static resetSettings(): void {
         this.settingStorageKeys.forEach((key) => localStorage.removeItem(key));
         ControllerSettingManager.reset();
+        KeyboardSettingManager.reset();
         globalValues.bgmVolume = 10;
         globalValues.seVolume = 10;
         globalValues.soloBGM = "ならべてトライアングル";
         globalValues.multiBGM = "Top of the Pyramid";
-        globalValues.graphic = { putShake: true, removeShake: true, playBackground: true };
+        globalValues.graphic = { putShake: true, removeShake: true, playBackground: true, damageEffects: true, timeWarningEffect: true, playNotifications: true, reducedMotion: false, blockSymbols: false };
         Music.s$masterBGMVolume = 1;
         Music.s$masterSEVolume = 1;
         MusicManager.updateAllGain();

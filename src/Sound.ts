@@ -27,9 +27,10 @@ export function setupMusics() {
     });
 
     const pentamondSounds = [
+        ["実績達成", "Pentamond3-消去音6.mp3", 1],
         ["移動音", "Pentamond3-移動音.mp3", 0.7],
         ["右回転音", "Pentamond3-右回転音.mp3", 0.7],
-        ["滑り移動音", "Pentamond3-滑り移動音.mp3", 0.7],
+        ["滑り移動音", "Pentamond3-滑り移動音.mp3", 0.9],
         ["左回転音", "Pentamond3-左回転音.mp3", 0.7],
         ["設置音", "Pentamond3-設置音.mp3", 0.85],
         ...Array.from({ length: 7 }, (_, i) => [`消去音${i}`, `Pentamond3-消去音${i}.mp3`, 7] as [string, string, number]),

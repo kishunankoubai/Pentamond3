@@ -49,7 +49,7 @@ export class DeleteDataHandler {
                 if (description)
                     description.textContent =
                         group === "settings"
-                            ? "音量・BGM・グラフィック・コントローラー設定を初期値に戻します。 プレイデータとリプレイは残ります。 この操作は取り消せません。"
+                            ? "音量・BGM・グラフィック・操作設定を初期値に戻します。 プレイデータとリプレイは残ります。 この操作は取り消せません。"
                             : group === "replays"
                               ? "保存済みと直近のリプレイをすべて削除します。 設定とプレイデータは残ります。 この操作は取り消せません。"
                               : group === "play"

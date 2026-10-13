@@ -50,6 +50,7 @@ export class Music {
     private playGeneration = 0;
     private fadeGeneration = 0;
     private loading?: Promise<void>;
+    private playbackRequest?: Promise<void>;
 
     constructor(data: MusicData, volume = 1.0) {
         this.data = data;
@@ -80,7 +81,21 @@ export class Music {
         await this.loading;
     }
 
-    async play(options: PlaybackOptions = {}) {
+    /** BGMのページ遷移用。再生中・読み込み中の同じ曲を開始し直さない。 */
+    ensurePlaying(): Promise<void> {
+        if (this.isPlaying) return Promise.resolve();
+        return this.playbackRequest ?? this.play();
+    }
+
+    play(options: PlaybackOptions = {}): Promise<void> {
+        const request = this.startPlayback(options);
+        this.playbackRequest = request;
+        return request.finally(() => {
+            if (this.playbackRequest === request) this.playbackRequest = undefined;
+        });
+    }
+
+    private async startPlayback(options: PlaybackOptions) {
         ++this.fadeGeneration;
         if (this.isPlaying) this.stop();
         const generation = ++this.playGeneration;
@@ -118,6 +133,7 @@ export class Music {
     }
 
     pause() {
+        this.playbackRequest = undefined;
         ++this.fadeGeneration;
         ++this.playGeneration;
         if (!this.isPlaying || !this.sourceNode) return;
@@ -135,6 +151,7 @@ export class Music {
     }
 
     stop() {
+        this.playbackRequest = undefined;
         ++this.fadeGeneration;
         ++this.playGeneration;
         if (this.sourceNode) {

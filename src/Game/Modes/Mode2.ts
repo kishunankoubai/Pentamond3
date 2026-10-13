@@ -115,12 +115,14 @@ export class Mode2 extends GameMode {
                 if (lastTrick) {
                     p.recordTrick(lastTrick);
                     p.playInfo.trickCount += 1;
+                    p.feedback.flashRow(removeSoundIndex);
                     if (["一列揃え(上)", "一列揃え(下)"].includes(lastTrick.name)) {
                         p.playInfo.line += 1;
-                        p.playInfo.score += p.playInfo.chain * 100;
-                        p.playInfo.score += (lastTrick.time + lastTrick.attack) * 50;
+                        const score = p.playInfo.chain * 100 + (lastTrick.time + lastTrick.attack) * 50;
+                        p.playInfo.score += score;
                         p.playInfo.chain += 1;
                         p.playInfo.maxChain = Math.max(p.playInfo.maxChain, p.playInfo.chain);
+                        p.feedback.showRewards(score);
                         p.canvas.guideBorderHeight = p.playInfo.targetLines - p.playInfo.line;
                         p.canvas.paintPlayCanvas();
                         if (GraphicSetting.removeShake) {

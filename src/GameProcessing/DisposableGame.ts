@@ -9,6 +9,7 @@ import { createRandomSeed } from "../Utilities/Random/SeededRandom";
 import { PlayStatistics } from "../PlayStatistics";
 import { Achievements } from "../Achievements/Achievements";
 import { SimulationClock } from "../Utilities/Loop/SimulationClock";
+import { newRecordHighlights } from "./ResultHighlights";
 
 /**
  * ゲームのセッティングから片付けまでやって捨てられるクラス
@@ -21,6 +22,7 @@ export class DisposableGame {
     readonly replayData?: ReplayData;
     readonly randomSeeds: ReplayRandomSeeds;
     readonly clock = new SimulationClock();
+    readonly highlights = { records: [] as string[], achievements: [] as string[] };
 
     private hasStarted = false;
     private disposed = false;
@@ -98,8 +100,14 @@ export class DisposableGame {
     }
 
     private async onGameFinish() {
+        const previousStatistics = PlayStatistics.getData();
+        const previousAchievements = new Set(Achievements.achievedIds());
         PlayStatistics.recordCompletedGame(this);
         Achievements.recordCompletedGame(this);
+        if (!this.isReplay()) {
+            this.highlights.records = newRecordHighlights(previousStatistics, PlayStatistics.getData());
+            this.highlights.achievements = Achievements.achievedIds().filter((id) => !previousAchievements.has(id));
+        }
         this.onEnding();
         if (this.isReplay()) {
             this.onFinishReplay();

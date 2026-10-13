@@ -7,6 +7,7 @@ import { PageManager } from "../Utilities/Page/PageManager";
 import { ScenePlay } from "./ScenePlay";
 
 export class SceneReplay extends ScenePlay {
+    private controlsHideTimer?: number;
     constructor() {
         super("src/HTML/SceneReplay.html");
     }
@@ -14,6 +15,7 @@ export class SceneReplay extends ScenePlay {
     protected override setupPausePage(): void {
         this.pauseInputEvent = inputManager.addHandler("inputValid", ([input, info]: [InputObserver, InputInfo]) => {
             if (input instanceof AutoInputObserver || this.pageManager.g$currentPageId !== "play") return;
+            this.showControls();
 
             if (["KeyP", "Escape", "button:8", "button:9"].includes(info.name)) {
                 this.pauseGame();
@@ -26,6 +28,18 @@ export class SceneReplay extends ScenePlay {
             } else if (["Enter", "Space", "KeyZ", "button:1"].includes(info.name)) {
                 GameProcessing.toggleReplayPlayback();
             }
+        });
+        const timer = window.setInterval(() => GameProcessing.updateReplayTimeDisplay(), 100);
+        this.addHandler("sceneEnd", () => {
+            window.clearInterval(timer);
+            window.clearTimeout(this.controlsHideTimer);
+        }, 1);
+        // 実際の操作だけで表示する。再生データの入力では表示しない。
+        document.addEventListener("pointerdown", () => this.showControls(), { signal: this.controller.signal });
+        document.addEventListener("keydown", () => this.showControls(), { signal: this.controller.signal });
+        this.pageManager.addHandler("changePage", () => {
+            window.clearTimeout(this.controlsHideTimer);
+            document.getElementById("replayControls")?.classList.remove("visible");
         });
 
         document.addEventListener("visibilitychange", () => {
@@ -46,6 +60,15 @@ export class SceneReplay extends ScenePlay {
         document.getElementById("replayTitleButton")?.addEventListener("click", () => this.returnTo("title"));
 
         this.pageManager.addHandler("openPage-replayPause", () => MusicManager.fadeAllBGM(0.5, 200));
+    }
+
+    private showControls(): void {
+        if (this.pageManager.g$currentPageId !== "play") return;
+        const controls = document.getElementById("replayControls");
+        if (!controls) return;
+        window.clearTimeout(this.controlsHideTimer);
+        controls.classList.add("visible");
+        this.controlsHideTimer = window.setTimeout(() => controls.classList.remove("visible"), 3000);
     }
 
     protected override pauseGame(): void {

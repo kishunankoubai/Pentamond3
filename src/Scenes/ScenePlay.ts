@@ -13,6 +13,8 @@ import { MyEvent } from "../Utilities/MyEventListener";
 import { PageManager } from "../Utilities/Page/PageManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
+import { KeyboardSettingManager } from "../KeyboardSettingManager";
+import { applyPageTransitions } from "../Utilities/Element/PageTransitions";
 
 export class ScenePlay extends Scene {
     private elementManager: ElementManager;
@@ -59,51 +61,14 @@ export class ScenePlay extends Scene {
     }
 
     private setPageAnimation() {
-        this.pageManager.g$pages.forEach((page) => {
-            page.setOpenAnimation(
-                [
-                    {
-                        transform: "translate(0, 0.3cqh)",
-                        opacity: 0,
-                    },
-                    {
-                        transform: "",
-                        opacity: 1,
-                    },
-                ],
-                {
-                    duration: 200,
-                    direction: "normal",
-                    iterations: 1,
-                    easing: "ease-in",
-                }
-            );
-            page.setCloseAnimation(
-                [
-                    {
-                        transform: "",
-                        opacity: 1,
-                    },
-                    {
-                        transform: "translate(0, 0.3cqh)",
-                        opacity: 0,
-                    },
-                ],
-                {
-                    duration: 200,
-                    direction: "normal",
-                    iterations: 1,
-                    easing: "ease-in",
-                }
-            );
-        });
+        applyPageTransitions(this);
     }
 
     protected setupPausePage() {
         this.pauseInputEvent = inputManager.addHandler("inputValid", ([input, info]: [InputObserver, InputInfo]) => {
             const playerIndex = inputManager.g$registeredInputs.indexOf(input);
             if (playerIndex < 0) return;
-            const pauseInputs = ["KeyP", "Escape", ...(ControllerRegisterer.gamepadConfigs[playerIndex]?.pause || [])];
+            const pauseInputs = input.g$type === "keyboard" ? KeyboardSettingManager.pauseKeys : (ControllerRegisterer.gamepadConfigs[playerIndex]?.pause || []);
             if (pauseInputs.includes(info.name)) this.pauseGame();
         });
 

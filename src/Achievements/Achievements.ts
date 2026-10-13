@@ -30,6 +30,16 @@ export class Achievements {
 
     static get allAchieved(): boolean { return achievements.every(({ id }) => this.isAchieved(id)); }
 
+    static achievedIds(): string[] { return achievements.filter(({ id }) => this.isAchieved(id)).map(({ id }) => id); }
+
+    static getProgress(id: string): { current: number; target: number; unit: string } | null {
+        const achievement = achievements.find((item) => item.id === id);
+        if (achievement?.counter !== undefined && achievement.target !== undefined)
+            return { current: this.counters[achievement.counter], target: achievement.target, unit: "回" };
+        if (id === "tricks-all") return { current: this.counters.slice(0, achievementTricks.length).filter((count) => count > 0).length, target: achievementTricks.length, unit: "種類" };
+        return null;
+    }
+
     private static unlock(id: string): void {
         const index = achievements.findIndex((achievement) => achievement.id === id);
         if (index < 0) throw new Error(`実績が存在しません: ${id}`);

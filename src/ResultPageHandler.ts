@@ -3,6 +3,10 @@ import { qsAll, qs, sleep } from "./Utils";
 import { Replay } from "./Replay/Replay";
 import { PlaySetting } from "./BeforePlaying/PlaySettingSetter";
 import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
+import type { DisposableGame } from "./GameProcessing/DisposableGame";
+import { achievements, achievementGrades } from "./Achievements/Definitions";
+import { MusicManager } from "./Utilities/Music/MusicManager";
+import { Achievements } from "./Achievements/Achievements";
 
 /**
  * ResultPageに関する、状態を持たない関数群
@@ -10,7 +14,7 @@ import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 export class ResultPageHandler {
     private static readonly parser = new DOMParser();
 
-    static setSaveButton() {
+    static setSaveButton(game: DisposableGame) {
         const saveButton = qs("#result .saveReplayButton");
         let saving = false;
         // 初期化は新しい結果に対して一度だけ行う。詳細結果から戻った際は維持する。
@@ -25,10 +29,17 @@ export class ResultPageHandler {
 
             await sleep(17);
 
+            const alreadyAchieved = Achievements.isAchieved("replay-saved");
             const succeed = await Replay.saveLastOne();
             if (succeed) {
                 saveButton.innerText = "保存しました";
                 saveButton.onclick = () => {};
+                if (!alreadyAchieved && Achievements.isAchieved("replay-saved")) {
+                    game.highlights.achievements.push("replay-saved");
+                    this.updateHighlights(game, false);
+                    this.updateDetailedResultPage(game);
+                    MusicManager.get("実績達成")?.play();
+                }
             } else {
                 saveButton.innerText = "リプレイを保存する";
                 setInteractionEnabled(saveButton, true);
@@ -51,8 +62,35 @@ export class ResultPageHandler {
         });
     }
 
+    static updateHighlights(game: DisposableGame, playSound = true): void {
+        const pageId = game.isReplay() ? "replayResult" : "result";
+        const summary = document.querySelector<HTMLElement>(`#${pageId} .resultSummary`)!;
+        const highlights = document.querySelector<HTMLElement>(`#${pageId} .resultHighlights`)!;
+        summary.replaceChildren(); highlights.replaceChildren();
+        const maxChain = Math.max(...game.players.map((player) => player.playInfo.maxChain));
+        const trickCount = game.players.reduce((sum, player) => sum + player.playInfo.trickCount, 0);
+        const time = Math.max(...game.players.map((player) => player.playInfo.playTime));
+        for (const [label, value] of [["プレイ時間", (time / 1000).toFixed(2)], ["役成立", `${trickCount}回`], ["最大Chain", String(maxChain)]]) {
+            const cell = document.createElement("div"); cell.className = "resultSummaryCell";
+            const heading = document.createElement("span"); heading.textContent = label;
+            const content = document.createElement("span"); content.textContent = value;
+            cell.append(heading, content); summary.appendChild(cell);
+        }
+        if (game.isReplay()) return;
+        game.highlights.records.slice(0, 2).forEach((text) => {
+            const record = document.createElement("div"); record.className = "recordBadge"; record.textContent = text; highlights.appendChild(record);
+        });
+        if (game.highlights.achievements.length) {
+            const earned = document.createElement("div"); earned.className = "achievementEarned";
+            const triangle = document.createElement("span"); triangle.className = "achievementTriangle gold"; triangle.setAttribute("aria-hidden", "true");
+            const text = document.createElement("span"); text.textContent = `実績達成！ ${game.highlights.achievements.length}個 ／ 詳細結果で確認できます`;
+            earned.append(triangle, text); highlights.appendChild(earned);
+        }
+        if (playSound && (game.highlights.records.length || game.highlights.achievements.length)) MusicManager.get("実績達成")?.play();
+    }
+
     //詳細結果の中身を作成する
-    static updateDetailedResultPage({ players, playSetting }: { players: GamePlayer[]; playSetting: PlaySetting }) {
+    static updateDetailedResultPage({ players, playSetting, highlights }: { players: GamePlayer[]; playSetting: PlaySetting; highlights?: DisposableGame["highlights"] }) {
         // 前の結果を消す
         qsAll("#detailedResult .subPage").forEach((subPage) => {
             subPage.remove();
@@ -62,6 +100,20 @@ export class ResultPageHandler {
 
         const resultTitlePage = this.createResultTitlePage(players, playSetting);
         subPageController.before(resultTitlePage);
+
+        if (highlights) {
+            const lines = [...highlights.records, ...highlights.achievements.map((id) => {
+                const item = achievements.find((achievement) => achievement.id === id)!;
+                return `${achievementGrades[item.grade]}：${item.description}`;
+            })];
+            for (let i = 0; i < lines.length; i += 5) {
+                const page = document.createElement("div"); page.className = "subPage resultAccomplishments";
+                const heading = document.createElement("div"); heading.className = "helpTopic"; heading.textContent = "今回の成果";
+                page.appendChild(heading);
+                lines.slice(i, i + 5).forEach((text) => { const row = document.createElement("div"); row.className = "text"; row.textContent = text; page.appendChild(row); });
+                subPageController.before(page);
+            }
+        }
 
         players.forEach((player, index) => {
             const page = this.createPlayerResultPage(playSetting, player, index);

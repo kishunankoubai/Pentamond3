@@ -138,7 +138,6 @@ export class SceneTutorial extends Scene {
                 MusicManager.fadeAllBGM(1, 150);
             }
         });
-        document.getElementById("lessonPausePointer")!.addEventListener("click", () => this.pause(), { signal: this.controller.signal });
         document.getElementById("lessonLeave")!.addEventListener("click", () => this.leave(), { signal: this.controller.signal });
         document.getElementById("lessonTitle")!.addEventListener("click", () => this.leave("title"), { signal: this.controller.signal });
         document.getElementById("lessonRetry")!.addEventListener(
@@ -231,24 +230,24 @@ export class SceneTutorial extends Scene {
             );
         } else {
             const introductions: Record<string, string[]> = {
-                move: ["白枠に合うように、モンドを5個設置してください。"],
+                move: ["黄色の枠に合うように、モンドを5個設置してください。"],
                 rotate: [
                     "今度は回転です！1回で60度、3回で上下が反転します。",
                     `${this.controlMarkup("spin-left")}で左回転、${this.controlMarkup("spin-right")}で右回転します。`,
-                    "白枠の形と三角形の向きを合わせて5個設置してください。",
+                    "黄色の枠の形と三角形の向きを合わせて5個設置してください。",
                 ],
                 slide: [
                     "屋根の下には、真下への設置だけでは入れません。",
-                    "白枠の少し右へ動かしてから下へ進んでください。真下が塞がれていると、斜め下へ滑り込みます。",
+                    "黄色の枠の少し右へ動かしてから下へ進んでください。真下が塞がれていると、斜め下へ滑り込みます。",
                     "滑り移動を使って5個設置しましょう。",
                 ],
                 hold: [
-                    "白枠と今のモンドの形が違いますね。こんなときはホールド！",
+                    "黄色の枠と今のモンドの形が違いますね。こんなときはホールド！",
                     `${this.controlMarkup("hold")}でモンドを取っておけます。空なら次のモンドが出現し、入っていれば入れ替わります。`,
                     "ホールドを使って5個設置しましょう。次の課題にもホールドしたモンドが残ります。",
                 ],
-                undo: ["設置を間違えたときには、一手戻しが使えます！", "まずは試しに、そのまま設置してみましょう。白枠に合わなくても大丈夫です。"],
-                erase: ["今までに覚えた移動と設置で、白枠に3個設置してみましょう。", "形と三角形の向きを合わせて盤面を完成させてください。"],
+                undo: ["設置を間違えたときには、一手戻しが使えます！", "まずは試しに、そのまま設置してみましょう。"],
+                erase: ["今までに覚えた移動と設置で、黄色の枠に3個設置してみましょう。"],
             };
             await this.say(introductions[this.model.lesson.id], token);
         }
@@ -329,7 +328,7 @@ export class SceneTutorial extends Scene {
         if (outcome.sound) MusicManager.get(outcome.sound)?.play();
         if (outcome.message) this.setText("lessonStatus", outcome.message);
         else if (outcome.trick) this.setText("lessonStatus", `${outcome.trick}の列を消去しました。`);
-        else if (this.model.placed > placedBefore) this.setText("lessonStatus", this.model instanceof TrickPracticeBoard ? "モンドを設置しました！" : "白枠に設置できました！");
+        else if (this.model.placed > placedBefore) this.setText("lessonStatus", this.model instanceof TrickPracticeBoard ? "モンドを設置しました！" : "黄色の枠に設置できました！");
         this.render();
         if (outcome.failed) {
             this.busy = true;
@@ -393,7 +392,7 @@ export class SceneTutorial extends Scene {
             this.releasePractice();
             return;
         }
-        await this.say([timedOut ? "持ち時間がなくなりました。もう一度挑戦しましょう！" : "あらら、課題を達成できませんでした。白枠の形と向きを確かめて、もう一度挑戦してください！"], token);
+        await this.say([timedOut ? "持ち時間がなくなりました。もう一度挑戦しましょう！" : "あらら、課題を達成できませんでした。黄色の枠の形を確かめて、もう一度挑戦してください！"], token);
         if (!this.isCurrent(token)) return;
         this.model.restart();
         this.setText("lessonStatus", "地形と進捗をリセットしました。もう一度挑戦しましょう。");
@@ -421,7 +420,7 @@ export class SceneTutorial extends Scene {
             if (!this.isCurrent(token)) return;
             this.model.continueAfterObservation();
             this.render();
-            await this.say(["では最後に、白い枠に合うように5個設置してください。白枠は順番に表示されます。"], token);
+            await this.say(["では最後に、黄色の枠に合うように5個設置してください。黄色の枠は順番に表示されます。"], token);
             if (this.isCurrent(token)) this.releasePractice();
             return;
         }
@@ -431,9 +430,9 @@ export class SceneTutorial extends Scene {
             autoPut: ["うまくできました！次のモンドが出現したようですね。", "では、今度はそのまま設置をしてみましょう。"],
             targets:
                 this.model.lesson.id === "move"
-                    ? ["どうやら、設置をすると自動的に一番下まで行くようですね。", "では最後に、白い枠に合うように5個設置してください。"]
-                    : ["元に戻せましたね！今度は白枠に合う位置に設置してください。", "10個の指定位置に設置するとクリアです。間違えても一手戻しで直せます。"],
-            undoBack: [`白枠とは違う位置に設置されました。${this.controlMarkup("unput")}で一手戻ししてみましょう。`],
+                    ? ["どうやら、設置をすると自動的に一番下まで行くようですね。", "では最後に、黄色の枠に合うように5個設置してください。"]
+                    : ["元に戻せましたね！今度は黄色の枠に合う位置に設置してください。", "10個の指定位置に設置するとクリアです。間違えても一手戻しで直せます。"],
+            undoBack: [`黄色の枠とは違う位置に設置されました。${this.controlMarkup("unput")}で一手戻ししてみましょう。`],
             erasing: ["3個とも設置できました！", "ここで「消去」を試してみましょう。一番下の列を消す操作です。", `${this.controlMarkup("removeLine")}で、役なしの列も含めて5回消してみましょう。`],
             done: ["成功しましたね！", `これにて「${this.model.lesson.name}」の教習を終了します！お疲れさまでした！`],
         };
@@ -460,7 +459,7 @@ export class SceneTutorial extends Scene {
                 "役を消去すると持ち時間が回復し、スコアも増えます。チェインではさらにスコアにボーナスがつきます！",
                 "マルチプレイなら攻撃もできます。時間は設定された上限を超えて回復しません。",
                 "今回は持ち時間30で、一列揃えを1回成立させましょう。",
-                `白枠にモンドを設置して${this.controlMarkup("removeLine")}で消去しましょう。`,
+                `黄色の枠にモンドを設置して${this.controlMarkup("removeLine")}で消去しましょう。`,
             ];
         if (id === "penalty")
             return [
@@ -479,10 +478,10 @@ export class SceneTutorial extends Scene {
 
     private varietyExplanation(): string[] {
         if (!(this.model instanceof BasicRuleBoard)) return [];
-        if (this.model.tricks === 0) return ["まずは「三つ子山」。3つの山の間に空きがある形です。白枠にモンドを設置しましょう。"];
+        if (this.model.tricks === 0) return ["まずは「三つ子山」。3つの山の間に空きがある形です。黄色の枠にモンドを設置しましょう。"];
         if (this.model.tricks === 1)
-            return ["次は「トゲトゲ(下)」。下向きの三角形がひとつおきに並ぶ役です。", `回転と${this.controlMarkup("move-down")}での滑り移動を使って、白枠に合うように設置しましょう。`];
-        return ["最後は「地割れ(上)」。左右で三角形の向きが変わり、間に1か所の空きがあります。空きを残すことが大切です。", "白枠にモンドを設置して、役を完成させましょう。"];
+            return ["次は「トゲトゲ(下)」。下向きの三角形がひとつおきに並ぶ役です。", `回転と${this.controlMarkup("move-down")}での滑り移動を使って、黄色の枠に合うように設置しましょう。`];
+        return ["最後は「地割れ(上)」。左右で三角形の向きが変わり、間に1か所の空きがあります。空きを残すことが大切です。", "黄色の枠にモンドを設置して、役を完成させましょう。"];
     }
 
     private async explainBasicPhase(): Promise<void> {
@@ -546,32 +545,32 @@ export class SceneTutorial extends Scene {
                 return [
                     "盤面の右側にあるNEXTを見てみましょう。これから出現するモンドが上から順番に並んでいます。",
                     "今のモンドだけでなく、次に来る形も見ておくと、置き場所を考えやすくなります。",
-                    "NEXTの一番上の形を確かめてから、今のモンドを白枠に設置してください。予告と出現する形を見比べながら、4個設置しましょう。",
+                    "NEXTの一番上の形を確かめてから、今のモンドを黄色の枠に設置してください。予告と出現する形を見比べながら、4個設置しましょう。",
                 ];
             case "holdReset":
                 return [
                     "Pentamondには上へ移動する操作はありません。しかし、下へ動かしすぎたときはホールドを使って戻すことができます。",
                     "ホールドにすでにモンドがあるなら、2回入れ替えると元のモンドに戻ります。入れ替えたモンドは初期位置・初期の向きで出現します。",
-                    `${this.controlMarkup("move-down")}で下へ動かし、${this.controlMarkup("hold")}で2回ホールドしてみましょう。白枠は初期位置です。`,
+                    `${this.controlMarkup("move-down")}で下へ動かし、${this.controlMarkup("hold")}で2回ホールドしてみましょう。黄色の枠は初期位置です。`,
                 ];
             case "juggling":
                 return [
                     "今のモンドも、ホールドのモンドも都合が悪いとき、ネクストを取り出す「ジャグリング」というテクニックがあります。",
                     "設置、ホールド、一手戻し、ホールドの順で行います。出現したネクストをホールドに取り、一手戻ししたあとに取り出す手順です。",
                     "一手戻しを使うためサバイバルでは持ち時間が3減ります。便利ですが、必要なときに使いましょう。",
-                    `まず${this.controlMarkup("put")}で設置し、右の課題に沿って順番に操作しましょう。最後に、取り出したモンドを白枠に設置してください。`,
+                    `まず${this.controlMarkup("put")}で設置し、右の課題に沿って順番に操作しましょう。最後に、取り出したモンドを黄色の枠に設置してください。`,
                 ];
             case "rotation":
                 return [
                     "屋根の下などには滑り移動したあとに回転すると入る形があります。いわゆる「回転入れ」です。",
-                    `まず2回左回転して形を変え、${this.controlMarkup("move-down")}で滑り込んでみてください。そのあと2回右回転すると、白枠の形に戻せます。`,
+                    `まず2回左回転して形を変え、${this.controlMarkup("move-down")}で滑り込んでみてください。そのあと2回右回転すると、黄色の枠の形に戻せます。`,
                     "滑り移動だけではなく、滑ったあとに回転してから設置することがポイントです。",
                 ];
             case "leftPriority":
                 return [
                     "下方向の入力ではまず真下へ進もうとします。真下に進めない場合には左下、右下の順に滑れるかを調べます。",
                     "つまり、左右のどちらにも滑れるときは左が優先されます。今回は灰色の三角形の左右が、どちらも空いています。",
-                    `${this.controlMarkup("move-down")}で下へ進んでみましょう。左へ滑ったら白枠の位置に設置してください。`,
+                    `${this.controlMarkup("move-down")}で下へ進んでみましょう。左へ滑ったら黄色の枠の位置に設置してください。`,
                 ];
             case "blockedSpawn":
                 return [
@@ -602,7 +601,10 @@ export class SceneTutorial extends Scene {
         }
         if (model.lesson.id === "rotation") {
             await this.say(
-                ["滑り移動のあとに回転して屋根の下へ入れられましたね！次は別の形でも試しましょう。", "次の地形では少し右へ動かしてから1回左回転し、下へ滑り込んだあとに右回転して白枠へ入れましょう。"],
+                [
+                    "滑り移動のあとに回転して屋根の下へ入れられましたね！次は別の形でも試しましょう。",
+                    "次の地形では少し右へ動かしてから1回左回転し、下へ滑り込んだあとに右回転して黄色の枠へ入れましょう。",
+                ],
                 token
             );
             if (!this.isCurrent(token)) return;
@@ -661,8 +663,8 @@ export class SceneTutorial extends Scene {
         this.canvas.readData(graphics);
         this.canvas.paint();
         const introducingErase = this.model.lesson.id === "erase" && ["erasing", "done"].includes(this.model.phase);
-        this.setText("lessonKnowledge", this.model.lesson.id === "erase" && !introducingErase ? "白枠に形と向きを合わせ、盤面を完成させましょう。" : this.model.lesson.knowledge);
-        this.setText("lessonCondition", `白枠にモンドを${this.model.lesson.count}個設置しよう${introducingErase ? "／消去を5回しよう" : ""}`);
+        this.setText("lessonKnowledge", this.model.lesson.id === "erase" && !introducingErase ? "黄色の枠に形と向きを合わせ、盤面を完成させましょう。" : this.model.lesson.knowledge);
+        this.setText("lessonCondition", `黄色の枠にモンドを${this.model.lesson.count}個設置しよう${introducingErase ? "／消去を5回しよう" : ""}`);
         this.setText(
             "lessonProgress",
             this.model.phase === "horizontal"
@@ -675,7 +677,7 @@ export class SceneTutorial extends Scene {
             firstPut: "その場所に設置してみよう",
             autoPut: "今度は動かさず、そのまま設置してみよう",
             autoPutReview: "設置後のモンドの位置を見てみよう",
-            targets: "白枠の形・向きに合わせて設置しよう",
+            targets: "黄色の枠の形・向きに合わせて設置しよう",
             undoPut: "まずは動かさず、そのまま設置してみよう",
             undoBack: "一手戻しで直前の設置を元に戻そう",
             erasing: "一番下の列を5回消去しよう",

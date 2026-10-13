@@ -124,12 +124,6 @@
         bottom: 2cqh;
         font-size: 2.5cqh;
     }
-    & #lessonPausePointer {
-        position: absolute;
-        right: 5cqh;
-        bottom: 2cqh;
-        font-size: 3cqh;
-    }
     & #talk {
         background: #2234;
     }

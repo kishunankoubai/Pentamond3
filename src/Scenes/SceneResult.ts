@@ -1,16 +1,14 @@
-import { globalValues } from "../Global";
-import { sleep } from "../Utilities/Common";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 import { PageInteraction } from "../Utilities/Interaction/PageInteraction";
 import { PageInteractionSetter } from "../Utilities/Interaction/PageInteractionSetter";
-import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { Scene } from "../Utilities/SceneManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
 import { GameProcessing } from "../GameProcessing/GameProcessing";
 import { PageManager } from "../Utilities/Page/PageManager";
+import { applyPageTransitions } from "../Utilities/Element/PageTransitions";
 
 export class SceneResult extends Scene {
     private elementManager: ElementManager;
@@ -35,10 +33,6 @@ export class SceneResult extends Scene {
         MusicManager.playExclusiveBGM("おかたづけ");
         document.getElementById("resultRestartButton")?.addEventListener("click", () => GameProcessing.restartNormal());
         document.getElementById("resultPlayPrepareButton")?.addEventListener("click", () => this.returnTo("playPrepare"));
-        document.getElementById("resultModeSelectButton")?.addEventListener("click", () => {
-            const target = GameProcessing.currentGame?.playSetting.playerNumber === 1 ? "soloStageSelect" : "multiStageSelect";
-            this.returnTo(target);
-        });
         document.getElementById("resultTitleButton")?.addEventListener("click", () => this.returnTo("title"));
         document.getElementById("replayRestartButton")?.addEventListener("click", () => GameProcessing.restartReplay());
         document.getElementById("replayListButton")?.addEventListener("click", () => this.returnToClosest(["replay", "savedReplay"]));
@@ -76,44 +70,6 @@ export class SceneResult extends Scene {
     }
 
     private setPageAnimation() {
-        this.pageManager.g$pages.forEach((page) => {
-            page.setOpenAnimation(
-                [
-                    {
-                        filter: "blur(0.5cqh)",
-                        transform: "translate(0, -0.3cqh)",
-                        opacity: 0,
-                    },
-                    {
-                        transform: "",
-                        opacity: 1,
-                    },
-                ],
-                {
-                    duration: 400,
-                    direction: "normal",
-                    iterations: 1,
-                    easing: "ease-in-out",
-                }
-            );
-            page.setCloseAnimation(
-                [
-                    {
-                        opacity: 1,
-                    },
-                    {
-                        filter: "blur(1cqh)",
-                        scale: 1.2,
-                        opacity: 0,
-                    },
-                ],
-                {
-                    duration: 300,
-                    direction: "normal",
-                    iterations: 1,
-                    easing: "ease-in",
-                }
-            );
-        });
+        applyPageTransitions(this);
     }
 }

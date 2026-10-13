@@ -3,6 +3,8 @@ import type { ElementManager } from "../Utilities/Element/ElementManager";
 import { spaceJapanesePunctuation } from "../Utilities/Text/JapaneseText";
 import { Achievements } from "./Achievements";
 import { achievements, achievementCategories, achievementGrades, type Achievement } from "./Definitions";
+import { TutorialProgress } from "../Tutorial/TutorialProgress";
+import { tutorialUnits } from "../Tutorial/TutorialUnits";
 
 export function setupAchievementPage(scene: Scene, elements: ElementManager): void {
     const page = document.getElementById("achievements")!;
@@ -11,6 +13,9 @@ export function setupAchievementPage(scene: Scene, elements: ElementManager): vo
     const title = page.querySelector<HTMLElement>("#achievementDescription")!;
     const state = page.querySelector<HTMLElement>("#achievementState")!;
     const note = page.querySelector<HTMLElement>("#achievementNote")!;
+    const progress = page.querySelector<HTMLElement>("#achievementProgress")!;
+    const progressText = page.querySelector<HTMLElement>("#achievementProgressText")!;
+    const progressFill = page.querySelector<HTMLElement>("#achievementProgressFill")!;
     const summaryOverall = page.querySelector<HTMLElement>("#achievementSummaryOverall")!;
     const summaryGrades = page.querySelector<HTMLElement>(".achievementSummaryGrades")!;
     const gradeRows = (["gold", "silver", "bronze"] as const).map((grade) => {
@@ -62,6 +67,17 @@ export function setupAchievementPage(scene: Scene, elements: ElementManager): vo
         title.textContent = spaceJapanesePunctuation(achievement.description);
         state.textContent = `${achievementGrades[achievement.grade]}　${Achievements.isAchieved(achievement.id) ? "達成済み" : "未達成"}`;
         note.textContent = spaceJapanesePunctuation(achievement.note);
+        let values = Achievements.getProgress(achievement.id);
+        if (achievement.id.startsWith("tutorial-")) {
+            const units = tutorialUnits.filter((unit) => achievement.id === "tutorial-all" || `tutorial-${unit.id}` === achievement.id);
+            values = { current: units.reduce<number>((total, unit) => total + unit.lessons.filter((_, i) => TutorialProgress.isCleared(unit.offset + i)).length, 0), target: units.reduce<number>((total, unit) => total + unit.lessons.length, 0), unit: "項目" };
+        }
+        progress.hidden = !values;
+        if (values) {
+            const current = Math.min(values.current, values.target);
+            progressText.textContent = `${current.toLocaleString("ja-JP")} / ${values.target.toLocaleString("ja-JP")} ${values.unit}`;
+            progressFill.style.width = `${current / values.target * 100}%`;
+        }
     };
     const showFirst = () => {
         const section = Array.from(page.querySelectorAll<HTMLElement>(".subPage")).find((element) => element.style.display !== "none");
