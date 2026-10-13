@@ -77,7 +77,9 @@ body::before {
     padding-inline-start: calc(1.25cqh + 1.12em);
     border-radius: 0.6cqh;
 }
-.selector { padding-inline: 1.12em; }
+.selector {
+    padding-inline: 1.12em;
+}
 .button[aria-disabled="true"] {
     opacity: 0.55;
     cursor: default;
@@ -150,16 +152,42 @@ body::before {
     animation-name: none;
 }
 .selectOptionDescriptions > div {
-    animation: descriptionAppear 240ms ease-out both;
+    animation:
+        descriptionAppear 240ms ease-out both,
+        descriptionFloat 4s ease-in-out 240ms infinite;
+}
+@keyframes descriptionFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.8cqh);
+    }
 }
 @keyframes descriptionAppear {
-    from { opacity: 0; transform: translateX(1.5cqh); }
-    to { opacity: 1; transform: translateX(0); }
+    from {
+        opacity: 0;
+        transform: translateX(1.5cqh);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 @media (prefers-reduced-motion: reduce) {
-    .selectOptionDescriptions > div { animation: descriptionFade 120ms ease-out both; }
+    .selectOptionDescriptions > div {
+        animation: descriptionFade 120ms ease-out both;
+    }
 }
-@keyframes descriptionFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes descriptionFade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
 
 #pageStart {
     gap: 3cqh;
@@ -188,12 +216,24 @@ body::before {
     -webkit-text-stroke: 0.08cqh #52617855;
 }
 /* 盤面の6色を、淡い背景にも読める色へ馴染ませる。 */
-.startWordmark [data-mond="L"] { color: #d45469; }
-.startWordmark [data-mond="J"] { color: #c77c30; }
-.startWordmark [data-mond="p"] { color: #aa901d; }
-.startWordmark [data-mond="q"] { color: #3d9c78; }
-.startWordmark [data-mond="U"] { color: #537dcc; }
-.startWordmark [data-mond="I"] { color: #a768ac; }
+.startWordmark [data-mond="L"] {
+    color: #d45469;
+}
+.startWordmark [data-mond="J"] {
+    color: #c77c30;
+}
+.startWordmark [data-mond="p"] {
+    color: #aa901d;
+}
+.startWordmark [data-mond="q"] {
+    color: #3d9c78;
+}
+.startWordmark [data-mond="U"] {
+    color: #537dcc;
+}
+.startWordmark [data-mond="I"] {
+    color: #a768ac;
+}
 .startInvitation {
     margin-top: 5cqh;
     display: flex;
@@ -349,9 +389,18 @@ body::before {
     display: block;
     flex: none;
     clip-path: polygon(50% 0, 100% 100%, 0 100%);
-    background: linear-gradient(135deg, #fff09a, #ca961b);
+    background: linear-gradient(135deg, #ffffff90, transparent 45%, #00000030), var(--trophy-color, #e5b833);
     width: 3cqh;
     height: 2.6cqh;
+}
+.achievementEarned .achievementTriangle.bronze {
+    --trophy-color: #ba793f;
+}
+.achievementEarned .achievementTriangle.silver {
+    --trophy-color: #a1b1c3;
+}
+.achievementEarned .achievementTriangle.gold {
+    --trophy-color: #e5b833;
 }
 #detailedResult .subPage {
     width: 132cqh;
@@ -535,28 +584,47 @@ body::before {
     border-radius: 0.5cqh;
     background: none;
 }
-#keyboardBindingSetting .bindingPopup {
+#keyboardBindingSetting .bindingPopup,
+#controllerBindingSetting .controllerBindingPopup {
+    box-sizing: border-box;
     justify-content: flex-start;
     padding: 16cqh 5cqh 13cqh;
     gap: 2cqh;
 }
-#keyboardBindingSetting .bindingStatus {
+#keyboardBindingSetting .bindingStatus,
+#controllerBindingSetting #controllerBindingStatus {
     font-size: 3.2cqh;
     min-height: 6cqh;
+    flex-shrink: 0;
 }
-#keyboardBindingList {
+#keyboardBindingList,
+#controllerBindingSetting #controllerBindingList {
     display: flex;
     width: 100%;
     min-height: 27cqh;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 1cqh;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 0.5cqh;
 }
-#keyboardBindingList .button {
+#keyboardBindingList .button,
+#controllerBindingSetting #controllerBindingList .button {
+    position: relative;
+    margin-left: 0;
+    font-size: 4cqh;
+    line-height: 1.4;
+}
+#keyboardBindingList .text,
+#controllerBindingSetting .controllerBindingEmpty {
     font-size: 4cqh;
 }
-#keyboardBindingAdd {
+#keyboardBindingAdd,
+#controllerBindingSetting #controllerBindingAdd {
+    position: relative;
+    margin-left: 0;
     font-size: 4cqh;
+    flex-shrink: 0;
 }
 .waitingInput {
     background: #fff0f7;
@@ -655,6 +723,51 @@ body::before {
     right: auto;
     font-size: 1em;
 }
+#playerControllerSetting {
+    justify-content: flex-start;
+    padding-top: 18cqh;
+    box-sizing: border-box;
+    gap: 3cqh;
+}
+#playerControllerSetting > .text {
+    margin-bottom: 0;
+}
+#playerControllerSetting .playerControllerRows {
+    width: 126cqh;
+    padding: 2cqh;
+    box-sizing: border-box;
+    background: var(--panel);
+    border: 0.3cqh solid var(--panel-border);
+    border-radius: 2cqh;
+    gap: 1.5cqh;
+}
+#playerControllerSetting .playerControllerRows .playerControllerRow {
+    width: 100%;
+    grid-template-columns: 22cqh repeat(4, minmax(0, 1fr));
+    gap: 2cqh;
+    min-height: 9cqh;
+}
+#playerControllerSetting .playerControllerRows .playerControllerRow .label {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3cqh;
+}
+#playerControllerSetting .playerSettingName {
+    font-size: 3.5cqh;
+    color: #228899;
+}
+#playerControllerSetting .playerInputType {
+    font-size: 2.4cqh;
+}
+#playerControllerSetting .playerControllerRow .button {
+    padding-block: 0.6cqh;
+    box-sizing: border-box;
+}
+#playerOperationSettingButton {
+    font-size: 4.5cqh;
+    margin-top: 1cqh;
+}
 .lessonList .lessonButton {
     text-align: center;
 }
@@ -700,6 +813,10 @@ body::before {
 }
 #survivalPlaySetting .handyRow .playerSettingLabel {
     color: #228899;
+}
+#survivalPlaySetting .handyRow .handyValue {
+    width: 16cqh;
+    flex: none;
 }
 #survivalPlaySetting .handyRow .handyValue,
 #linePlaySetting .settingValue {
@@ -758,11 +875,46 @@ body::before {
 .clearedRowFlash[hidden] {
     display: none;
 }
+.boardCollapse {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+.boardCollapse[hidden] {
+    display: none;
+}
+.boardCollapse::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(115deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%),
+        linear-gradient(65deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%);
+}
+.boardCollapse span {
+    position: absolute;
+    width: 16%;
+    height: 15%;
+    background: #e9a1ae;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    transform: translate(calc(var(--collapse-progress) * var(--fragment-drift)), calc(var(--collapse-progress) * 28cqh)) rotate(calc(var(--collapse-progress) * var(--fragment-turn)));
+}
 #play .playField .informationLabelBase {
     min-width: 0;
     padding-top: 2cqh;
     margin-left: 0;
     gap: 2.5cqh;
+}
+.informationLabelHeader,
+.informationLabelContent,
+.infinitySymbol {
+    font-family: "RocknRoll One", Arial, sans-serif;
+}
+.infinitySymbol {
+    font-size: inherit;
+    color: inherit;
 }
 .informationLabelHeader {
     text-shadow: none;
@@ -857,9 +1009,11 @@ body::before {
 .reducedPlayMotion .feedbackMessage {
     animation: none;
 }
-.playFeedback[hidden] { display: none; }
+.playFeedback[hidden] {
+    display: none;
+}
 #play .multiplayerField .playFeedback {
-    width: 24%;
+    width: 34%;
     right: 0.5cqh;
 }
 #play .multiplayerField .feedbackMessage:not(:last-child) {
@@ -884,24 +1038,26 @@ body::before {
 #play .multiplayerField .pendingAttack {
     font-size: calc(5cqh / var(--player-count));
 }
-#play .multiplayerField:not(.compactPlayField) .feedbackReward {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
-}
 #replayControls,
 #replayControls.disabled {
     opacity: 0;
     visibility: hidden;
-    transition: opacity 250ms ease-out, visibility 250ms;
+    transition:
+        opacity 250ms ease-out,
+        visibility 250ms;
     max-width: 145cqh;
     flex-wrap: wrap;
     justify-content: flex-end;
     border-width: 0.3cqh;
     gap: 0.5cqh 2cqh;
 }
-#replayControls.visible { opacity: 1; visibility: visible; }
-#replayControls.visible.disabled { opacity: 0.5; }
+#replayControls.visible {
+    opacity: 1;
+    visibility: visible;
+}
+#replayControls.visible.disabled {
+    opacity: 0.5;
+}
 #replayElapsedTime {
     font-family: "RocknRoll One", Arial;
     font-variant-numeric: tabular-nums;

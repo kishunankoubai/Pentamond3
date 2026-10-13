@@ -228,6 +228,7 @@ export class GamePlayer {
     };
     runningAnimations: Animation[] = [];
     private readonly events = new EventScope();
+    private damagePenalty = 0;
 
     constructor(input: InputObserver, playerCount: number, seeds: { next: number; nuisance: number }, readonly clock: SimulationClock) {
         this.loop = new SimulationLoop(clock);
@@ -236,7 +237,12 @@ export class GamePlayer {
         this.feedback = new PlayFeedback(clock, playerCount);
         this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance, clock);
         this.events.add(
+            this.nuisanceMondManager.addHandler("startDamage", () => {
+                this.damagePenalty = 0;
+            }),
             this.nuisanceMondManager.addHandler("finishDamage", () => {
+                // 通常落下分と演出省略分を合わせ、被弾1回につき終了時に一度だけ知らせる。
+                this.notifyDamagePenalty();
                 this.state.damaging = false;
                 this.damageInfo.damageTask = 0;
                 this.operator.forgetPrev();
@@ -250,8 +256,19 @@ export class GamePlayer {
             }),
             this.nuisanceMondManager.addHandler("damageBoard", () => {
                 this.playInfo.penalty += 1;
+                this.damagePenalty += 1;
                 if (GraphicSetting.damageEffects) this.animations.damageBoard.play();
-                this.feedback.show("ダメージ", "持ち時間 −1", "penalty");
+            }),
+            this.nuisanceMondManager.addHandler("collapseDamage", (remaining: number) => {
+                // 処理中に届いた次の攻撃も、空の盤面では全量がペナルティになる。
+                const queued = this.damageInfo.temporaryDamageTask;
+                this.damageInfo.temporaryDamageTask = 0;
+                this.damageInfo.totalDamage += queued;
+                const penalty = remaining + queued;
+                this.playInfo.penalty += penalty;
+                this.damagePenalty += penalty;
+                this.feedback.collapseBoard();
+                this.updateGameTime();
             }),
             this.nuisanceMondManager.addHandler("progress", () => {
                 this.canvas.readData(this.operator.g$graphicData);
@@ -276,7 +293,7 @@ export class GamePlayer {
         this.playField.classList.add("playField");
         const board = document.createElement("div");
         board.className = "boardView";
-        board.append(this.canvas.g$playCanvas, this.feedback.rowFlash);
+        board.append(this.canvas.g$playCanvas, this.feedback.rowFlash, this.feedback.boardCollapse);
         this.playField.appendChild(board);
         this.playField.appendChild(this.canvas.g$nextCanvas);
         this.playField.appendChild(this.label.g$element);
@@ -350,11 +367,18 @@ export class GamePlayer {
     }
 
     finish() {
+        // 被弾途中で時間切れになった場合も、実際に減った分はまとめて知らせる。
+        this.notifyDamagePenalty();
         this.stop();
         this.playInfo.playTime = this.loop.g$elapsedTime;
         this.updateGameTime();
         this.state.hasFinished = true;
         this.animations.timeWarning.cancel();
+    }
+
+    private notifyDamagePenalty(): void {
+        if (this.damagePenalty > 0) this.feedback.show("ダメージ", `持ち時間 −${this.damagePenalty}`, "penalty");
+        this.damagePenalty = 0;
     }
 
     addDamageTask(damageTask: number) {
@@ -391,7 +415,7 @@ export class GamePlayer {
             return;
         }
         this.state.damaging = true;
-        this.feedback.show("ダメージ", `攻撃 ${this.damageInfo.damageTask} を受ける`, "penalty");
+        this.feedback.show("ダメージ", "攻撃を受ける", "penalty");
         this.operator.stop();
         this.nuisanceMondManager.damage(this.damageInfo.damageTask);
         this.nuisanceMondManager.start();

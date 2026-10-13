@@ -36,6 +36,7 @@ export class NuisanceMondManager extends MyEventListener {
      * @param destroyMond モンド破壊
      * @param damageBoard 盤面へのダメージ
      * @param finishDamage ダメージ処理終了
+     * @param collapseDamage 盤面が空になった後の残りをまとめて時間ペナルティに変換
      */
     constructor(blockManager: BlockManager, seed: number, clock?: SimulationClock) {
         super();
@@ -227,6 +228,7 @@ export class NuisanceMondManager extends MyEventListener {
 
     //progressFrequencyの頻度でNuisanceBlockを進行させつつ、三回に一回の割合で、taskの分だけNuisanceBlockを生成する
     private damageProcess() {
+        if (this.finishEmptyBoardDamage()) return;
         if (this.progressCount == 0) {
             //指定されたtaskの量の生成が完了していないとき
             if (this.taskCount < this.task) {
@@ -256,6 +258,19 @@ export class NuisanceMondManager extends MyEventListener {
                 this.progressCount = 0;
             }
         }
+    }
+
+    private finishEmptyBoardDamage(): boolean {
+        if (this.loop.g$elapsedTime <= Setting.emptyBoardDamageCutTime || !this.blockManager.isEmpty(this.nuisanceMonds)) return false;
+        const remaining = this.task - this.taskCount + this.nuisanceMonds.filter((mond) => mond.g$visible).length;
+        if (remaining <= 0) return false;
+        this.nuisanceMonds.forEach((mond) => this.blockManager.removeMonoiamond(mond));
+        this.nuisanceMonds = [];
+        this.penalty += remaining;
+        // 1個ずつdamageBoardを発火せず、通知・演出・ペナルティを一度だけ更新する。
+        this.executeEvent("collapseDamage", remaining);
+        this.finishDamage();
+        return true;
     }
 
     //damage処理を終了させる

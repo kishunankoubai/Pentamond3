@@ -79,7 +79,7 @@ export class InformationLabelManager {
     updateContents(options: Partial<UpdateContentOptions>) {
         Object.entries(options).forEach(([key, value]) => {
             const label = this.labels[key as keyof typeof this.labels];
-            label.setTextContent(value);
+            label.setTextContent(key === "gameTime" && value === "Infinity" ? "∞" : value);
         });
     }
 }

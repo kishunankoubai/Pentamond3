@@ -33,7 +33,7 @@ export class ReplayDataHandler {
             finishTime,
             finishPlayers,
             randomSeeds,
-            version: 3,
+            version: 4,
             date: Date.now(),
         }) as ReplayData;
 

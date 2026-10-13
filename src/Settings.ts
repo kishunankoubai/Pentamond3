@@ -69,6 +69,7 @@ export const next = {
 };
 //一度のdamage処理にかかる時間の目安(ミリ秒)
 export const damageTime = 2000;
+export const emptyBoardDamageCutTime = damageTime + 100;
 export const damageWaitingTime = 4000;
 //nuisanceMondが生成される間隔
 export const damageGrace = 3;

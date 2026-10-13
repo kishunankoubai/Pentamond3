@@ -60,7 +60,7 @@ export const trickInfos: TrickInfo[] = [
     {
         name: "地殻変動(上)",
         time: 16,
-        attack: 8,
+        attack: 12,
         shape: [
             [true, true],
             [false, true],
@@ -84,7 +84,7 @@ export const trickInfos: TrickInfo[] = [
     {
         name: "地殻変動(下)",
         time: 16,
-        attack: 8,
+        attack: 12,
         shape: [
             [false, true],
             [true, true],
@@ -107,8 +107,8 @@ export const trickInfos: TrickInfo[] = [
     },
     {
         name: "トゲトゲ(上)",
-        time: 30,
-        attack: 20,
+        time: 40,
+        attack: 40,
         shape: [
             [true, true],
             [true, false],
@@ -131,8 +131,8 @@ export const trickInfos: TrickInfo[] = [
     },
     {
         name: "トゲトゲ(下)",
-        time: 30,
-        attack: 20,
+        time: 40,
+        attack: 40,
         shape: [
             [false, true],
             [true, false],
@@ -156,7 +156,7 @@ export const trickInfos: TrickInfo[] = [
     {
         name: "牙(上)",
         time: 50,
-        attack: 40,
+        attack: 50,
         shape: [
             [true, true],
             [true, false],
@@ -180,7 +180,7 @@ export const trickInfos: TrickInfo[] = [
     {
         name: "牙(下)",
         time: 50,
-        attack: 40,
+        attack: 50,
         shape: [
             [false, true],
             [true, false],
@@ -203,8 +203,8 @@ export const trickInfos: TrickInfo[] = [
     },
     {
         name: "三つ子山",
-        time: 15,
-        attack: 10,
+        time: 20,
+        attack: 25,
         shape: [
             [true, true],
             [false, true],
@@ -227,8 +227,8 @@ export const trickInfos: TrickInfo[] = [
     },
     {
         name: "五人囃子",
-        time: 30,
-        attack: 15,
+        time: 25,
+        attack: 30,
         shape: [
             [false, true],
             [true, true],

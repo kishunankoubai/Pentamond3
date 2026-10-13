@@ -12,7 +12,7 @@ function finitePositive(value: unknown): value is number {
 
 /** 入力はフレームへ丸めず、ミリ秒差分＋操作IDを圧縮して再現性を維持する。 */
 export function replayDataEncryption(data: ReplayData): string {
-    requireData(data.version === 3 && data.randomSeeds);
+    requireData(data.version === 4 && data.randomSeeds);
     const inputData = data.inputData.map((inputs) => inputs.map((input, index) => {
         const delta = input.time - (index ? inputs[index - 1].time : 0);
         const keyIndex = replayKeyCodes.indexOf(input.keyCode as typeof replayKeyCodes[number]);
@@ -23,7 +23,7 @@ export function replayDataEncryption(data: ReplayData): string {
     ordered.forEach(({ input }, index) => requireData(input.sequence === index && (!index || input.time >= ordered[index - 1].input.time)));
     const order = ordered.map(({ player }) => String(player)).join("");
     return LZString.compressToUTF16(JSON.stringify([
-        3, inputData,
+        4, inputData,
         [data.playSetting.playerNumber, data.playSetting.mode, data.playSetting.maxGameTime === Infinity ? "I" : data.playSetting.maxGameTime, data.playSetting.handy, data.playSetting.targetLines],
         data.finishTime, data.finishPlayers, data.date, data.randomSeeds.next, data.randomSeeds.nuisance, order,
     ]));
@@ -34,12 +34,15 @@ export function replayDataDecryption(encryptedData: string): ReplayData {
     const source = LZString.decompressFromUTF16(encryptedData);
     requireData(source);
     const data = JSON.parse(source);
-    requireData(Array.isArray(data) && data.length === 9 && data[0] === 3);
+    requireData(Array.isArray(data) && data.length === 9 && (data[0] === 3 || data[0] === 4));
     const [_, encodedInputs, settings, finishTime, finishPlayers, date, next, nuisance, order] = data;
     requireData(Array.isArray(settings) && settings.length === 5);
     const [playerNumber, mode, maxTime, handy, targetLines] = settings;
     requireData(Number.isInteger(playerNumber) && playerNumber >= 1 && playerNumber <= 4);
     requireData(mode === 1 || mode === 2);
+    // 旧マルチサバイバルは攻撃分配・被弾時間が異なるため再現できない。
+    // 影響のないソロ・十五列揃えは、データを変換してそのまま視聴できる。
+    requireData(data[0] === 4 || mode !== 1 || playerNumber === 1);
     requireData(maxTime === "I" || finitePositive(maxTime));
     requireData(Array.isArray(handy) && handy.length >= playerNumber && handy.every((value) => finitePositive(value) && value >= 0.1 && value <= 10));
     requireData(Number.isInteger(targetLines) && targetLines >= 1 && targetLines <= 30);
@@ -70,7 +73,7 @@ export function replayDataDecryption(encryptedData: string): ReplayData {
     });
     requireData(indices.every((count, player) => count === inputData[player].length));
     return {
-        version: 3, inputData, finishTime, finishPlayers, date,
+        version: 4, inputData, finishTime, finishPlayers, date,
         randomSeeds: { next, nuisance },
         playSetting: { playerNumber, mode, maxGameTime: maxTime === "I" ? Infinity : maxTime, handy: handy.slice(0, playerNumber), targetLines },
     };

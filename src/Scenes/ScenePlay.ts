@@ -68,7 +68,7 @@ export class ScenePlay extends Scene {
         this.pauseInputEvent = inputManager.addHandler("inputValid", ([input, info]: [InputObserver, InputInfo]) => {
             const playerIndex = inputManager.g$registeredInputs.indexOf(input);
             if (playerIndex < 0) return;
-            const pauseInputs = input.g$type === "keyboard" ? KeyboardSettingManager.pauseKeys : (ControllerRegisterer.gamepadConfigs[playerIndex]?.pause || []);
+            const pauseInputs = input.g$type === "keyboard" ? ["Escape", ...(ControllerRegisterer.keyboardConfigs[playerIndex]?.pause ?? KeyboardSettingManager.getConfig().pause)] : (ControllerRegisterer.gamepadConfigs[playerIndex]?.pause || []);
             if (pauseInputs.includes(info.name)) this.pauseGame();
         });
 

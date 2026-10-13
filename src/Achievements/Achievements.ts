@@ -1,7 +1,7 @@
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
 import type { PlayStatisticData } from "../PlayStatistics";
 import { globalValues } from "../Global";
-import { defaultMaxGameTime } from "../Settings";
+import { isStandardSurvivalRecord } from "../Game/SurvivalRules";
 import { UInt32Codec } from "../Utilities/Data/UInt32Codec";
 import { PageNotice } from "../Utilities/Feedback/PageNotice";
 import { achievements, achievementCounterCount, achievementTricks, survivalCountIndex, sprintCountIndex, type AchievementGrade } from "./Definitions";
@@ -78,7 +78,7 @@ export class Achievements {
                 this.counters[survivalCountIndex] = Math.max(this.counters[survivalCountIndex], 1);
             const times = [data.soloSprintTime, data.multiSprintTime].filter((time) => time > 0);
             if (times.length) this.counters[sprintCountIndex] = Math.max(this.counters[sprintCountIndex], 1);
-            this.evaluateSurvival(Math.max(data.soloSurvivalScore, data.multiSurvivalScore), data.soloSurvivalTime, true);
+            // 旧統計にはハンデが残っていないため、条件付き実績を推測で解除しない。
             if (times.length) this.evaluateSprintTime(Math.min(...times));
             this.evaluateCounters();
         });
@@ -104,9 +104,10 @@ export class Achievements {
                 const info = player.playInfo;
                 player.trickCounts.forEach((count, i) => this.counters[i] = Math.min(UInt32Codec.max, this.counters[i] + count));
                 if (mode === 1) {
-                    this.evaluateSurvival(info.score, info.playTime, game.playSetting.maxGameTime === defaultMaxGameTime);
+                    const standard = isStandardSurvivalRecord(info);
+                    this.evaluateSurvival(info.score, info.playTime, standard);
                     // 他プレイヤーとの合算ではなく、同じプレイヤーが全種類を揃える。
-                    if (player.trickCounts.every((count) => count > 0)) this.unlock("survival-tricks-all");
+                    if (standard && player.trickCounts.every((count) => count > 0)) this.unlock("survival-tricks-all");
                 } else if (mode === 2 && game.playSetting.targetLines === 15 && info.line >= 15) {
                     this.evaluateSprintTime(info.playTime);
                     if (info.hold === 0 && info.remove === 15) this.unlock("sprint-no-hold");
@@ -124,11 +125,12 @@ export class Achievements {
         if (this.counters.slice(0, achievementTricks.length).every((count) => count > 0)) this.unlock("tricks-all");
     }
 
-    private static evaluateSurvival(score: number, time: number, defaultTime: boolean): void {
+    private static evaluateSurvival(score: number, time: number, standard: boolean): void {
+        if (!standard) return;
         achievements.forEach(({ id, target }) => {
             if (target === undefined) return;
             if (id.startsWith("survival-score-") && score >= target) this.unlock(id);
-            if (id.startsWith("survival-time-") && defaultTime && time >= target) this.unlock(id);
+            if (id.startsWith("survival-time-") && time >= target) this.unlock(id);
         });
     }
 

@@ -1,35 +1,3 @@
-/* .page,
-.subPage {
-    animation-duration: 400ms;
-    animation-timing-function: ease-out;
-    animation-delay: 0;
-    animation-direction: normal;
-    animation-iteration-count: 1;
-    animation-name: fade;
-}
-
-@keyframes fade {
-    0% {
-        padding-top: 2cqh;
-        opacity: 0;
-    }
-    100% {
-        padding-top: 0;
-        opacity: 1;
-    }
-} */
-
-/* button:hover {
-    scale: 1.05;
-    transition: scale 65ms ease-in-out;
-    animation-duration: 100ms;
-    animation-timing-function: ease-in;
-    animation-delay: 0;
-    animation-direction: normal;
-    animation-iteration-count: infinite;
-    animation-name: shake;
-} */
-
 @keyframes shake {
     0% {
         transform: translateX(0cqh);
@@ -45,33 +13,6 @@
     }
     100% {
         transform: translateX(0cqh);
-    }
-}
-
-.goal {
-    animation-name: rotate;
-    animation-duration: 4s;
-    animation-delay: 0;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    filter: blur(1cqh);
-}
-
-.checkPoint {
-    animation-name: rotate;
-    animation-duration: 4s;
-    animation-delay: 0;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
-    filter: blur(1cqh);
-}
-
-@keyframes rotate {
-    0% {
-        transform: rotate(0);
-    }
-    100% {
-        transform: rotate(360deg);
     }
 }
 
@@ -135,36 +76,6 @@
     }
     100% {
         filter: brightness(1);
-    }
-}
-
-.enemy {
-    animation-duration: 800ms;
-    animation-timing-function: ease-in-out;
-    animation-delay: 0;
-    animation-direction: normal;
-    animation-iteration-count: 1;
-    animation-name: fade;
-}
-
-@keyframes swaying {
-    0% {
-        transform: rotate(0);
-    }
-    15% {
-        transform: rotate(-5deg);
-    }
-    25% {
-        transform: rotate(-10deg);
-    }
-    65% {
-        transform: rotate(5deg);
-    }
-    75% {
-        transform: rotate(10deg);
-    }
-    100% {
-        transform: rotate(0deg);
     }
 }
 

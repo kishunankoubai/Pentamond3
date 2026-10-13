@@ -22,7 +22,7 @@ export type ReplayData = {
     finishTime: number;
     finishPlayers: number[];
     randomSeeds: ReplayRandomSeeds;
-    version: 3;
+    version: 4;
     date: number;
 };
 

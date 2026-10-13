@@ -93,14 +93,20 @@ export class PlaySettingSetter {
         const back = prepare?.querySelector<HTMLElement>(".back");
         if (back) back.dataset.xy = this.playSetting.mode === 1 ? "[-1,3]" : "[-1,2]";
         const controls = document.getElementById("playPrepareControllerButton");
-        if (controls) controls.textContent = this.playSetting.playerNumber === 1 ? "操作設定" : "コントローラー";
+        if (controls) controls.textContent = this.playSetting.playerNumber === 1 ? "操作設定" : "プレイヤー別配置";
         const summary = document.getElementById("playPrepareSummary");
         if (summary) {
             const { mode, playerNumber, maxGameTime, targetLines, handy } = this.playSetting;
             summary.replaceChildren();
             const rule = document.createElement("div");
             rule.className = "prepareRule";
-            rule.textContent = `${mode === 1 ? "サバイバル" : "十五列揃え"} ／ ${playerNumber === 1 ? "ひとりで" : `${playerNumber}人で`} ／ ${mode === 1 ? `持ち時間 ${maxGameTime === Infinity ? "∞" : maxGameTime}` : `${targetLines}列`}`;
+            rule.textContent = `${mode === 1 ? "サバイバル" : "十五列揃え"} ／ ${playerNumber === 1 ? "ひとりで" : `${playerNumber}人で`} ／ ${mode === 1 ? `持ち時間 ${maxGameTime === Infinity ? "" : maxGameTime}` : `${targetLines}列`}`;
+            if (mode === 1 && maxGameTime === Infinity) {
+                const symbol = document.createElement("span");
+                symbol.className = "infinitySymbol";
+                symbol.textContent = "∞";
+                rule.appendChild(symbol);
+            }
             summary.appendChild(rule);
             if (mode === 1) {
                 const handicaps = document.createElement("div");

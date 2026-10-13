@@ -82,7 +82,9 @@ export class ResultPageHandler {
         });
         if (game.highlights.achievements.length) {
             const earned = document.createElement("div"); earned.className = "achievementEarned";
-            const triangle = document.createElement("span"); triangle.className = "achievementTriangle gold"; triangle.setAttribute("aria-hidden", "true");
+            const grades = new Set(game.highlights.achievements.map((id) => achievements.find((item) => item.id === id)?.grade));
+            const highestGrade = (["gold", "silver", "bronze"] as const).find((grade) => grades.has(grade)) ?? "bronze";
+            const triangle = document.createElement("span"); triangle.className = `achievementTriangle ${highestGrade}`; triangle.setAttribute("aria-hidden", "true");
             const text = document.createElement("span"); text.textContent = `実績達成！ ${game.highlights.achievements.length}個 ／ 詳細結果で確認できます`;
             earned.append(triangle, text); highlights.appendChild(earned);
         }
@@ -174,6 +176,6 @@ export class ResultPageHandler {
     }
 
     private static formatValue(value: number): string {
-        return value === Infinity ? "∞" : String(value);
+        return value === Infinity ? '<span class="infinitySymbol">∞</span>' : String(value);
     }
 }

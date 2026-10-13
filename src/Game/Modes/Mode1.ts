@@ -5,7 +5,7 @@ import * as Setting from "../../Settings";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
-import { emptyRemovalPenalty, survivalTrickReward } from "../SurvivalRules";
+import { emptyRemovalPenalty, sharedSurvivalDamage, survivalTrickReward } from "../SurvivalRules";
 import { SimulationClock } from "../../Utilities/Loop/SimulationClock";
 
 export class Mode1 extends GameMode {
@@ -181,14 +181,12 @@ export class Mode1 extends GameMode {
                     p.damageInfo.totalDamage += p.damageInfo.damageTask;
                 }
                 if (p.damageInfo.attackTask) {
-                    if (this.players.length > 1) p.feedback.show("攻撃！", `${p.damageInfo.attackTask} を送った`, "attack");
+                    const recipients = this.players.filter((player) => player !== p && !player.state.hasFinished);
+                    const damage = sharedSurvivalDamage(p.damageInfo.attackTask, recipients.length);
+                    if (damage > 0) p.feedback.show("攻撃！", `各相手に ${damage}`, "attack");
                     p.damageInfo.maxAttack = Math.max(p.damageInfo.maxAttack, p.damageInfo.attackTask);
                     console.log(`Player ${index + 1} has attacked: ${p.damageInfo.attackTask}`);
-                    this.players.forEach((player, i) => {
-                        if (i != index) {
-                            player.addDamageTask(p.damageInfo.attackTask);
-                        }
-                    });
+                    recipients.forEach((player) => player.addDamageTask(damage));
                     p.damageInfo.totalAttack += p.damageInfo.attackTask;
                     p.damageInfo.attackTask = 0;
                 }

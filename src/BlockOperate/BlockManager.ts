@@ -203,10 +203,12 @@ export class BlockManager {
         return false;
     }
 
-    isEmpty(): boolean {
-        return this.blocks.every((blockX) => {
-            return blockX.every((block) => {
-                return !block.g$visible;
+    isEmpty(ignoredMonds: readonly Monoiamond[] = []): boolean {
+        // 色では判定しない。教材の灰色ブロックも通常の地形として扱う。
+        const ignored = new Set(ignoredMonds.filter((mond) => mond.g$visible).map((mond) => mond.g$x * Setting.playHeight + mond.g$y));
+        return this.blocks.every((blockX, x) => {
+            return blockX.every((block, y) => {
+                return !block.g$visible || ignored.has(x * Setting.playHeight + y);
             });
         });
     }

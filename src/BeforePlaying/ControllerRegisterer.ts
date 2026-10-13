@@ -10,12 +10,14 @@ import { PageManager } from "../Utilities/Page/PageManager";
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 import { InputRegistrationView } from "./InputRegistrationView";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
+import { KeyboardSettingManager } from "../KeyboardSettingManager";
 
 /**
  * コントローラーの登録をしたりする
  *  */
 export class ControllerRegisterer {
     static gamepadConfigs: Setting.GamepadConfig[] = [];
+    static keyboardConfigs: Setting.GamepadConfig[] = [];
     private static inputEvents: MyEvent[] = [];
     private static controller: AbortController | null = null;
     private static readonly registrationView = new InputRegistrationView("playerRegister");
@@ -71,13 +73,17 @@ export class ControllerRegisterer {
             pageManager.openPage(playerNumber === 1 ? "operationSetting" : "playerControllerSetting");
         });
         pageManager.addHandler("changePage-playPrepare", () => {
-            const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
-            this.gamepadConfigs = playerNumber === 1 ? [ControllerSettingManager.getSelectedConfig()] : ControllerSettingManager.getPlayerConfigs(playerNumber);
+            this.refreshPlayerConfigs();
         });
         qsAddEvent("#playerControllerSetting .back", "click", () => {
-            const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
-            this.gamepadConfigs = ControllerSettingManager.getPlayerConfigs(playerNumber);
+            this.refreshPlayerConfigs();
         });
+    }
+
+    private static refreshPlayerConfigs(): void {
+        const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
+        this.gamepadConfigs = playerNumber === 1 ? [ControllerSettingManager.getSelectedConfig()] : ControllerSettingManager.getPlayerConfigs(playerNumber);
+        this.keyboardConfigs = playerNumber === 1 ? [KeyboardSettingManager.getConfig()] : KeyboardSettingManager.getPlayerConfigs(playerNumber);
     }
 
     static clearEvents() {
@@ -132,6 +138,7 @@ export class ControllerRegisterer {
     private static startControllerRegistration(playerNumber: number) {
         inputManager.removeVirtualInputs();
         this.gamepadConfigs = [];
+        this.keyboardConfigs = [];
 
         inputManager.s$maxInputNumber = playerNumber;
         inputManager.startRegister();

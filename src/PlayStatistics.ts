@@ -1,7 +1,7 @@
 import type { DisposableGame } from "./GameProcessing/DisposableGame";
 import { globalValues } from "./Global";
 import { UInt32Codec } from "./Utilities/Data/UInt32Codec";
-import { defaultMaxGameTime } from "./Settings";
+import { isStandardSurvivalRecord } from "./Game/SurvivalRules";
 import { PageNotice } from "./Utilities/Feedback/PageNotice";
 
 // 保存順は形式v1の一部。順番を変更しない。
@@ -74,14 +74,16 @@ export class PlayStatistics {
             add("holdCount", p.hold);
             if (game.playSetting.mode === 1) {
                 if (solo) {
-                    if (game.playSetting.maxGameTime === defaultMaxGameTime) {
+                    if (isStandardSurvivalRecord(p)) {
                         max("soloSurvivalScore", p.score);
                         max("soloSurvivalTime", p.playTime);
                     }
                     add("soloRecovery", p.recovery);
                 } else {
-                    if (game.playSetting.maxGameTime === defaultMaxGameTime) max("multiSurvivalScore", p.score);
-                    max("multiSurvivalAttack", player.damageInfo.maxAttack);
+                    if (isStandardSurvivalRecord(p)) {
+                        max("multiSurvivalScore", p.score);
+                        max("multiSurvivalAttack", player.damageInfo.maxAttack);
+                    }
                 }
             } else if (game.playSetting.mode === 2 && game.playSetting.targetLines === 15 && p.line >= 15) {
                 minTime(solo ? "soloSprintTime" : "multiSprintTime", p.playTime);

@@ -5,7 +5,6 @@
     </div>
 
     <div class="page" id="pageStart">
-        <!-- pモンドの回転状態1。低解像度のアイコンを拡大せず、5つの正三角形を描く。 -->
         <svg class="startEmblem" viewBox="-3 -3 126 110" aria-hidden="true" focusable="false">
             <g fill="#ffff00" stroke="#a8a34b" stroke-width="1.5" stroke-linejoin="round">
                 <polygon points="0,0 60,0 30,51.9615" />
@@ -15,7 +14,10 @@
                 <polygon points="90,51.9615 60,103.923 120,103.923" />
             </g>
         </svg>
-        <div class="startWordmark" aria-label="Pentamond"><span data-mond="L">P</span><span data-mond="J">e</span><span data-mond="p">n</span><span data-mond="q">t</span><span data-mond="U">a</span><span data-mond="I">m</span><span data-mond="L">o</span><span data-mond="J">n</span><span data-mond="p">d</span></div>
+        <div class="startWordmark" aria-label="Pentamond">
+            <span data-mond="L">P</span><span data-mond="J">e</span><span data-mond="p">n</span><span data-mond="q">t</span><span data-mond="U">a</span><span data-mond="I">m</span
+            ><span data-mond="L">o</span><span data-mond="J">n</span><span data-mond="p">d</span>
+        </div>
         <div class="startInvitation">
             <div class="label" id="pageStartLabel">クリックしてスタート！</div>
             <div class="label startSoundNotice">音が出ます</div>
@@ -42,7 +44,7 @@
     </div>
 
     <div class="page" id="title">
-        <div class="label headingLabel">Pentamond</div>
+        <div class="label headingLabel">メインメニュー</div>
         <div class="selectWithDescription">
             <div class="selectWithDescriptionOptions">
                 <div class="button" data-page="soloStageSelect" data-xy="[0,0]">ひとりで</div>
@@ -166,7 +168,7 @@
             <div class="button" id="playPrepareModeHelpButton" data-xy="[1,0]">モード説明</div>
         </div>
         <div class="options" data-direction="row">
-            <div class="button" id="playPrepareControllerButton" data-xy="[0,1]">コントローラー</div>
+            <div class="button" id="playPrepareControllerButton" data-xy="[0,1]">プレイヤー別配置</div>
             <div class="button" id="playPrepareSettingButton" data-xy="[1,1]">プレイ設定</div>
             <div class="button" id="playPrepareTrickListButton" data-page="trickList" data-xy="[2,1]">役一覧</div>
         </div>
@@ -264,7 +266,7 @@
                     <div class="text">ちょっと詳しい仕組みはこちら！<br />ホールドや滑り移動、<br />攻撃の話など。</div>
                 </div>
                 <div>
-                    <div class="text">どうやって操作するか、<br />確認しよう！</div>
+                    <div class="text">どうやって操作するか<br />確認しよう！</div>
                 </div>
                 <div>
                     <div class="text">各モードの遊び方を見てみよう！</div>
@@ -472,7 +474,7 @@
         </div>
         <div class="subPage">
             <div class="statisticSection">ソロ</div>
-            <div class="text statisticNote">最高スコア・最長時間は持ち時間150の記録です。</div>
+            <div class="text statisticNote">最高スコア・最長時間は持ち時間150・ハンデ1の記録です。</div>
             <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="soloSurvivalScore"></span></div>
             <div class="statisticRow"><span>サバイバル：最長プレイ時間</span><span data-statistic="soloSurvivalTime" data-format="time"></span></div>
             <div class="statisticRow"><span>サバイバル：累計回復</span><span data-statistic="soloRecovery"></span></div>
@@ -480,7 +482,7 @@
         </div>
         <div class="subPage">
             <div class="statisticSection">マルチ</div>
-            <div class="text statisticNote">最高スコアは持ち時間150の記録です。</div>
+            <div class="text statisticNote">最高スコア・最大攻撃は持ち時間150・ハンデ1の記録です。</div>
             <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="multiSurvivalScore"></span></div>
             <div class="statisticRow"><span>サバイバル：最大攻撃</span><span data-statistic="multiSurvivalAttack"></span></div>
             <div class="statisticRow"><span>十五列揃え：最速タイム</span><span data-statistic="multiSprintTime" data-format="time"></span></div>
@@ -555,16 +557,16 @@
             </div>
             <div class="selectOptionDescriptions">
                 <div>
-                    <div class="text">音量や流れるBGMを、<br />変更できるよ！</div>
+                    <div class="text">音量や流れるBGMを<br />変更できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">保存されているデータを、<br />確認・消去できるよ！</div>
+                    <div class="text">保存されているデータを<br />確認・消去できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">各モードの持ち時間や、<br />クリア条件を設定できるよ！</div>
+                    <div class="text">各モードの持ち時間や<br />クリア条件を設定できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">演出や盤面の表示を、<br />調節できるよ！</div>
+                    <div class="text">演出や盤面の表示を<br />調節できるよ！</div>
                 </div>
                 <div>
                     <div class="text">キーボードやコントローラーの<br />配置を変更できるよ！</div>
@@ -582,8 +584,12 @@
                 <div class="button" data-page="controllerSetting" data-xy="[0,1]">コントローラー</div>
             </div>
             <div class="selectOptionDescriptions">
-                <div><div class="text">プレイ中のキーを変更できるよ！<br />メニューと養成所では、<br />初期配置を使います。</div></div>
-                <div><div class="text">ボタンやスティックの<br />配置を変更できるよ！<br />編集用に3つ保存できます。</div></div>
+                <div>
+                    <div class="text">プレイ中のキーを変更できるよ！<br />メニューと養成所では<br />初期配置を使います。</div>
+                </div>
+                <div>
+                    <div class="text">ボタンやスティックの<br />配置を変更できるよ！<br />編集用に3つ保存できます。</div>
+                </div>
             </div>
         </div>
         <div class="back button" data-xy="[0,2]">戻る</div>
@@ -618,8 +624,12 @@
                 <div class="button" data-page="linePlaySetting" data-xy="[0,1]">十五列揃え</div>
             </div>
             <div class="selectOptionDescriptions">
-                <div><div class="text">持ち時間と、<br />各プレイヤーのハンデを<br />設定します。</div></div>
-                <div><div class="text">クリアに必要な、<br />一列揃えの回数を設定します。</div></div>
+                <div>
+                    <div class="text">持ち時間と、<br />各プレイヤーのハンデを<br />設定します。</div>
+                </div>
+                <div>
+                    <div class="text">クリアに必要な、<br />一列揃えの回数を設定します。</div>
+                </div>
             </div>
         </div>
         <div class="back button" data-xy="[0,2]">戻る</div>
@@ -635,7 +645,7 @@
                     <div class="button selectedValue" data-max-time="150" data-xy="[1,0]">150</div>
                     <div class="button" data-max-time="300" data-xy="[2,0]">300</div>
                     <div class="button" data-max-time="1000" data-xy="[3,0]">1000</div>
-                    <div class="button" data-max-time="Infinity" data-xy="[4,0]">Infinity</div>
+                    <div class="button" data-max-time="Infinity" data-xy="[4,0]"><span class="infinitySymbol">∞</span></div>
                 </div>
             </div>
             <div class="playSettingSection handySettingSection">
@@ -767,7 +777,8 @@
                 <div class="button" data-player-index="3" data-controller-slot="3" data-xy="[3,3]">編集3</div>
             </div>
         </div>
-        <div class="back button" data-xy="[0,4]">戻る</div>
+        <div class="button" data-page="operationSetting" id="playerOperationSettingButton" data-xy="[0,4]">操作設定</div>
+        <div class="back button" data-xy="[0,5]">戻る</div>
     </div>
 
     <div class="page" id="musicSetting">

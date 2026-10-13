@@ -36,6 +36,8 @@ export class KeyboardSettingManager {
     static readonly storageKey = "Pentamond3-keyboardSettings";
     private static custom = this.initial();
     private static useCustom = false;
+    // マルチのプレイヤーとの組み合わせは、登録ごとに初期化し保存しない。
+    private static playerCustom: boolean[] = [];
     private static event: MyEvent | null = null;
     private static opened: Action | null = null;
     private static waiting = false;
@@ -46,6 +48,14 @@ export class KeyboardSettingManager {
     }
 
     static getConfig(): GamepadConfig { return structuredClone(this.useCustom ? this.custom : this.initial()); }
+    static startPlayerSelection(playerNumber: number): void { this.playerCustom = Array(playerNumber).fill(false); }
+    static isPlayerCustom(playerIndex: number): boolean { return this.playerCustom[playerIndex] ?? false; }
+    static selectPlayerConfig(playerIndex: number, useCustom: boolean): void {
+        if (playerIndex >= 0 && playerIndex < this.playerCustom.length) this.playerCustom[playerIndex] = useCustom;
+    }
+    static getPlayerConfigs(playerNumber: number): GamepadConfig[] {
+        return Array.from({ length: playerNumber }, (_, index) => structuredClone(this.isPlayerCustom(index) ? this.custom : this.initial()));
+    }
     static keysFor(operation: OperateName): string[] { return this.getConfig()[operationActions[operation]]; }
     static get pauseKeys(): string[] { return ["Escape", ...this.getConfig().pause]; }
 
@@ -81,6 +91,7 @@ export class KeyboardSettingManager {
         if (removeStorage) localStorage.removeItem(this.storageKey);
         this.custom = this.initial();
         this.useCustom = false;
+        this.playerCustom = [];
         this.cancel();
         this.render();
     }

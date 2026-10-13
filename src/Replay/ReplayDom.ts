@@ -73,7 +73,7 @@ export class ReplayDom {
         const time = (replayData.finishTime / 1000).toFixed(2);
         const setting =
             replayData.playSetting.mode === 1
-                ? `持ち時間: ${replayData.playSetting.maxGameTime === Infinity ? "Infinity" : replayData.playSetting.maxGameTime}`
+                ? `持ち時間: ${replayData.playSetting.maxGameTime === Infinity ? '<span class="infinitySymbol">∞</span>' : replayData.playSetting.maxGameTime}`
                 : `クリア列数: ${replayData.playSetting.targetLines}列`;
 
         return `${solo} : ${mode}<br>${setting}<br>時間: ${time}`;

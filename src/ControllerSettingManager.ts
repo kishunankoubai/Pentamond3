@@ -10,6 +10,7 @@ import { setInteractionEnabled } from "./Utilities/Element/InteractionElement";
 import { PageNotice } from "./Utilities/Feedback/PageNotice";
 import { formatControllerInput } from "./ControllerInputLabels";
 import { spaceJapanesePunctuation } from "./Utilities/Text/JapaneseText";
+import { KeyboardSettingManager } from "./KeyboardSettingManager";
 
 type ControllerAction = keyof GamepadConfig;
 
@@ -123,8 +124,9 @@ export class ControllerSettingManager {
 
     static startPlayerSelection(playerNumber: number): void {
         this.playerSlots = Array.from({ length: playerNumber }, () => 0);
+        KeyboardSettingManager.startPlayerSelection(playerNumber);
         document.querySelectorAll<HTMLElement>("#playerControllerSetting .playerControllerRow").forEach((row) => {
-            row.style.display = Number(row.dataset.playerIndex) < playerNumber ? "flex" : "none";
+            row.style.display = Number(row.dataset.playerIndex) < playerNumber ? "grid" : "none";
         });
         this.renderPlayerSlots();
     }
@@ -154,7 +156,10 @@ export class ControllerSettingManager {
 
     private static selectPlayerSlot(playerIndex: number, slot: number): void {
         if (!this.isValidSlot(slot) || playerIndex < 0 || playerIndex >= this.playerSlots.length) return;
-        this.playerSlots[playerIndex] = slot;
+        if (inputManager.g$registeredInputs[playerIndex]?.g$type === "keyboard") {
+            if (slot > 1) return;
+            KeyboardSettingManager.selectPlayerConfig(playerIndex, slot === 1);
+        } else this.playerSlots[playerIndex] = slot;
         this.renderPlayerSlots();
     }
 
@@ -286,9 +291,28 @@ export class ControllerSettingManager {
     }
 
     private static renderPlayerSlots(): void {
+        document.querySelectorAll<HTMLElement>("#playerControllerSetting .playerControllerRow").forEach((row) => {
+            const index = Number(row.dataset.playerIndex);
+            row.style.display = index < this.playerSlots.length ? "grid" : "none";
+            const label = row.querySelector<HTMLElement>(".label");
+            if (label) {
+                const name = document.createElement("span"); name.className = "playerSettingName"; name.textContent = `P${index + 1}`;
+                const type = document.createElement("span"); type.className = "playerInputType";
+                type.textContent = inputManager.g$registeredInputs[index]?.g$type === "keyboard" ? "キーボード" : "コントローラー";
+                label.replaceChildren(name, type);
+            }
+        });
         document.querySelectorAll<HTMLElement>("#playerControllerSetting [data-player-index][data-controller-slot]").forEach((button) => {
             const playerIndex = Number(button.dataset.playerIndex);
-            button.classList.toggle("selectedValue", this.playerSlots[playerIndex] === Number(button.dataset.controllerSlot));
+            const keyboard = inputManager.g$registeredInputs[playerIndex]?.g$type === "keyboard";
+            const slot = Number(button.dataset.controllerSlot);
+            const available = !keyboard || slot <= 1;
+            button.style.display = available ? "" : "none";
+            setInteractionEnabled(button, available);
+            button.textContent = slot === 0 ? "初期" : keyboard ? "編集用" : `編集${slot}`;
+            const selected = keyboard ? Number(KeyboardSettingManager.isPlayerCustom(playerIndex)) === slot : this.playerSlots[playerIndex] === slot;
+            button.classList.toggle("selectedValue", selected);
+            button.setAttribute("aria-pressed", String(selected));
         });
     }
 
