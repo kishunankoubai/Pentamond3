@@ -5,7 +5,9 @@
     }
     & .lessonList {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: minmax(10cqh, auto);
+        align-items: stretch;
         width: 132cqh;
         gap: 3cqh;
         margin-top: 4cqh;
@@ -13,6 +15,13 @@
     & .lessonButton {
         font-size: 3.8cqh;
         width: 100%;
+        min-width: 0;
+        min-height: 10cqh;
+        padding: 0.6cqh 1cqh 0.6cqh calc(1cqh + 1.12em);
+        white-space: normal;
+        text-wrap: wrap;
+        overflow-wrap: anywhere;
+        line-height: 1.5;
     }
     & .lessonCleared {
         border-color: #6bd;

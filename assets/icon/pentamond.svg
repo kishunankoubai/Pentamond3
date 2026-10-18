@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#edf7fc"/>
+  <!-- pモンドの回転状態1。低解像度の既存アイコンは拡大しない。 -->
+  <g transform="translate(64 90) scale(3.2)" fill="#ffff00" stroke="#a8a34b" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M0 0H60L30 51.9615Z"/>
+    <path d="M60 0 30 51.9615H90Z"/>
+    <path d="M60 0H120L90 51.9615Z"/>
+    <path d="M30 51.9615H90L60 103.923Z"/>
+    <path d="M90 51.9615 60 103.923H120Z"/>
+  </g>
+</svg>

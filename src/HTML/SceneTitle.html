@@ -82,6 +82,7 @@
             <div class="selectWithDescriptionOptions">
                 <div class="button" data-page="help" data-xy="[0,0]">ヘルプ</div>
                 <div class="button" data-page="settings" data-xy="[0,1]">設定</div>
+                <div class="button" data-page="credits" data-xy="[0,2]">クレジット</div>
             </div>
             <div class="selectOptionDescriptions">
                 <div>
@@ -94,9 +95,50 @@
                 <div>
                     <div class="text">音楽や操作の配置、<br />ゲームルールを変更できるよ！</div>
                 </div>
+                <div>
+                    <div class="text">作者や、 使用しているフォント、<br />ライブラリはこちら。</div>
+                </div>
             </div>
         </div>
-        <div class="back button" data-xy="[0,2]">戻る</div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
+    </div>
+
+    <div class="page" id="credits">
+        <div class="label headingLabel">クレジット</div>
+        <div class="subPage creditAuthorPage">
+            <div class="creditAuthor creditPanel">
+                <div class="creditIdentity"><span class="creditHeading">制作</span><span class="creditAuthorName">梅雨酒</span></div>
+                <a class="button" href="https://x.com/tsuyuzake" target="_blank" rel="noopener noreferrer" data-xy="[0,0]" aria-label="梅雨酒のTwitter（X）を新しいタブで開く">@tsuyuzake（Twitter / X）</a>
+            </div>
+        </div>
+        <div class="subPage creditResourcesPage">
+          <div class="creditsContent">
+            <div class="creditHeading">使用フォント</div>
+            <div class="creditFontGrid">
+                <div class="creditPanel creditFont">
+                    <div class="creditName">Mochiy Pop P One</div>
+                    <div class="creditAttribution">Copyright 2020<br />The Mochiypop Project Authors</div>
+                    <a class="button" href="assets/fonts/mochiypoppone/OFL.txt" target="_blank" rel="noopener noreferrer" data-xy="[0,0]" aria-label="Mochiy Pop P Oneのライセンス全文を新しいタブで開く">SIL OFL 1.1</a>
+                </div>
+                <div class="creditPanel creditFont">
+                    <div class="creditName">RocknRoll One</div>
+                    <div class="creditAttribution">Copyright 2020<br />The RocknRoll Project Authors</div>
+                    <a class="button" href="assets/fonts/rocknrollone/OFL.txt" target="_blank" rel="noopener noreferrer" data-xy="[1,0]" aria-label="RocknRoll Oneのライセンス全文を新しいタブで開く">SIL OFL 1.1</a>
+                </div>
+            </div>
+            <div class="creditHeading">使用ライブラリ</div>
+            <div class="creditLibrary creditPanel">
+                <div><span class="creditName">lz-string</span><span class="creditAttribution">Copyright (c) 2013 pieroxy</span></div>
+                <a class="button" href="assets/licenses/lz-string.txt" target="_blank" rel="noopener noreferrer" data-xy="[0,1]" aria-label="lz-stringのMITライセンス全文を新しいタブで開く">MIT License</a>
+            </div>
+          </div>
+        </div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,3]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,3]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
     </div>
 
     <div class="page" id="soloStageSelect">

@@ -1,4 +1,88 @@
 /* 色と共通操作の大きさは維持し、情報の階層と読みやすさを整える。 */
+#credits .creditsContent {
+    width: 132cqh;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2cqh;
+}
+#credits > .subPage {
+    position: absolute;
+    top: 19cqh;
+    bottom: 17cqh;
+    justify-content: center;
+}
+#credits .creditAuthor {
+    display: flex;
+    width: 110cqh;
+    min-height: 40cqh;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5cqh;
+}
+#credits .creditAuthor .creditIdentity {
+    flex-direction: column;
+    gap: 2cqh;
+}
+#credits .creditAuthor .creditAuthorName {
+    font-size: 9cqh;
+}
+#credits .creditAuthor .button {
+    font-size: 4.8cqh;
+    text-decoration: none;
+    padding-left: 1.12em;
+}
+#credits .creditPanel {
+    padding: 2.5cqh 4cqh;
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 1.6cqh;
+    background: var(--panel);
+    box-sizing: border-box;
+}
+#credits .creditHeading {
+    font-size: 3.6cqh;
+    line-height: 1.4;
+    color: var(--heading-ink);
+}
+#credits .creditIdentity,
+#credits .creditLibrary {
+    display: flex;
+    gap: 3cqh;
+    justify-content: space-between;
+}
+#credits .creditIdentity {
+    justify-content: flex-start;
+}
+#credits .creditFontGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3cqh;
+    align-items: stretch;
+}
+#credits .creditFont {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2cqh;
+}
+#credits .creditName {
+    font-size: 3.8cqh;
+    line-height: 1.4;
+}
+#credits .creditAttribution {
+    display: block;
+    font-size: 3cqh;
+    line-height: 1.5;
+    text-wrap: wrap;
+}
+#credits .creditsContent .button {
+    display: inline-block;
+    font-size: 3.5cqh;
+    line-height: 1.4;
+    text-decoration: none;
+    padding-left: 1.12em;
+    flex-shrink: 0;
+}
 :root {
     --ink: #6bd;
     --heading-ink: #228899;

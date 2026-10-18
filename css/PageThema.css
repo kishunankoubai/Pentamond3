@@ -1,9 +1,34 @@
-@import url("https://fonts.googleapis.com/css2?family=RocknRoll+One&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Mochiy+Pop+P+One&display=swap");
+@font-face {
+    font-family: "RocknRoll One";
+    src: url("../assets/fonts/rocknrollone/RocknRollOne-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+/* Mochiy Pop P Oneの幅の狭い全角約物がSafariで前の文字へ重なる場合がある。
+   記号だけ全角幅のRocknRoll Oneを使い、本文・文字送り・フォント原本は変えない。
+   unicode-rangeは描画対象の指定であり、フォントファイルの加工ではない。 */
+@font-face {
+    font-family: "Pentamond Punctuation";
+    src: url("../assets/fonts/rocknrollone/RocknRollOne-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    unicode-range: U+FF01, U+FF1A;
+}
+@font-face {
+    font-family: "Mochiy Pop P One";
+    src: url("../assets/fonts/mochiypoppone/MochiyPopPOne-Regular.ttf") format("truetype");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    /* 比例幅の約物を、ブラウザー側でさらに詰めない。フォント自体は改変しない。 */
+    font-feature-settings: "palt" 0, "halt" 0, "chws" 0;
+}
 * {
     /* min-height: fit-content;
     min-width: fit-content; */
-    font-family: "Mochiy Pop P One", Arial;
+    font-family: "Pentamond Punctuation", "Mochiy Pop P One", Arial;
     font-size: 6cqh;
     align-items: center;
     justify-content: center;
@@ -20,6 +45,11 @@
 
 html {
     background-color: #9ce;
+    /* Safariの文字自動拡大で、ゲーム領域の寸法と文字サイズがずれるのを防ぐ。 */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    font-kerning: none;
+    text-spacing-trim: space-all;
 }
 
 body {
@@ -99,6 +129,9 @@ body {
     /* padding: 2cqh; */
     border-bottom: #22222200 0.5cqh solid;
     margin-left: -6cqh;
+    transition:
+        border-color 150ms ease-in-out,
+        color 150ms ease-in-out;
     &:active {
         scale: 0.98;
     }
@@ -114,15 +147,12 @@ body {
         outline: none;
         border: none;
         border-bottom: #ff90be 0.5cqh solid;
+        color: #ff90be;
         &::before {
             opacity: 1;
             transition: opacity 200ms ease-in-out;
         }
-        color: #ff90be;
     }
-    transition:
-        border-color 150ms ease-in-out,
-        color 150ms ease-in-out;
 }
 
 .headingLabel {
@@ -190,15 +220,15 @@ p {
         font-size: 6cqh;
         line-height: 1.6;
         outline: none;
+        box-shadow: 1cqh 1cqh 2cqh #33333366;
+        position: absolute;
         & * {
             text-wrap: wrap;
         }
-        box-shadow: 1cqh 1cqh 2cqh #33333366;
         & ruby {
             & rt {
                 font-size: 2.5cqh;
             }
         }
-        position: absolute;
     }
 }

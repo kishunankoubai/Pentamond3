@@ -3,6 +3,7 @@ type MusicType = "BGM" | "SE";
 export type MusicData = {
     name: string;
     src: string;
+    fallbackSrc?: readonly string[];
     loop: boolean;
     loopStart?: number;
     loopEnd?: number;
@@ -21,10 +22,23 @@ export class Music {
     private static masterBGMVolume = 1.0;
     private static masterSEVolume = 1.0;
 
-    //使用する前に呼んでね
+    private static readonly resumeOnInteraction = () => {
+        void this.resumeContext().catch((error) => console.warn("音声を再開できませんでした", error));
+    };
+
+    // 初回はpageStartの直接クリック中に呼ぶ。復帰後も同じContextを再利用する。
     static async init() {
-        if (!this.audioContext) this.audioContext = new AudioContext();
-        if (this.audioContext.state === "suspended") await this.audioContext.resume();
+        if (!this.audioContext) {
+            this.audioContext = new AudioContext();
+            // Safariのinterrupted状態や、ブラウザーによる再停止を操作時に解除する。
+            for (const event of ["pointerdown", "keydown", "click"]) document.addEventListener(event, this.resumeOnInteraction, { capture: true });
+        }
+        await this.resumeContext();
+    }
+
+    private static async resumeContext(): Promise<void> {
+        const context = this.audioContext;
+        if (context && context.state !== "running" && context.state !== "closed") await context.resume();
     }
 
     private static get context(): AudioContext {
@@ -73,17 +87,24 @@ export class Music {
     async load() {
         if (this.isLoaded) return;
         this.loading ??= (async () => {
-            const res = await fetch(this.data.src);
-            if (!res.ok) throw new Error(`音声の読み込みに失敗しました: ${res.status}`);
-            this.audioBuffer = await Music.context.decodeAudioData(await res.arrayBuffer());
-            this.isLoaded = true;
+            let lastError: unknown;
+            for (const src of [this.data.src, ...(this.data.fallbackSrc ?? [])]) {
+                try {
+                    const res = await fetch(src);
+                    if (!res.ok) throw new Error(`音声の読み込みに失敗しました: ${res.status}`);
+                    this.audioBuffer = await Music.context.decodeAudioData(await res.arrayBuffer());
+                    this.isLoaded = true;
+                    return;
+                } catch (error) { lastError = error; }
+            }
+            throw lastError;
         })().finally(() => { this.loading = undefined; });
         await this.loading;
     }
 
     /** BGMのページ遷移用。再生中・読み込み中の同じ曲を開始し直さない。 */
     ensurePlaying(): Promise<void> {
-        if (this.isPlaying) return Promise.resolve();
+        if (this.isPlaying) return Music.resumeContext();
         return this.playbackRequest ?? this.play();
     }
 
@@ -100,6 +121,7 @@ export class Music {
         if (this.isPlaying) this.stop();
         const generation = ++this.playGeneration;
         if (!this.isLoaded) await this.load();
+        await Music.resumeContext();
 
         if (!this.audioBuffer || generation !== this.playGeneration) return;
         this.gainNode.gain.cancelScheduledValues(Music.context.currentTime);

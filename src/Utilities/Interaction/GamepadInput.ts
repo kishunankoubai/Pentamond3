@@ -1,5 +1,6 @@
 import { LoopManager } from "../Loop/LoopManager";
 import { MyEventListener } from "../MyEventListener";
+import { readGamepads } from "./GamepadAccess";
 
 export interface GamepadButtonInfo {
     buttonIndex: number;
@@ -25,7 +26,7 @@ export class GamepadInput extends MyEventListener {
         this.axisThreshold = axisThreshold;
 
         this.loop.addHandler("loop", () => {
-            const gamepad = navigator.getGamepads()[this.index];
+            const gamepad = readGamepads()[this.index];
             if (!gamepad) { this.releaseInputs(); return; }
 
             this.updateGamepad(gamepad);
@@ -34,7 +35,7 @@ export class GamepadInput extends MyEventListener {
     }
 
     get g$connecting(): boolean {
-        return navigator.getGamepads()[this.index] != null;
+        return readGamepads()[this.index] != null;
     }
 
     /**

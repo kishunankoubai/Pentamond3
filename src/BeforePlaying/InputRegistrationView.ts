@@ -2,6 +2,7 @@ import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
 import { inputManager } from "../Utilities/Interaction/InputManager";
 import { InputObserver } from "../Utilities/Interaction/InputObserver";
+import { readGamepads } from "../Utilities/Interaction/GamepadAccess";
 
 /** 本編・養成所共通の登録表示。登録後の遷移や配置の選択は呼び出し側に任せる。 */
 export class InputRegistrationView {
@@ -18,7 +19,7 @@ export class InputRegistrationView {
     get ready(): boolean {
         const inputs = inputManager.g$registeredInputs;
         return inputs.length === this.requiredNumber && inputs.every((input) =>
-            input.g$type === "keyboard" || input instanceof GamepadObserver && !!navigator.getGamepads?.()[input.g$index]?.connected);
+            input.g$type === "keyboard" || input instanceof GamepadObserver && !!readGamepads()[input.g$index]?.connected);
     }
 
     reset(requiredNumber: number): void {

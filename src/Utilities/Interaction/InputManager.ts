@@ -3,6 +3,7 @@ import { AutoInputObserver } from "./AutoInputObserver";
 import { GamepadObserver } from "./GamepadObserver";
 import { InputObserver } from "./InputObserver";
 import { KeyboardObserver } from "./KeyboardObserver";
+import { readGamepads } from "./GamepadAccess";
 
 export class InputManager extends MyEventListener {
     private static instance: InputManager;
@@ -107,7 +108,7 @@ export class InputManager extends MyEventListener {
     }
 
     private discoverGamepads(): void {
-        navigator.getGamepads?.().forEach((gamepad) => {
+        readGamepads().forEach((gamepad) => {
             if (gamepad) this.addGamepad(gamepad.index);
         });
     }

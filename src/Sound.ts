@@ -8,8 +8,8 @@ export function setupMusics() {
         return;
     }
 
-    Music.init();
-    bgmTracks.forEach((track) => MusicManager.add({ ...track, src: `assets/musics/${track.name}.m4a`, loop: true, type: "BGM" }));
+    void Music.init().catch((error) => console.warn("音声を初期化できませんでした", error));
+    bgmTracks.forEach((track) => MusicManager.add({ ...track, src: `assets/musics/${track.name}.mp3`, loop: true, type: "BGM" }));
 
     MusicManager.add({
         name: "ボタン",
@@ -27,13 +27,13 @@ export function setupMusics() {
     });
 
     const pentamondSounds = [
-        ["サブページボタン", "Pentamond2-サブページボタン.m4a", 0.5],
-        ["ブロック破壊音", "Pentamond2-ブロック破壊音.m4a", 0.85],
-        ["ダメージ音", "Pentamond2-ダメージ音.m4a", 0.85],
-        ["攻撃音", "Pentamond2-攻撃音.m4a", 0.85],
-        ["ホールド音", "Pentamond2-ホールド音.m4a", 0.6],
-        ["一手戻し音", "Pentamond2-一手戻し音.m4a", 0.85],
-        ["役無し消去音", "Pentamond2-役無し消去音.m4a", 0.95],
+        ["サブページボタン", "Pentamond2-サブページボタン.mp3", 0.5],
+        ["ブロック破壊音", "Pentamond2-ブロック破壊音.mp3", 0.85],
+        ["ダメージ音", "Pentamond2-ダメージ音.mp3", 0.85],
+        ["攻撃音", "Pentamond2-攻撃音.mp3", 0.85],
+        ["ホールド音", "Pentamond2-ホールド音.mp3", 0.6],
+        ["一手戻し音", "Pentamond2-一手戻し音.mp3", 0.85],
+        ["役無し消去音", "Pentamond2-役無し消去音.mp3", 0.95],
         ["開始音1", "Pentamond3-開始音1.mp3", 0.7],
         ["開始音2", "Pentamond3-開始音2.mp3", 0.8],
         ["実績達成", "Pentamond3-消去音6.mp3", 1],
