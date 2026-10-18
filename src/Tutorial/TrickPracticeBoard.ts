@@ -127,7 +127,7 @@ export class TrickPracticeBoard {
             this.undo = null;
             this.phase = "targets";
             this.spawn(snapshot.kind);
-            return { sound: "ボタン" };
+            return { sound: "一手戻し音" };
         }
         if (!this.hand?.g$visible) return {};
         if (operation.startsWith("move-")) {
@@ -174,12 +174,12 @@ export class TrickPracticeBoard {
             outcome.sound = "設置音";
         } else if (operation === "hold") {
             operator.hold();
-            outcome.sound = "ボタン";
+            outcome.sound = "ホールド音";
         } else if (operation === "unput") {
             operator.unput();
             this.placed--;
             this.canUndo = false;
-            outcome.sound = "ボタン";
+            outcome.sound = "一手戻し音";
         } else if (operation === "removeLine") {
             operator.removeLine();
             this.erased++;
@@ -194,19 +194,22 @@ export class TrickPracticeBoard {
                     this.phase = "done";
                     operator.stop();
                 }
-            } else this.chain = 0;
+            } else {
+                this.chain = 0;
+                outcome.sound = "役無し消去音";
+            }
         }
         return outcome;
     }
 
     private erase(): PracticeOutcome {
         const trick = this.blocks.removeLine();
-        const sound = trick ? `消去音${Math.min(6, this.chain)}` : undefined;
+        const sound = trick ? `消去音${Math.min(6, this.chain)}` : "役無し消去音";
         this.chain = trick ? this.chain + 1 : 0;
         this.erased++;
         this.undo = null;
         if (this.erased === this.layout.height) {
-            if (!trick || !this.acceptsTrick(trick.name)) return { failed: true };
+            if (!trick || !this.acceptsTrick(trick.name)) return { failed: true, sound };
             this.stage++;
             this.phase = "recoveryReview";
         }

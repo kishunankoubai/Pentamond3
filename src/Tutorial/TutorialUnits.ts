@@ -5,10 +5,10 @@ import { trickLessonOffset, trickLessons } from "./TrickLessons";
 
 /** 保存済みの項目番号を維持し、一覧・見出し・戻り先・解放判定を一元化する。 */
 export const tutorialUnits = [
-    { id: "operation", name: "操作方法", page: "operateTutorial", list: "operationLessonList", offset: 0, lessons: operationLessons, perPage: operationLessons.length },
-    { id: "basic", name: "基本ルール", page: "BasicRule", list: "basicRuleLessonList", offset: operationLessons.length, lessons: basicRuleLessons, perPage: basicRuleLessons.length },
-    { id: "advanced", name: "応用など", page: "advancedRule", list: "advancedLessonList", offset: advancedLessonOffset, lessons: advancedLessons, perPage: advancedLessons.length },
-    { id: "trick", name: "役の揃え方", page: "trickTutorial", list: "trickLessonList", offset: trickLessonOffset, lessons: trickLessons, perPage: 4 },
+    { id: "operation", name: "操作方法", page: "operateTutorial", list: "operationLessonList", offset: 0, lessons: operationLessons, perPage: operationLessons.length, requiredAchievements: 0 },
+    { id: "basic", name: "基本ルール", page: "BasicRule", list: "basicRuleLessonList", offset: operationLessons.length, lessons: basicRuleLessons, perPage: basicRuleLessons.length, requiredAchievements: 0 },
+    { id: "advanced", name: "応用など", page: "advancedRule", list: "advancedLessonList", offset: advancedLessonOffset, lessons: advancedLessons, perPage: advancedLessons.length, requiredAchievements: 3 },
+    { id: "trick", name: "役の揃え方", page: "trickTutorial", list: "trickLessonList", offset: trickLessonOffset, lessons: trickLessons, perPage: 4, requiredAchievements: 5 },
 ] as const;
 
 export const tutorialLessonCount = tutorialUnits.reduce((count, unit) => count + unit.lessons.length, 0);

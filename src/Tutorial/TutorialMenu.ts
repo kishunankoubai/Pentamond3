@@ -17,6 +17,33 @@ export function setupTutorialMenu(scene: Scene, elementManager: ElementManager):
     const next = document.getElementById("tutorialRegisterNext")!;
     const registrationView = new InputRegistrationView("tutorialInputRegister");
     const controller = new AbortController();
+    const unlockHint = document.getElementById("tutorialUnlockHint")!;
+    const unitButtons = tutorialUnits.map((unit) => ({
+        unit,
+        button: document.querySelector<HTMLElement>(`#tutorial [data-page="${unit.page}"]`)!,
+    }));
+    const showUnlockHint = () => {
+        const focused = unitButtons.find(({ button }) => button === document.activeElement);
+        unlockHint.textContent = focused && !TutorialProgress.isUnitUnlocked(focused.unit.id)
+            ? `実績を${focused.unit.requiredAchievements}個以上獲得すると解放されます`
+            : "";
+    };
+    const refreshUnits = () => {
+        unitButtons.forEach(({ unit, button }) => {
+            setInteractionEnabled(button, TutorialProgress.isUnitUnlocked(unit.id));
+        });
+        showUnlockHint();
+    };
+    unitButtons.forEach(({ unit, button }) => {
+        if (unit.requiredAchievements > 0) {
+            button.dataset.focusWhenDisabled = "true";
+            button.setAttribute("aria-describedby", unlockHint.id);
+        }
+        button.addEventListener("focus", showUnlockHint, { signal: controller.signal });
+        button.addEventListener("blur", () => { unlockHint.textContent = ""; }, { signal: controller.signal });
+    });
+    refreshUnits();
+    pageManager.addHandler("changePage-tutorial", refreshUnits);
     let pendingLesson: number | null = null;
     let registering = false;
     let proceeding = false;

@@ -129,7 +129,7 @@ export class ResultPageHandler {
                 <div class="text">
                     Player人数 : ${players.length}<br />
                     モード : ${playSetting.mode == 1 ? "サバイバル" : "十五列揃え"}<br />
-                    ${playSetting.mode == 1 ? `持ち時間 : ${this.formatValue(playSetting.maxGameTime)}<br />` : `クリア列数 : ${playSetting.targetLines}<br />`}
+                    ${playSetting.mode == 1 ? `初期最大持ち時間 : ${this.formatValue(playSetting.maxGameTime)}<br />` : `クリア列数 : ${playSetting.targetLines}<br />`}
                     ${players.length != 1 ? `結果 : ${qs(".resultLabel").innerHTML}<br />` : ""}
                 </div>
             </div>    
@@ -143,8 +143,8 @@ export class ResultPageHandler {
             <div class="subPage">
                 <div class="text">
                     Player : ${i + 1}<br />
-                    ${playSetting.mode === 1 ? `開始Time : ${this.formatValue(p.playInfo.maxGameTime)}<br />` : ""}
-                    ${playSetting.mode === 1 ? `残りTime : ${this.formatValue(p.playInfo.gameTime)}<br />` : ""}
+                    ${playSetting.mode === 1 ? `最大持ち時間 : ${this.formatValue(p.playInfo.maxGameTime)}<br />` : ""}
+                    ${playSetting.mode === 1 ? `持ち時間 : ${this.formatValue(p.playInfo.gameTime)}<br />` : ""}
                     プレイ時間 : ${(p.playInfo.playTime / 1000).toFixed(2)}<br />
                     役の回数 : ${p.playInfo.trickCount}<br />
                     一列揃え : ${p.playInfo.line}<br />

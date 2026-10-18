@@ -26,7 +26,15 @@ export class TutorialProgress {
         } catch (error) { console.warn("教習記録を読み込めませんでした", error); }
     }
     static isCleared(index: number): boolean { return Number.isInteger(index) && index >= 0 && index < lessonCount && !!(this.cleared & (1 << index)); }
-    static isUnlocked(index: number): boolean { return Number.isInteger(index) && index >= 0 && index < lessonCount && (tutorialUnits.some((unit) => unit.offset === index) || this.isCleared(index) || this.isCleared(index - 1)); }
+    static isUnitUnlocked(unitId: string): boolean {
+        const unit = tutorialUnits.find((unit) => unit.id === unitId);
+        return !!unit && Achievements.getSummary().achieved >= unit.requiredAchievements;
+    }
+    static isUnlocked(index: number): boolean {
+        if (!Number.isInteger(index) || index < 0 || index >= lessonCount) return false;
+        const unit = tutorialUnits.find((unit) => index >= unit.offset && index < unit.offset + unit.lessons.length)!;
+        return this.isUnitUnlocked(unit.id) && (unit.offset === index || this.isCleared(index) || this.isCleared(index - 1));
+    }
     static complete(index: number): void {
         if (!Number.isInteger(index) || index < 0 || index >= lessonCount) return;
         this.cleared |= 1 << index;

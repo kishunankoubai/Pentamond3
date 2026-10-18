@@ -49,7 +49,7 @@ export const achievements: readonly Achievement[] = [
             [10, "bronze"],
             [100, "silver"],
             [1000, "silver"],
-            [10000, "gold"],
+            [5000, "gold"],
         ] as const
     ).map(([target, grade]) => ({
         id: `trick-0-${target}`,
@@ -105,21 +105,21 @@ export const achievements: readonly Achievement[] = [
         category: "survival" as const,
         grade,
         description: `${minutes}分以上生存しよう`,
-        note: "持ち時間150・ハンデ1で完了した通常プレイが対象です。 時間は実際のプレイ時間で判定します。",
+        note: "初期最大持ち時間150・ハンデ1で完了した通常プレイが対象です。 時間は実際のプレイ時間で判定します。",
         target: minutes * 60000,
     })),
     ...(
         [
             [10000, "silver"],
             [100000, "silver"],
-            [1000000, "gold"],
+            [500000, "gold"],
         ] as const
     ).map(([target, grade]) => ({
         id: `survival-score-${target}`,
         category: "survival" as const,
         grade,
         description: `スコア${target}を達成しよう`,
-        note: "持ち時間150・ハンデ1のサバイバルで、 1プレイのスコアを判定します。",
+        note: "初期最大持ち時間150・ハンデ1のサバイバルで、 1プレイのスコアを判定します。",
         target,
     })),
     {
@@ -127,7 +127,7 @@ export const achievements: readonly Achievement[] = [
         category: "survival",
         grade: "gold",
         description: "1プレイで役を全種類作ろう",
-        note: `持ち時間150・ハンデ1のサバイバルで、 同じプレイヤーが次の8種類を成立させよう：${achievementTricks.join("、 ")}。`,
+        note: `初期最大持ち時間150・ハンデ1のサバイバルで、 同じプレイヤーが次の8種類を成立させよう：${achievementTricks.join("、 ")}。`,
     },
     ...(
         [

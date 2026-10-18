@@ -205,6 +205,7 @@
             <div class="button" data-xy="[3,0]" data-page="advancedRule">応用など</div>
             <div class="button" data-xy="[4,0]" data-page="trickTutorial">役の揃え方</div>
         </div>
+        <div id="tutorialUnlockHint" class="text" role="status" aria-live="polite"></div>
         <div class="back button" data-xy="[0,1]">戻る</div>
     </div>
 
@@ -474,7 +475,7 @@
         </div>
         <div class="subPage">
             <div class="statisticSection">ソロ</div>
-            <div class="text statisticNote">最高スコア・最長時間は持ち時間150・ハンデ1の記録です。</div>
+            <div class="text statisticNote">最高スコア・最長時間は初期最大持ち時間150・ハンデ1の記録です。</div>
             <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="soloSurvivalScore"></span></div>
             <div class="statisticRow"><span>サバイバル：最長プレイ時間</span><span data-statistic="soloSurvivalTime" data-format="time"></span></div>
             <div class="statisticRow"><span>サバイバル：累計回復</span><span data-statistic="soloRecovery"></span></div>
@@ -482,7 +483,7 @@
         </div>
         <div class="subPage">
             <div class="statisticSection">マルチ</div>
-            <div class="text statisticNote">最高スコア・最大攻撃は持ち時間150・ハンデ1の記録です。</div>
+            <div class="text statisticNote">最高スコア・最大攻撃は初期最大持ち時間150・ハンデ1の記録です。</div>
             <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="multiSurvivalScore"></span></div>
             <div class="statisticRow"><span>サバイバル：最大攻撃</span><span data-statistic="multiSurvivalAttack"></span></div>
             <div class="statisticRow"><span>十五列揃え：最速タイム</span><span data-statistic="multiSprintTime" data-format="time"></span></div>
@@ -563,7 +564,7 @@
                     <div class="text">保存されているデータを<br />確認・消去できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">各モードの持ち時間や<br />クリア条件を設定できるよ！</div>
+                    <div class="text">各モードの最大持ち時間や<br />クリア条件を設定できるよ！</div>
                 </div>
                 <div>
                     <div class="text">演出や盤面の表示を<br />調節できるよ！</div>
@@ -625,7 +626,7 @@
             </div>
             <div class="selectOptionDescriptions">
                 <div>
-                    <div class="text">持ち時間と、<br />各プレイヤーのハンデを<br />設定します。</div>
+                    <div class="text">最大持ち時間と、<br />各プレイヤーのハンデを<br />設定します。</div>
                 </div>
                 <div>
                     <div class="text">クリアに必要な、<br />一列揃えの回数を設定します。</div>
@@ -639,7 +640,7 @@
         <div class="label headingLabel">サバイバル設定</div>
         <div class="playSettingPanel">
             <div class="playSettingSection">
-                <div class="label playSettingSectionTitle">持ち時間</div>
+                <div class="label playSettingSectionTitle">最大持ち時間</div>
                 <div class="options maxTimeOptions" data-direction="row">
                     <div class="button" data-max-time="30" data-xy="[0,0]">30</div>
                     <div class="button selectedValue" data-max-time="150" data-xy="[1,0]">150</div>
@@ -900,7 +901,7 @@
             <div class="button" id="damageEffectsOff" data-xy="[1,4]">OFF</div>
         </div>
         <div class="options graphicSubSetting" data-direction="row">
-            <div class="label">残り時間警告</div>
+            <div class="label">持ち時間警告</div>
             <div class="button" id="timeWarningEffectOn" data-xy="[0,5]">ON</div>
             <div class="button" id="timeWarningEffectOff" data-xy="[1,5]">OFF</div>
         </div>

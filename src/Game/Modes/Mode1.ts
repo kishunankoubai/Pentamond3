@@ -5,7 +5,7 @@ import * as Setting from "../../Settings";
 import { playBackground } from "../../PlayBackground";
 import { GraphicSetting } from "../../GraphicSetting";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
-import { emptyRemovalPenalty, sharedSurvivalDamage, survivalTrickReward } from "../SurvivalRules";
+import { emptyRemovalPenalty, sharedSurvivalDamage, survivalMaximumTime, survivalTrickReward } from "../SurvivalRules";
 import { SimulationClock } from "../../Utilities/Loop/SimulationClock";
 
 export class Mode1 extends GameMode {
@@ -49,6 +49,7 @@ export class Mode1 extends GameMode {
                 p.finish();
                 p.label.updateContents({
                     gameTime: p.playInfo.gameTime + "",
+                    maxGameTime: p.playInfo.maxGameTime + "",
                     playTime: "",
                     line: "",
                     lastTrick: p.playInfo.lastTrick ? p.playInfo.lastTrick.name : "　",
@@ -83,6 +84,7 @@ export class Mode1 extends GameMode {
             this.players.forEach((p) => {
                 p.label.updateContents({
                     gameTime: p.playInfo.gameTime + "",
+                    maxGameTime: p.playInfo.maxGameTime + "",
                     playTime: "",
                     line: "",
                     lastTrick: p.playInfo.lastTrick ? p.playInfo.lastTrick.name : "　",
@@ -112,6 +114,7 @@ export class Mode1 extends GameMode {
             p.feedback.updatePending(p.damageInfo.attackTask, p.damageInfo.damageTask + p.damageInfo.temporaryDamageTask, p.state.damaging);
             p.label.updateContents({
                 gameTime: p.playInfo.gameTime + "",
+                maxGameTime: p.playInfo.maxGameTime + "",
                 playTime: "",
                 line: "",
                 lastTrick: p.playInfo.lastTrick ? p.playInfo.lastTrick.name : "　",
@@ -124,9 +127,10 @@ export class Mode1 extends GameMode {
         this.events.add(
             p.loop.addHandler("loop", () => {
                 p.playInfo.playTime = p.loop.g$elapsedTime;
-                updateLabel();
                 p.updateGameTime();
+                updateLabel();
 
+                p.canvas.setFinalTimeWarning(p.playInfo.gameTime < Setting.finalWarningGameTime);
                 p.g$element.classList.toggle("lowTime", p.playInfo.gameTime <= Setting.warningGameTime);
                 if (p.playInfo.gameTime <= Setting.warningGameTime && GraphicSetting.timeWarningEffect) {
                     if (p.animations.timeWarning.playState != "running") {
@@ -183,21 +187,25 @@ export class Mode1 extends GameMode {
                 if (p.damageInfo.attackTask) {
                     const recipients = this.players.filter((player) => player !== p && !player.state.hasFinished);
                     const damage = sharedSurvivalDamage(p.damageInfo.attackTask, recipients.length);
-                    if (damage > 0) p.feedback.show("攻撃！", `各相手に ${damage}`, "attack");
+                    if (damage > 0) {
+                        p.feedback.show("攻撃！", `各相手に ${damage}`, "attack");
+                        MusicManager.get("攻撃音")?.play();
+                    }
                     p.damageInfo.maxAttack = Math.max(p.damageInfo.maxAttack, p.damageInfo.attackTask);
                     console.log(`Player ${index + 1} has attacked: ${p.damageInfo.attackTask}`);
                     recipients.forEach((player) => player.addDamageTask(damage));
                     p.damageInfo.totalAttack += p.damageInfo.attackTask;
                     p.damageInfo.attackTask = 0;
                 }
+                this.updateMaximumGameTimes();
             }),
 
             p.operator.addHandler("unput", () => {
                 p.playInfo.put -= 1;
-                p.playInfo.score -= 10;
                 p.playInfo.penalty += Setting.penalty.unput;
                 p.playInfo.unput += 1;
                 p.feedback.show("一手戻し", `持ち時間 −${Setting.penalty.unput}`, "penalty");
+                this.updateMaximumGameTimes();
             }),
 
             p.operator.addHandler("hold", () => {
@@ -238,7 +246,22 @@ export class Mode1 extends GameMode {
                 p.playInfo.lastTrick = p.operator.g$lastTrick;
                 p.playInfo.remove += 1;
                 if (lastTrick) MusicManager.get(`消去音${removeSoundIndex}`)?.play();
+                this.updateMaximumGameTimes();
             })
         );
+    }
+
+    private updateMaximumGameTimes(): void {
+        // 脱落で分母が変わらないよう、開始時の全参加者を対象にする。
+        const averageScore = this.players.reduce((total, player) => total + player.playInfo.score, 0) / this.players.length;
+        this.players.forEach((player) => {
+            if (player.state.hasFinished) return;
+            const info = player.playInfo;
+            const maximum = survivalMaximumTime(info.initialMaxGameTime, info.maxGameTime, averageScore);
+            if (maximum === info.maxGameTime) return;
+            info.maxGameTime = maximum;
+            // 上限を超えた残りだけを余剰回復として差し引く。
+            player.updateGameTime();
+        });
     }
 }

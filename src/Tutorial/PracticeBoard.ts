@@ -91,8 +91,8 @@ export class PracticeBoard {
             const trick = this.blocks.removeLine();
             this.erased++;
             if (this.erased === 5) this.phase = "done";
-            // 役なしの列には消去音を鳴らさない。
-            const sound = trick ? `消去音${Math.min(6, this.chain++)}` : undefined;
+            // 役なしには専用の音を使い、役成立時の消去音と区別する。
+            const sound = trick ? `消去音${Math.min(6, this.chain++)}` : "役無し消去音";
             if (!trick) this.chain = 0;
             return { trick: trick?.name ?? "役なし", sound };
         }
@@ -107,7 +107,7 @@ export class PracticeBoard {
             this.undo = null;
             this.usedSkill = true;
             this.phase = "targets";
-            return { sound: "ボタン" };
+            return { sound: "一手戻し音" };
         }
         if (!this.hand?.g$visible) return { failed: true };
         if (operation.startsWith("move-")) {
@@ -136,7 +136,7 @@ export class PracticeBoard {
             this.hold = current;
             this.spawn(replacement);
             this.usedSkill = true;
-            return { sound: "ボタン" };
+            return { sound: "ホールド音" };
         }
         if (operation !== "put") return {};
         // 一手戻し用の状態は設置の直前の「地形だけ」。移動状態は初期位置へ戻す。

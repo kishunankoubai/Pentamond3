@@ -458,7 +458,7 @@ export class SceneTutorial extends Scene {
                 "サバイバルでは持ち時間が少しずつ減り、0になると終了です。持ち時間は実時間の0.5秒ごとに1減ります。",
                 "役を消去すると持ち時間が回復し、スコアも増えます。チェインではさらにスコアにボーナスがつきます！",
                 "マルチプレイなら攻撃もできます。時間は設定された上限を超えて回復しません。",
-                "今回は持ち時間30で、一列揃えを1回成立させましょう。",
+                "今回は最大持ち時間30で、一列揃えを1回成立させましょう。",
                 `黄色の枠にモンドを設置して${this.controlMarkup("removeLine")}で消去しましょう。`,
             ];
         if (id === "penalty")
@@ -508,7 +508,7 @@ export class SceneTutorial extends Scene {
             const review =
                 model.phase === "recoveryReview"
                     ? [
-                          "一列揃えが成立しました！持ち時間が10回復し、役のスコア1000を獲得しました。上限を超える回復分は残りません。",
+                          "一列揃えが成立しました！持ち時間が10回復し、役のスコア1000を獲得しました。回復しても最大持ち時間は超えません。",
                           "サバイバルは、役を揃えて時間を回復しながら、スコアを伸ばすモードです！",
                       ]
                     : model.phase === "damageReview"
@@ -520,7 +520,7 @@ export class SceneTutorial extends Scene {
                         ? ["10回の役と10チェインを達成しました！Pentamondでは、役を揃えて消すことが遊びの中心です。"]
                         : model.lesson.id === "variety"
                           ? ["3種類の役が成立しました！ほかの形は役一覧でも確かめられます。"]
-                          : ["3回のペナルティを体験しました。残り時間を見ながら、一手戻しや役なし消去を使いましょう！"];
+                          : ["3回のペナルティを体験しました。持ち時間を見ながら、一手戻しや役なし消去を使いましょう！"];
             model.setActive(false);
             model.phase = "done";
             TutorialProgress.complete(model.index);

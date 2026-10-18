@@ -3,7 +3,7 @@ import { LifeCounter } from "../Flags";
 import { MyEventListener } from "../MyEventListener";
 import { Page } from "./Page";
 import { Scene, SceneClass, sceneManager } from "../SceneManager";
-import { initializeInteractionElements, isInteractionEnabled } from "../Element/InteractionElement";
+import { initializeInteractionElements, isInteractionFocusable } from "../Element/InteractionElement";
 import { InputActivation } from "../Interaction/InputActivation";
 
 type PageFocus = { id: string; coordinate: string; index: number; subPageIndex: number };
@@ -77,7 +77,7 @@ export class PageManager extends MyEventListener {
         if (focus && focus.subPageIndex >= 0) this.executeEvent("restoreFocusSubPage", focus.subPageIndex);
         initializeInteractionElements(page);
         const elements = Array.from(page.querySelectorAll<HTMLElement>("[data-xy]"));
-        const valid = (element: HTMLElement) => element.getClientRects().length > 0 && !element.classList.contains("closing") && isInteractionEnabled(element);
+        const valid = (element: HTMLElement) => element.getClientRects().length > 0 && !element.classList.contains("closing") && isInteractionFocusable(element);
         const remembered = focus?.id
             ? elements.find((element) => element.id === focus.id)
             : focus && elements[focus.index]?.dataset.xy === focus.coordinate ? elements[focus.index] : undefined;

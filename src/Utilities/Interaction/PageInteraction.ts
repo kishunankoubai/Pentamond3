@@ -3,7 +3,7 @@ import { inputManager } from "./InputManager";
 import { InputInfo, InputObserver } from "./InputObserver";
 import { MyEvent } from "../MyEventListener";
 import { MusicManager } from "../Music/MusicManager";
-import { initializeInteractionElements, isInteractionEnabled } from "../Element/InteractionElement";
+import { initializeInteractionElements, isInteractionFocusable } from "../Element/InteractionElement";
 import { InputActivation } from "./InputActivation";
 
 type InteractionElement = {
@@ -31,7 +31,8 @@ export class PageInteraction {
     };
     private readonly clickHandler = (event: MouseEvent) => {
         if (event.target instanceof HTMLElement && event.target.closest("[data-xy]")) {
-            MusicManager.get("ボタン")?.play();
+            const sound = event.target.closest(".subPagePrev, .subPageNext") ? "サブページボタン" : "ボタン";
+            MusicManager.get(sound)?.play();
         }
     };
     private readonly pointerHandler = () => { PageInteraction.firstFocus = false; };
@@ -49,7 +50,7 @@ export class PageInteraction {
             ({ element }) =>
                 !element.classList.contains("closing") &&
                 element.getClientRects().length > 0 &&
-                isInteractionEnabled(element)
+                isInteractionFocusable(element)
         );
     }
 

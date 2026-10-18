@@ -13,6 +13,7 @@ import { GraphicSetting } from "../GraphicSetting";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { achievementTrickIndex, achievementTricks } from "../Achievements/Definitions";
 import { PlayFeedback } from "./PlayFeedback";
+import { bindDamageSounds } from "./DamageSounds";
 
 export class GamePlayer {
     readonly trickCounts = Array<number>(achievementTricks.length).fill(0);
@@ -31,6 +32,7 @@ export class GamePlayer {
     input: InputObserver;
     playField: HTMLDivElement = document.createElement("div");
     playInfo = {
+        initialMaxGameTime: 300,
         maxGameTime: 300,
         gameTime: 300,
         playTime: 0,
@@ -236,6 +238,7 @@ export class GamePlayer {
         this.label = new InformationLabelManager(playerCount);
         this.feedback = new PlayFeedback(clock, playerCount);
         this.nuisanceMondManager = new NuisanceMondManager(this.operator.blockManager, seeds.nuisance, clock);
+        bindDamageSounds(this.nuisanceMondManager);
         this.events.add(
             this.nuisanceMondManager.addHandler("startDamage", () => {
                 this.damagePenalty = 0;
@@ -283,7 +286,12 @@ export class GamePlayer {
             this.operator.addHandler(["move-left", "move-right", "move-down-direct"], () => MusicManager.get("移動音")?.play()),
             this.operator.addHandler("slide-down", () => MusicManager.get("滑り移動音")?.play()),
             this.operator.addHandler("spin-left", () => MusicManager.get("左回転音")?.play()),
-            this.operator.addHandler("spin-right", () => MusicManager.get("右回転音")?.play())
+            this.operator.addHandler("spin-right", () => MusicManager.get("右回転音")?.play()),
+            this.operator.addHandler("hold", () => MusicManager.get("ホールド音")?.play()),
+            this.operator.addHandler("unput", () => MusicManager.get("一手戻し音")?.play()),
+            this.operator.addHandler("removeLine", () => {
+                if (!this.operator.g$lastTrick) MusicManager.get("役無し消去音")?.play();
+            })
         );
         this.input = input;
         if (this.input instanceof AutoInputObserver) {
@@ -426,7 +434,8 @@ export class GamePlayer {
             return;
         }
         this.playInfo.gameTime = Math.max(
-            Math.ceil(this.playInfo.maxGameTime - this.loop.g$elapsedTime / Setting.gameTimeRate) - this.playInfo.penalty + this.playInfo.recovery - this.playInfo.surplus,
+            // 経過時間の基準は初期上限。現在の上限の低下自体では持ち時間を引かない。
+            Math.ceil(this.playInfo.initialMaxGameTime - this.loop.g$elapsedTime / Setting.gameTimeRate) - this.playInfo.penalty + this.playInfo.recovery - this.playInfo.surplus,
             0
         );
         if (this.playInfo.gameTime > this.playInfo.maxGameTime) {

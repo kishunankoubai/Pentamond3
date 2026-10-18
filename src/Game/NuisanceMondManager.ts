@@ -72,14 +72,12 @@ export class NuisanceMondManager extends MyEventListener {
         if (this.blockManager.canDisplayMonoiamond(nuisanceMond)) {
             this.blockManager.displayMonoiamond(nuisanceMond);
             this.nuisanceMonds.push(nuisanceMond);
-        } else if (!this.blockManager.getBlockProperty(x, y)[1]) {
-            this.blockManager.remove(x, y);
-        } else if (0 < x) {
-            this.blockManager.remove(x - 1, y);
-        } else if (x < Setting.playWidth - 1) {
-            this.blockManager.remove(x + 1, y);
         } else {
-            this.blockManager.remove(x, y);
+            const targetX = !this.blockManager.getBlockProperty(x, y)[1] ? x : 0 < x ? x - 1 : x < Setting.playWidth - 1 ? x + 1 : x;
+            const existed = this.blockManager.getBlockProperty(targetX, y)[2];
+            this.blockManager.remove(targetX, y);
+            // 出現位置での衝突も、落下途中と同じ破壊として知らせる。
+            if (existed) this.executeEvent("destroyMond");
         }
     }
 

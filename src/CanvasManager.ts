@@ -56,6 +56,7 @@ export class CanvasManager {
     guideBorderHeight: number = 15;
     constructor() {
         this.playCanvas.classList.add("playCanvas");
+        this.playCanvas.style.setProperty("--normal-play-background", Setting.backgroundColor);
         this.pct = this.playCanvas.getContext("2d")!;
         this.playCanvas.height = Setting.blockHeight * (Setting.height + Setting.displayMargin);
         this.playCanvas.width = Setting.blockWidth * Setting.width;
@@ -79,6 +80,10 @@ export class CanvasManager {
         this.data = data;
     }
 
+    setFinalTimeWarning(enabled: boolean): void {
+        this.playCanvas.classList.toggle("finalTimeWarning", enabled);
+    }
+
     paint() {
         this.paintPlayCanvas();
         this.paintNextCanvas();
@@ -86,7 +91,7 @@ export class CanvasManager {
 
     paintPlayCanvas() {
         this.pct.clearRect(0, 0, this.playCanvas.width, this.playCanvas.height);
-        this.paintBackground();
+        // 背景はCSSで切り替え、ブロック自体の色を変えずに警告を遷移させる。
         if (this.guideBorder) {
             this.paintGuideBorder();
         }
@@ -171,11 +176,6 @@ export class CanvasManager {
         }
     }
 
-    private paintBackground() {
-        this.pct.fillStyle = Setting.backgroundColor;
-        this.pct.fillRect(0, 0, this.playCanvas.width, this.playCanvas.height);
-    }
-
     private paintGuideBorder() {
         this.pct.fillStyle = Setting.guideBorderColor;
         this.pct.fillRect(0, Setting.blockHeight * (Setting.height + Setting.displayMargin - this.guideBorderHeight), this.playCanvas.width, Setting.blockHeight);
@@ -214,21 +214,29 @@ export class CanvasManager {
         this.nct.fillStyle = "#bbddff";
         this.nct.textAlign = "center";
         this.nct.fillText("HOLD", this.nextCanvas.width / 2, 55);
-        this.nct.fillText("NEXT", this.nextCanvas.width / 2, Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + Setting.next.gap * 0.64);
+        this.nct.fillText("NEXT", Setting.blockWidth * Setting.next.width * Setting.next.scale.normal / 2, this.nextPanelTop + 52);
         this.nct.restore();
     }
 
+    private get nextPanelTop(): number {
+        return Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + Setting.next.gap / 2;
+    }
+
     private paintNextBackground() {
+        // キャンバスの大きさとモンドの位置は保ち、透明な隙間で二つの枠を分ける。
         this.nct.fillStyle = Setting.backgroundColor;
-        this.nct.fillRect(0, 0, Setting.blockWidth * Setting.next.width * Setting.next.scale.hold, Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + Setting.next.gap / 4);
-        this.nct.fillRect(
+        this.nct.beginPath();
+        this.nct.roundRect(0, 0, Setting.blockWidth * Setting.next.width * Setting.next.scale.hold, Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + Setting.next.gap / 8, 20);
+        this.nct.fill();
+        this.nct.beginPath();
+        this.nct.roundRect(
             0,
-            Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + (Setting.next.gap * 3) / 4,
+            this.nextPanelTop,
             Setting.blockWidth * Setting.next.width * Setting.next.scale.normal,
-            Setting.blockHeight * Setting.next.height * Setting.next.length + Setting.next.gap / 4
+            this.nextCanvas.height - this.nextPanelTop,
+            20
         );
-        this.nct.fillStyle = Setting.next.splitColor;
-        this.nct.fillRect(0, Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + Setting.next.gap / 4, this.nextCanvas.width, Setting.next.gap / 2);
+        this.nct.fill();
     }
 
     private paintNext() {

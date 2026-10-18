@@ -153,7 +153,7 @@ export class AdvancedBoard {
             this.erased++;
             this.spawn(kind);
             if (this.hand!.g$visible) this.phase = "done";
-            return { trick: trick?.name, sound: trick ? "消去音0" : undefined };
+            return { trick: trick?.name, sound: trick ? "消去音0" : "役無し消去音" };
         }
         if (!this.hand?.g$visible) return {};
         if (operation.startsWith("move-")) {
@@ -189,7 +189,7 @@ export class AdvancedBoard {
             this.stage++;
             if (this.lesson.id === "holdReset" && this.stage === 3) this.phase = "done";
             if (this.lesson.id === "juggling" && this.stage === 4) this.target = new Pentiamond(8, bottom, this.hand!.g$kind);
-            return { sound: "ボタン" };
+            return { sound: "ホールド音" };
         }
         if (operation !== "put") return {};
         this.blocks.removePentiamond(this.hand);
@@ -247,9 +247,9 @@ export class AdvancedBoard {
         this.undo = null;
         this.spawn(snapshot.kind);
         this.penalty += Settings.penalty.unput;
-        if (this.lesson.id === "juggling") { this.stage = 3; return { sound: "ボタン", message: "一手戻ししました。サバイバルでは持ち時間が3減ります。" }; }
+        if (this.lesson.id === "juggling") { this.stage = 3; return { sound: "一手戻し音", message: "一手戻ししました。サバイバルでは持ち時間が3減ります。" }; }
         this.stage = 2;
-        return { sound: "ボタン", explain: true, message: "設置前に戻りました。左右に動かして確かめましょう。" };
+        return { sound: "一手戻し音", explain: true, message: "設置前に戻りました。左右に動かして確かめましょう。" };
     }
     private canSlideBothWays(): boolean {
         if (!this.hand?.g$visible || this.blocks.canFall(this.hand)) return false;

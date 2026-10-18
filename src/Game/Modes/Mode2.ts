@@ -100,7 +100,6 @@ export class Mode2 extends GameMode {
 
             p.operator.addHandler("unput", () => {
                 p.playInfo.put -= 1;
-                p.playInfo.score -= 10;
                 p.playInfo.unput += 1;
             }),
 

@@ -269,8 +269,8 @@ function 地割れ(): TrickInfo[] {
 
         list.push({
             name: "地割れ(上)",
-            time: 8,
-            attack: 9,
+            time: 9,
+            attack: 8,
             shape: l.map(transpile),
         });
     }

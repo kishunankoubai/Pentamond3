@@ -1,4 +1,4 @@
-import { damageWaitingTime, defaultMaxGameTime, gameTimeRate, penalty } from "./Settings";
+import { damageWaitingTime, defaultMaxGameTime, gameTimeRate, maxGameTimeScoreInterval, minimumMaxGameTime, penalty } from "./Settings";
 import { spaceJapanesePunctuation } from "./Utilities/Text/JapaneseText";
 
 type HelpSection = { title: string; paragraphs: string[] };
@@ -51,7 +51,7 @@ const basicSections: HelpSection[] = [
     {
         title: "持ち時間に気を付けよう！",
         paragraphs: [
-            "サバイバルには持ち時間があり、 0になるとゲームオーバーです。 役を揃えて消去すると、 持ち時間を回復できます。",
+            "サバイバルの残り時間を「持ち時間」、 その上限を「最大持ち時間」といいます。 持ち時間が0になるとゲームオーバーです。 役を消去すると回復できます。",
             "役のない列も消せますが、 役なし消去を繰り返すと持ち時間が減ってしまいます。 一手戻しにもペナルティがあるので、 使いどころには気を付けましょう。",
             "十五列揃えには持ち時間の制限はありません。 遊び方の違いは、 ヘルプの「モード説明」で確認できます。",
         ],
@@ -150,12 +150,20 @@ function survivalSections(multi: boolean): HelpSection[] {
         {
             title: "プレイ設定と記録",
             paragraphs: [
-                `持ち時間の初期値は${defaultMaxGameTime}です。 ${gameTimeRate / 1000}秒ごとに1減り、 回復しても設定した持ち時間を超えません。`,
-                "持ち時間が無限なら時間切れになりません。 ポーズ画面からメニューなどに戻ることができます。",
+                `最大持ち時間の初期設定は${defaultMaxGameTime}です。 持ち時間は${gameTimeRate / 1000}秒ごとに1減り、 回復しても最大持ち時間を超えません。`,
+                "最大持ち時間が無限なら時間切れになりません。 ポーズ画面からメニューなどに戻れます。",
                 multi
-                    ? "プレイ設定で持ち時間とハンデを変更できます。 ハンデは回復・攻撃の倍率で、 初期値は1です。"
-                    : "プレイ設定で持ち時間とハンデを変更できます。 ハンデは回復量の倍率で、 初期値は1です。",
-                multi ? `最高スコア・最大攻撃の記録は、 持ち時間${defaultMaxGameTime}・ハンデ1が対象です。` : `最高スコア・最長プレイ時間の記録は、 持ち時間${defaultMaxGameTime}・ハンデ1が対象です。`,
+                    ? "プレイ設定で最大持ち時間とハンデを変更できます。 ハンデは回復・攻撃の倍率で、 初期値は1です。"
+                    : "プレイ設定で最大持ち時間とハンデを変更できます。 ハンデは回復量の倍率で、 初期値は1です。",
+                multi ? `最高スコア・最大攻撃は、 初期最大持ち時間${defaultMaxGameTime}・ハンデ1が記録対象です。` : `最高スコア・最長プレイ時間は、 初期最大持ち時間${defaultMaxGameTime}・ハンデ1が記録対象です。`,
+            ],
+        },
+        {
+            title: "最大持ち時間の減少",
+            paragraphs: [
+                `スコアが伸びると、 最大持ち時間が少しずつ減ります。 ${multi ? "開始時の全参加者の平均スコア" : "自分のスコア"}が${maxGameTimeScoreInterval}増えるごとに1減り、 下限は${minimumMaxGameTime}です。`,
+                ...(multi ? ["脱落したプレイヤーのスコアも平均に含みます。"] : []),
+                "最大持ち時間が無限の場合、 この減少は起こりません。",
             ],
         },
     ];
@@ -176,7 +184,7 @@ function lineSections(multi: boolean): HelpSection[] {
             title: "クリア列数と記録",
             paragraphs: [
                 "プレイ準備の「プレイ設定」で、 クリアまでの列数を1～30列に変更できます。 初期値は15列です。",
-                "サバイバルの持ち時間やハンデの設定は、 このモードには影響しません。",
+                "サバイバルの最大持ち時間やハンデの設定は、 このモードには影響しません。",
                 "クリアタイムと揃えた列数は、 プレイ後の詳細結果やリプレイで確認できます。",
                 "情報ページの最速タイムは、 15列設定でクリアしたプレイだけが対象です。",
             ],

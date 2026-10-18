@@ -151,6 +151,7 @@ export class DisposableGame {
                 player.g$element.style.width = `0px`;
             }
 
+            player.playInfo.initialMaxGameTime = playSetting.maxGameTime;
             player.playInfo.maxGameTime = playSetting.maxGameTime;
             player.playInfo.gameTime = playSetting.maxGameTime;
             player.playInfo.handy = playSetting.mode === 1 ? (playSetting.handy[i] ?? 1) : 1;

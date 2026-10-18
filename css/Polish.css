@@ -85,6 +85,15 @@ body::before {
     cursor: default;
     pointer-events: none;
 }
+.button[aria-disabled="true"][data-focus-when-disabled="true"] {
+    pointer-events: auto;
+}
+#tutorialUnlockHint {
+    min-height: 5cqh;
+    margin-top: 2cqh;
+    font-size: 3cqh;
+    color: var(--heading-ink);
+}
 .back {
     position: absolute;
 }
@@ -679,7 +688,7 @@ body::before {
 /* 両方の配置画面で星専用の列を確保し、文字とパネルの縁を避ける。 */
 #controllerSetting .controllerMappingGrid .controllerMappingButton,
 #keyboardSetting .controllerMappingGrid .controllerMappingButton {
-    grid-template-columns: 3.5cqh 13cqh minmax(0, 1fr);
+    grid-template-columns: 3.5cqh 12cqh minmax(0, 1fr);
     gap: 1cqh;
 }
 #controllerSetting .controllerMappingGrid .controllerMappingButton::before,
@@ -808,8 +817,12 @@ body::before {
 }
 #survivalPlaySetting .handyRow {
     width: 100%;
-    gap: 3.5cqh;
+    gap: 4.75cqh;
     min-height: 7cqh;
+}
+#survivalPlaySetting .handyRow .button::before {
+    margin-right: 0.25em;
+    margin-left: -1.25em;
 }
 #survivalPlaySetting .handyRow .playerSettingLabel {
     color: #228899;
@@ -844,6 +857,19 @@ body::before {
     border-radius: 1cqh;
 }
 
+.playCanvas {
+    background-color: var(--normal-play-background, #222233);
+    transition: background-color 240ms ease-out;
+}
+.playCanvas.finalTimeWarning {
+    background-color: #3d1119;
+}
+.reducedPlayMotion .playCanvas {
+    transition: none;
+}
+#play .playField .nextCanvas {
+    border-radius: 0;
+}
 #play .playField {
     position: relative;
     gap: 1.2cqh;
@@ -889,9 +915,7 @@ body::before {
     content: "";
     position: absolute;
     inset: 0;
-    background:
-        linear-gradient(115deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%),
-        linear-gradient(65deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%);
+    background: linear-gradient(115deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%), linear-gradient(65deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%);
 }
 .boardCollapse span {
     position: absolute;
@@ -921,6 +945,25 @@ body::before {
 }
 .informationLabelContent {
     text-shadow: 0 0.1cqh #fff;
+}
+.informationLabelContent.survivalTimeValue {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    line-height: 1.15;
+    min-height: 1.75em;
+    max-width: 100%;
+}
+.survivalTimeCurrent {
+    font: inherit;
+    color: inherit;
+}
+.survivalTimeMaximum {
+    font-family: inherit;
+    font-size: 0.48em;
+    color: inherit;
 }
 .informationLabel.hasChain .informationLabelContent {
     color: #f298b4;

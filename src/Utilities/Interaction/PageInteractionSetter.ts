@@ -1,6 +1,6 @@
 import { SceneSetter } from "../SceneSetter";
 import { PageInteraction } from "./PageInteraction";
-import { initializeInteractionElements, isInteractionEnabled } from "../Element/InteractionElement";
+import { initializeInteractionElements, isInteractionEnabled, isInteractionFocusable } from "../Element/InteractionElement";
 
 export class PageInteractionSetter extends SceneSetter {
     private pageInteraction: PageInteraction;
@@ -25,11 +25,11 @@ export class PageInteractionSetter extends SceneSetter {
         const findElement = (event: Event) => event.target instanceof Element ? event.target.closest<HTMLElement>("[data-xy]") : null;
         initializeInteractionElements(container);
         const observer = new MutationObserver(() => initializeInteractionElements(container));
-        observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-xy", "aria-disabled", "disabled"] });
+        observer.observe(container, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-xy", "aria-disabled", "disabled", "data-focus-when-disabled"] });
         container.addEventListener("mouseover", (event) => {
             if (document.body.classList.contains("cursorHidden")) return;
             const element = findElement(event);
-            if (element && isInteractionEnabled(element)) element.focus({ preventScroll: true });
+            if (element && isInteractionFocusable(element)) element.focus({ preventScroll: true });
         }, options);
         container.addEventListener("mouseout", (event) => {
             if (document.body.classList.contains("cursorHidden")) return;
@@ -49,7 +49,7 @@ export class PageInteractionSetter extends SceneSetter {
         document.addEventListener("mousemove", (event) => {
             document.body.classList.remove("cursorHidden");
             const element = findElement(event);
-            if (element && isInteractionEnabled(element)) element.focus({ preventScroll: true });
+            if (element && isInteractionFocusable(element)) element.focus({ preventScroll: true });
         }, options);
         this.scene.addHandler("sceneEnd", () => {
             controller.abort();

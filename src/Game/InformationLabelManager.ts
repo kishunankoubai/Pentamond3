@@ -9,6 +9,7 @@ type VisibilityOptions = {
 
 type UpdateContentOptions = {
     gameTime: string;
+    maxGameTime: string;
     playTime: string;
     line: string;
     lastTrick: string;
@@ -20,6 +21,8 @@ export class InformationLabelManager {
     private readonly labels;
 
     private readonly base: HTMLDivElement = document.createElement("div");
+    private gameTime = "";
+    private maxGameTime = "";
 
     constructor(
         playerNum: number,
@@ -77,9 +80,16 @@ export class InformationLabelManager {
     }
 
     updateContents(options: Partial<UpdateContentOptions>) {
-        Object.entries(options).forEach(([key, value]) => {
+        const { gameTime, maxGameTime, ...other } = options;
+        if (gameTime !== undefined || maxGameTime !== undefined) {
+            if (gameTime !== undefined) this.gameTime = gameTime;
+            if (maxGameTime !== undefined) this.maxGameTime = maxGameTime;
+            const format = (value: string) => (value === "Infinity" ? "∞" : value);
+            this.labels.gameTime.setTextContent(format(this.gameTime), this.maxGameTime ? `/${format(this.maxGameTime)}` : undefined);
+        }
+        Object.entries(other).forEach(([key, value]) => {
             const label = this.labels[key as keyof typeof this.labels];
-            label.setTextContent(key === "gameTime" && value === "Infinity" ? "∞" : value);
+            label.setTextContent(value);
         });
     }
 }
@@ -92,6 +102,8 @@ class Label {
     private readonly title: string;
 
     private isFirstUpdated = false;
+    private lastText: string | undefined;
+    private lastMaximum: string | undefined;
 
     constructor(title: string, textFontSize: string, headerFontSize: string) {
         this.title = title;
@@ -123,10 +135,21 @@ class Label {
         this.label.style.display = visible ? "" : "none";
     }
 
-    setTextContent(text: string) {
-        if (this.text.textContent === text) return;
-
-        this.text.textContent = text;
+    setTextContent(text: string, maximum?: string) {
+        if (this.lastText === text && this.lastMaximum === maximum) return;
+        this.lastText = text;
+        this.lastMaximum = maximum;
+        this.text.classList.toggle("survivalTimeValue", maximum !== undefined);
+        if (maximum !== undefined) {
+            const remaining = document.createElement("span");
+            remaining.className = "survivalTimeCurrent";
+            remaining.textContent = text;
+            const limit = document.createElement("span");
+            limit.className = "survivalTimeMaximum";
+            limit.textContent = maximum;
+            this.text.replaceChildren(remaining, limit);
+            this.label.setAttribute("aria-label", `持ち時間 ${text}、 最大持ち時間 ${maximum.slice(1)}`);
+        } else this.text.textContent = text;
         if (this.title === "Chain") this.label.classList.toggle("hasChain", Number(text) > 1);
 
         if (!this.isFirstUpdated) {

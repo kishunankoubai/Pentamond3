@@ -100,7 +100,7 @@ export class PlaySettingSetter {
             summary.replaceChildren();
             const rule = document.createElement("div");
             rule.className = "prepareRule";
-            rule.textContent = `${mode === 1 ? "サバイバル" : "十五列揃え"} ／ ${playerNumber === 1 ? "ひとりで" : `${playerNumber}人で`} ／ ${mode === 1 ? `持ち時間 ${maxGameTime === Infinity ? "" : maxGameTime}` : `${targetLines}列`}`;
+            rule.textContent = `${mode === 1 ? "サバイバル" : "十五列揃え"} ／ ${playerNumber === 1 ? "ひとりで" : `${playerNumber}人で`} ／ ${mode === 1 ? `最大持ち時間 ${maxGameTime === Infinity ? "" : maxGameTime}` : `${targetLines}列`}`;
             if (mode === 1 && maxGameTime === Infinity) {
                 const symbol = document.createElement("span");
                 symbol.className = "infinitySymbol";

@@ -9,7 +9,7 @@ export function setupMusics() {
     }
 
     Music.init();
-    bgmTracks.forEach(({ name, srcVolume }) => MusicManager.add({ name, src: `assets/musics/${name}.m4a`, srcVolume, loop: true, type: "BGM" }));
+    bgmTracks.forEach((track) => MusicManager.add({ ...track, src: `assets/musics/${track.name}.m4a`, loop: true, type: "BGM" }));
 
     MusicManager.add({
         name: "ボタン",
@@ -27,6 +27,15 @@ export function setupMusics() {
     });
 
     const pentamondSounds = [
+        ["サブページボタン", "Pentamond2-サブページボタン.m4a", 0.5],
+        ["ブロック破壊音", "Pentamond2-ブロック破壊音.m4a", 0.85],
+        ["ダメージ音", "Pentamond2-ダメージ音.m4a", 0.85],
+        ["攻撃音", "Pentamond2-攻撃音.m4a", 0.85],
+        ["ホールド音", "Pentamond2-ホールド音.m4a", 0.6],
+        ["一手戻し音", "Pentamond2-一手戻し音.m4a", 0.85],
+        ["役無し消去音", "Pentamond2-役無し消去音.m4a", 0.95],
+        ["開始音1", "Pentamond3-開始音1.mp3", 0.7],
+        ["開始音2", "Pentamond3-開始音2.mp3", 0.8],
         ["実績達成", "Pentamond3-消去音6.mp3", 1],
         ["移動音", "Pentamond3-移動音.mp3", 0.7],
         ["右回転音", "Pentamond3-右回転音.mp3", 0.7],
@@ -43,6 +52,10 @@ export function setupMusics() {
             loop: false,
             type: "SE",
         });
+        // 初回の操作やカウントダウンに、音声取得の待ち時間が重ならないようにする。
+        void MusicManager.get(name)!
+            .load()
+            .catch((error) => console.warn(`効果音「${name}」を読み込めませんでした`, error));
     });
 
     Music.s$masterBGMVolume = globalValues.bgmVolume / 10;

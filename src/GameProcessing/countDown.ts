@@ -1,3 +1,5 @@
+import { MusicManager } from "../Utilities/Music/MusicManager";
+
 /** シーンを離れた場合は、カウントダウンの後続処理を残さない。 */
 export function countDown(countStrings: string[], signal?: AbortSignal): Promise<void> {
     const container = document.getElementById("startEffectBase");
@@ -17,6 +19,7 @@ export function countDown(countStrings: string[], signal?: AbortSignal): Promise
             label.textContent = remaining.shift()!;
             if (!remaining.length) label.id = "startLabel";
             container.appendChild(label);
+            if (label.textContent) MusicManager.get(remaining.length ? "開始音1" : "開始音2")?.play();
             label.addEventListener("animationend", () => { label?.remove(); next(); }, { once: true, signal });
         };
         signal?.addEventListener("abort", finish, { once: true });

@@ -1,6 +1,6 @@
 import type { ReplayData } from "./Replay";
 import LZString from "lz-string";
-import { replayKeyCodes } from "../Game/Operations";
+import { operationKeyCodes, replayKeyCodes } from "../Game/Operations";
 
 function requireData(condition: unknown): asserts condition {
     if (!condition) throw new Error("未対応または破損したリプレイです");
@@ -12,7 +12,7 @@ function finitePositive(value: unknown): value is number {
 
 /** 入力はフレームへ丸めず、ミリ秒差分＋操作IDを圧縮して再現性を維持する。 */
 export function replayDataEncryption(data: ReplayData): string {
-    requireData(data.version === 4 && data.randomSeeds);
+    requireData(data.version === 6 && data.randomSeeds);
     const inputData = data.inputData.map((inputs) => inputs.map((input, index) => {
         const delta = input.time - (index ? inputs[index - 1].time : 0);
         const keyIndex = replayKeyCodes.indexOf(input.keyCode as typeof replayKeyCodes[number]);
@@ -23,7 +23,7 @@ export function replayDataEncryption(data: ReplayData): string {
     ordered.forEach(({ input }, index) => requireData(input.sequence === index && (!index || input.time >= ordered[index - 1].input.time)));
     const order = ordered.map(({ player }) => String(player)).join("");
     return LZString.compressToUTF16(JSON.stringify([
-        4, inputData,
+        6, inputData,
         [data.playSetting.playerNumber, data.playSetting.mode, data.playSetting.maxGameTime === Infinity ? "I" : data.playSetting.maxGameTime, data.playSetting.handy, data.playSetting.targetLines],
         data.finishTime, data.finishPlayers, data.date, data.randomSeeds.next, data.randomSeeds.nuisance, order,
     ]));
@@ -34,16 +34,17 @@ export function replayDataDecryption(encryptedData: string): ReplayData {
     const source = LZString.decompressFromUTF16(encryptedData);
     requireData(source);
     const data = JSON.parse(source);
-    requireData(Array.isArray(data) && data.length === 9 && (data[0] === 3 || data[0] === 4));
+    requireData(Array.isArray(data) && data.length === 9 && [3, 4, 5, 6].includes(data[0]));
     const [_, encodedInputs, settings, finishTime, finishPlayers, date, next, nuisance, order] = data;
     requireData(Array.isArray(settings) && settings.length === 5);
     const [playerNumber, mode, maxTime, handy, targetLines] = settings;
     requireData(Number.isInteger(playerNumber) && playerNumber >= 1 && playerNumber <= 4);
     requireData(mode === 1 || mode === 2);
     // 旧マルチサバイバルは攻撃分配・被弾時間が異なるため再現できない。
-    // 影響のないソロ・十五列揃えは、データを変換してそのまま視聴できる。
-    requireData(data[0] === 4 || mode !== 1 || playerNumber === 1);
+    requireData(data[0] !== 3 || mode !== 1 || playerNumber === 1);
     requireData(maxTime === "I" || finitePositive(maxTime));
+    // 旧有限サバイバルには上限減少がない。影響のない無限・上限30以下・十五列揃えは残す。
+    requireData(data[0] >= 5 || mode !== 1 || maxTime === "I" || maxTime <= 30);
     requireData(Array.isArray(handy) && handy.length >= playerNumber && handy.every((value) => finitePositive(value) && value >= 0.1 && value <= 10));
     requireData(Number.isInteger(targetLines) && targetLines >= 1 && targetLines <= 30);
     requireData(typeof finishTime === "number" && Number.isFinite(finishTime) && finishTime >= 0);
@@ -72,8 +73,10 @@ export function replayDataDecryption(encryptedData: string): ReplayData {
         previousTime = input.time;
     });
     requireData(indices.every((count, player) => count === inputData[player].length));
+    // 旧形式で一手戻しがある場合、スコアと上限減少のタイミングを再現できない。
+    requireData(data[0] === 6 || inputData.every((inputs) => inputs.every((input) => input.keyCode !== operationKeyCodes.unput)));
     return {
-        version: 4, inputData, finishTime, finishPlayers, date,
+        version: 6, inputData, finishTime, finishPlayers, date,
         randomSeeds: { next, nuisance },
         playSetting: { playerNumber, mode, maxGameTime: maxTime === "I" ? Infinity : maxTime, handy: handy.slice(0, playerNumber), targetLines },
     };

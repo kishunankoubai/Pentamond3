@@ -4,6 +4,7 @@ import { Pentiamond } from "../BlockOperate/Pentiamond";
 import { GraphicData } from "../CanvasManager";
 import { OperateName } from "../Game/GameMode";
 import { NuisanceMondManager } from "../Game/NuisanceMondManager";
+import { bindDamageSounds } from "../Game/DamageSounds";
 import { emptyRemovalPenalty, survivalTrickReward } from "../Game/SurvivalRules";
 import * as Settings from "../Settings";
 import { trickInfos } from "../Trick";
@@ -90,6 +91,7 @@ export class BasicRuleBoard {
                 for (let x = 2; x <= 14; x++) terrain[x][y] = ["g", (x + y - bottom) % 2 === 0, true];
             this.blocks.load(terrain);
             this.nuisance = new NuisanceMondManager(this.blocks, 0x50454e54);
+            bindDamageSounds(this.nuisance);
             this.nuisance.addHandler("damageBoard", () => this.penalty++);
             this.nuisance.addHandler("finishDamage", () => { this.phase = "damageReview"; });
         }
@@ -165,11 +167,10 @@ export class BasicRuleBoard {
             this.consumed = this.undo.consumed;
             this.hand = null;
             this.undo = null;
-            this.score -= 10;
             this.penalty += Settings.penalty.unput;
             this.penalties++;
             this.phase = "erasing";
-            return { sound: "ボタン", message: "一手戻し：持ち時間 −3" };
+            return { sound: "一手戻し音", message: "一手戻し：持ち時間 −3" };
         }
         if (!this.hand?.g$visible) return { failed: true };
         if (operation.startsWith("move-")) {
@@ -237,9 +238,9 @@ export class BasicRuleBoard {
             this.penalty += result.charge;
             if (result.charge > 0) this.penalties++;
             this.chain = 0;
-            if (this.lesson.id !== "penalty") return { failed: true, trick: "役なし" };
+            if (this.lesson.id !== "penalty") return { failed: true, trick: "役なし", sound: "役無し消去音" };
             if (this.penalties >= 3) this.phase = "done";
-            return { message: result.charge > 0 ? `役なしの連続消去：持ち時間 −${result.charge}` : "最初の役なし消去：ペナルティなし" };
+            return { sound: "役無し消去音", message: result.charge > 0 ? `役なしの連続消去：持ち時間 −${result.charge}` : "最初の役なし消去：ペナルティなし" };
         }
         const reward = survivalTrickReward(trick, this.chain);
         const sound = `消去音${Math.min(6, this.chain)}`;
