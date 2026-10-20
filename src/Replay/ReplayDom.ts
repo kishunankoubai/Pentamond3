@@ -1,11 +1,11 @@
-import { qs, qsAll } from "../Utils";
+import { htmlQS, htmlQSAll } from "../Utilities/Element/Query";
 import { ReplayData } from "./Replay";
 
 export class ReplayDom {
     private static readonly parser = new DOMParser();
 
     static setupSavedReplayPage(replayDataList: ReplayData[]) {
-        const container = qs("#savedReplay .options");
+        const container = htmlQS("#savedReplay .options");
         container.querySelectorAll(".replayDataContainer").forEach((element) => {
             element.remove();
         });
@@ -23,15 +23,15 @@ export class ReplayDom {
         }
 
         //座標の割り振り
-        qsAll("#savedReplay .replayButton").forEach((button, i) => {
+        htmlQSAll("#savedReplay .replayButton").forEach((button, i) => {
             button.dataset.xy = `[0,${i}]`;
         });
 
-        qsAll("#savedReplay .replayDeleteButton").forEach((button, i) => {
+        htmlQSAll("#savedReplay .replayDeleteButton").forEach((button, i) => {
             button.dataset.xy = `[1,${i}]`;
         });
 
-        qs("#savedReplay .back").dataset.xy = `[0,${replayDataList.length}]`;
+        htmlQS("#savedReplay .back").dataset.xy = `[0,${replayDataList.length}]`;
 
         return { deleteButtons, replayButtons };
     }
@@ -111,27 +111,27 @@ export class ReplayDom {
         replayContainer.appendChild(replayButton);
         replayContainer.appendChild(description);
         replayContainer.appendChild(saveButton);
-        qs("#replay .options").prepend(replayContainer);
+        htmlQS("#replay .options").prepend(replayContainer);
 
         let tempDataListLength = 0;
 
         //座標の割り振り直し
-        qsAll("#replay .replayButton").forEach((button, i) => {
+        htmlQSAll("#replay .replayButton").forEach((button, i) => {
             button.dataset.xy = `[0,${i}]`;
             tempDataListLength++;
         });
 
-        qsAll("#replay .replaySaveButton").forEach((button, i) => {
+        htmlQSAll("#replay .replaySaveButton").forEach((button, i) => {
             button.dataset.xy = `[1,${i}]`;
         });
 
-        qs("#replay .back").dataset.xy = `[0,${tempDataListLength}]`;
+        htmlQS("#replay .back").dataset.xy = `[0,${tempDataListLength}]`;
 
         return { replayButton, saveButton };
     }
 
     static setupTempReplayPage(replayDataList: ReplayData[]) {
-        const container = qs("#replay .options");
+        const container = htmlQS("#replay .options");
         container.querySelectorAll(".replayDataContainer").forEach((element) => element.remove());
         return replayDataList.map((data) => this.createTempReplayButton(data));
     }

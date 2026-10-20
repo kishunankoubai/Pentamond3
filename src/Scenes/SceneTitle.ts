@@ -1,33 +1,33 @@
 import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
 import { PlaySettingSetter } from "../BeforePlaying/PlaySettingSetter";
-import { DataManager } from "../DataManager";
-import { DeleteDataHandler } from "../DeleteDataHandler";
+import { DataManager } from "../Storage/DataManager";
+import { DataDeletionController } from "../Storage/DataDeletionController";
 import { GameStartEventSetter } from "../GameProcessing/GameStarter";
-import { globalValues } from "../Global";
-import { GraphicSetting } from "../GraphicSetting";
+import { globalValues } from "../Config/UserSettings";
+import { GraphicSetting } from "../UI/GraphicSetting";
 import { Replay } from "../Replay/Replay";
-import { setupMusics } from "../Sound";
+import { setupMusics } from "../Audio/Sound";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 import { PageInteraction } from "../Utilities/Interaction/PageInteraction";
 import { PageInteractionSetter } from "../Utilities/Interaction/PageInteractionSetter";
 import { Music } from "../Utilities/Music/Music";
 import { MusicManager } from "../Utilities/Music/MusicManager";
-import { Scene, sceneManager } from "../Utilities/SceneManager";
-import { ControllerSettingManager } from "../ControllerSettingManager";
-import { SoundTest } from "../SoundTest";
-import { populateBGMSelectors } from "../BGMTracks";
-import { setupTrickList } from "../TrickList";
-import { setupStatisticsPage } from "../StatisticsPage";
+import { Scene, sceneManager } from "../Utilities/Scene/SceneManager";
+import { ControllerSettingManager } from "../Input/ControllerSettingManager";
+import { SoundTest } from "../Audio/SoundTest";
+import { populateBGMSelectors } from "../Audio/BGMTracks";
+import { setupTrickList } from "../UI/TrickList";
+import { setupStatisticsPage } from "../UI/StatisticsPage";
 import { setupTutorialMenu } from "../Tutorial/TutorialMenu";
 import { TutorialInput } from "../Tutorial/TutorialInput";
 import { InputRegistrationView } from "../BeforePlaying/InputRegistrationView";
-import { PlayData } from "../PlayData";
-import { setupHelpPages } from "../HelpPages";
+import { PlayData } from "../Storage/PlayData";
+import { setupHelpPages } from "../UI/HelpPages";
 import { setupAchievementPage } from "../Achievements/AchievementPage";
 import { setupAchievementCompletionNotice } from "../Achievements/CompletionNotice";
-import { KeyboardSettingManager } from "../KeyboardSettingManager";
-import { applyPageTransitions } from "../Utilities/Element/PageTransitions";
+import { KeyboardSettingManager } from "../Input/KeyboardSettingManager";
+import { applyPageTransitions, setupMenuFeedback } from "../UI/Presentation";
 import { PageManager } from "../Utilities/Page/PageManager";
 
 export class SceneTitle extends Scene {
@@ -45,6 +45,7 @@ export class SceneTitle extends Scene {
             const pageId = this.pageManager.g$currentPageId;
             return InputRegistrationView.acceptsMenuInput(pageId, input) && TutorialInput.acceptsMenuInput(pageId, input);
         });
+        setupMenuFeedback(this.pageInteraction);
         this.sceneSetters.push(
             this.elementEventSetter,
             new PageInteractionSetter(this.pageInteraction)
@@ -58,10 +59,10 @@ export class SceneTitle extends Scene {
         setupStatisticsPage(this);
         setupAchievementPage(this, this.elementManager);
         setupTutorialMenu(this, this.elementManager);
-        this.setPageAnimation();
+        applyPageTransitions(this);
         this.setPageStart();
         this.showAchievementCompletionNotice = setupAchievementCompletionNotice(this, () => this.openFirstLaunchGuide());
-        this.setSettingButton();
+        this.setupVolumeSetting();
         populateBGMSelectors();
         this.soundTest.setup(this, this.elementManager, this.elementEventSetter);
         // 試聴を停止した後で、戻り先のメニューBGMを再生する。
@@ -74,7 +75,7 @@ export class SceneTitle extends Scene {
         KeyboardSettingManager.setup();
 
         // データ消去イベントの設定
-        DeleteDataHandler.setEvents();
+        DataDeletionController.setEvents();
         // グラフィック設定
         GraphicSetting.init();
         // リプレイのイベントの設定と、リプレイページの設定
@@ -87,7 +88,7 @@ export class SceneTitle extends Scene {
 
     protected close(): void {
         this.soundTest.close();
-        DeleteDataHandler.close();
+        DataDeletionController.close();
         ControllerRegisterer.clearEvents();
         ControllerSettingManager.close();
         KeyboardSettingManager.close();
@@ -97,11 +98,6 @@ export class SceneTitle extends Scene {
     defaultStart(): void {
         this.pageManager.openPage("pageStart");
     }
-
-    private setPageAnimation() {
-        applyPageTransitions(this);
-    }
-
 
     private setPageStart() {
         // 音声の初期化はページ全体への直接クリックで行う。
@@ -131,13 +127,13 @@ export class SceneTitle extends Scene {
     }
 
     private openFirstLaunchGuide(): void {
-        if (!PlayData.needsFirstLaunchGuide || this.pageManager.g$currentPageId !== "title") return;
+        if (!PlayData.g$needsFirstLaunchGuide || this.pageManager.g$currentPageId !== "title") return;
         this.pageManager.openPage("firstLaunchGuide");
         PlayData.markFirstLaunchGuideShown();
         document.getElementById("firstLaunchTutorialButton")?.focus();
     }
 
-    private setSettingButton() {
+    private setupVolumeSetting() {
         const bgmLabel = document.querySelector<HTMLElement>("#volumeSetting .container .container:nth-child(1) .label:nth-child(3)")!;
         const seLabel = document.querySelector<HTMLElement>("#volumeSetting .container .container:nth-child(2) .label:nth-child(3)")!;
         bgmLabel.innerText = globalValues.bgmVolume + "";
@@ -170,31 +166,16 @@ export class SceneTitle extends Scene {
                 if (i < 2) {
                     bgmLabel.innerText = globalValues.bgmVolume + "";
                 } else if (i < 4) {
-                    MusicManager.get("Touch")?.play();
                     seLabel.innerText = globalValues.seVolume + "";
                 }
             });
-        });
-
-        this.pageManager.addHandler(["openPage-playDataWarning", "openPage-allDataWarning"], (pageId: string) => {
-            const button = document.querySelector<HTMLElement>(`#${pageId} .container .button`)!;
-            button.style.display = "none";
-            setTimeout(() => {
-                button.style.display = "";
-            }, 1400);
-        });
-        document.querySelector<HTMLElement>("#playDataWarning .container .button")!.addEventListener("click", () => {
-            DataManager.deletePlayData();
-        });
-        document.querySelector<HTMLElement>("#allDataWarning .container .button")!.addEventListener("click", () => {
-            DataManager.delete();
         });
     }
 
     private setupBGMSetting() {
         const selectors = [
-            { id: "bgmSelector1", setting: "soloBGM" },
-            { id: "bgmSelector2", setting: "multiBGM" },
+            { id: "soloBGMSelector", setting: "soloBGM" },
+            { id: "multiBGMSelector", setting: "multiBGM" },
         ] as const;
         selectors.forEach(({ id, setting }) => {
             const options = Array.from(document.querySelectorAll<HTMLElement>(`#${id} .scrollableContainer .button`));

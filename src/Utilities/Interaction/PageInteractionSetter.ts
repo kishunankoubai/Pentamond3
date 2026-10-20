@@ -1,4 +1,4 @@
-import { SceneSetter } from "../SceneSetter";
+import { SceneSetter } from "../Scene/SceneSetter";
 import { PageInteraction } from "./PageInteraction";
 import { initializeInteractionElements, isInteractionEnabled, isInteractionFocusable } from "../Element/InteractionElement";
 
@@ -12,7 +12,7 @@ export class PageInteractionSetter extends SceneSetter {
 
     protected progressSet(): void {
         this.addElementEvent();
-        this.pageInteraction.g$scene.g$pageManager.addHandler("changePage", (pageId: string) => {
+        this.pageInteraction.g$scene.g$pageManager.addHandler("changePage", () => {
             this.pageInteraction.setInteraction();
         });
     }

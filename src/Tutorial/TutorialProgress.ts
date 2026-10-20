@@ -1,4 +1,4 @@
-import { globalValues } from "../Global";
+import { globalValues } from "../Config/UserSettings";
 import { tutorialLessonCount, tutorialUnits } from "./TutorialUnits";
 import { PageNotice } from "../Utilities/Feedback/PageNotice";
 import { Achievements } from "../Achievements/Achievements";

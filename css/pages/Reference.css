@@ -1,0 +1,493 @@
+/* ヘルプ・役一覧・クレジット・統計・実績。 */
+#trickList .trickListPage {
+    width: 120cqh;
+}
+
+#trickList .trickCard {
+    width: 100%;
+    padding: 5cqh;
+    border-radius: 3cqh;
+    background-color: #eefb;
+    display: flex;
+    flex-direction: column;
+    gap: 8cqh;
+}
+
+#trickList .trickName {
+    font-size: 6cqh;
+}
+
+#trickList .trickValues {
+    display: flex;
+    gap: 12cqh;
+}
+
+#trickList .trickValues span {
+    font-size: 5.5cqh;
+}
+
+#trickList .trickCanvas {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.helpReference .helpContent {
+    width: 128cqh;
+    height: 60cqh;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 2cqh;
+}
+
+.helpReference .helpTopic {
+    font-size: 4.5cqh;
+    color: #289;
+    text-wrap: wrap;
+}
+
+.helpReference .helpMinorTopic {
+    font-size: 3.5cqh;
+}
+
+.helpReference .helpContent .text {
+    font-size: 3.3cqh;
+    line-height: 1.7;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.helpReference .helpContent .helpNote {
+    font-size: 2.8cqh;
+}
+
+.helpReference .helpKeyGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.helpReference .helpKeyGrid > div {
+    display: grid;
+    gap: 1cqh;
+    border-bottom: 0.2cqh solid #6bd5;
+}
+
+.helpReference .helpControllerImage {
+    display: block;
+    width: 100%;
+    object-fit: contain;
+}
+
+.helpReference .helpMenuMappings {
+    display: grid;
+    justify-content: stretch;
+}
+
+.helpReference .helpMenuMappings > div {
+    display: grid;
+    grid-template-columns: 16cqh 1fr;
+    gap: 3cqh;
+    padding-bottom: 0.4cqh;
+    border-bottom: 0.2cqh solid #6bd5;
+}
+
+.helpReference .helpMenuMappings span {
+    font-size: 3.3cqh;
+    line-height: 1.4;
+    text-wrap: wrap;
+}
+
+.helpReference .helpContent.helpMenuContent {
+    gap: 1cqh;
+}
+
+#achievements {
+    padding-top: 16cqh;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+#achievements #achievementTotal {
+    position: absolute;
+    right: 7cqh;
+    top: 17cqh;
+    font-size: 3cqh;
+}
+
+#achievements .achievementSection {
+    width: 116cqh;
+    height: 34cqh;
+    gap: 2cqh;
+}
+
+#achievements .achievementSummary {
+    width: 116cqh;
+    height: 63cqh;
+    gap: 4cqh;
+    justify-content: flex-start;
+}
+
+#achievements .achievementSummaryOverall {
+    width: 100%;
+    font-size: 4.5cqh;
+    padding: 3cqh 0;
+}
+
+#achievements .achievementSummaryGrades {
+    width: 92cqh;
+    display: flex;
+    flex-direction: column;
+    gap: 4cqh;
+}
+
+#achievements .achievementSummaryRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 7cqh 10cqh 1fr 22cqh;
+    gap: 3cqh;
+    align-items: center;
+}
+
+#achievements .achievementSummaryRow span {
+    font-size: 4cqh;
+}
+
+#achievements .achievementSummaryRow .achievementTriangle {
+    width: 5cqh;
+    height: 4.4cqh;
+}
+
+#achievements .bronze {
+    --trophy-color: #ba793f;
+}
+
+#achievements .silver {
+    --trophy-color: #a1b1c3;
+}
+
+#achievements .gold {
+    --trophy-color: #e5b833;
+}
+
+#achievements .achievementTriangle {
+    display: block;
+    width: 8cqh;
+    height: 7cqh;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    background: linear-gradient(135deg, #ffffff90, transparent 45%, #00000030), var(--trophy-color);
+}
+
+#achievements .achievementCategory {
+    width: 100%;
+    text-align: left;
+    font-size: 4cqh;
+    color: #289;
+}
+
+#achievements .achievementGrid {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(2, 11cqh);
+    justify-items: center;
+    gap: 1cqh 3cqh;
+}
+
+#achievements .achievementIcon {
+    position: relative;
+    margin: 0;
+    width: 11cqh;
+    height: 10cqh;
+    display: flex;
+    border-radius: 1cqh;
+    box-sizing: border-box;
+}
+
+#achievements .achievementIcon::before {
+    display: none;
+}
+
+#achievements .achievementIcon:focus {
+    border: 0.4cqh solid #ff90be;
+}
+
+#achievements .achievementDetail {
+    width: 116cqh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 1cqh;
+    padding-top: 2cqh;
+    border-top: 0.3cqh solid #6bd5;
+}
+
+#achievements .achievementDetail .text {
+    width: 100%;
+    text-align: left;
+    font-size: 3.7cqh;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+#achievements .achievementDetail #achievementState {
+    font-size: 3cqh;
+}
+
+#information .statisticNote {
+    font-size: 3cqh;
+}
+
+#information .subPage {
+    width: 120cqh;
+    gap: 1.5cqh;
+}
+
+#information .statisticSection {
+    font-size: 5.5cqh;
+    margin-bottom: 2cqh;
+}
+
+#information .statisticRow {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    gap: 4cqh;
+}
+
+#information .statisticRow span {
+    font-size: 4.5cqh;
+}
+
+#credits .creditsContent {
+    width: 132cqh;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2cqh;
+}
+
+#credits > .subPage {
+    position: absolute;
+    top: 19cqh;
+    bottom: 17cqh;
+    justify-content: center;
+}
+
+#credits .creditAuthor {
+    display: flex;
+    width: 110cqh;
+    min-height: 40cqh;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5cqh;
+}
+
+#credits .creditAuthor .creditIdentity {
+    flex-direction: column;
+    gap: 2cqh;
+}
+
+#credits .creditAuthor .creditAuthorName {
+    font-size: 9cqh;
+}
+
+#credits .creditAuthor .button {
+    font-size: 4.8cqh;
+    text-decoration: none;
+    padding-left: 1.12em;
+}
+
+#credits .creditPanel {
+    padding: 2.5cqh 4cqh;
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 1.6cqh;
+    background: var(--panel);
+    box-sizing: border-box;
+}
+
+#credits .creditHeading {
+    font-size: 3.6cqh;
+    line-height: 1.4;
+    color: var(--heading-ink);
+}
+
+#credits .creditIdentity,
+#credits .creditLibrary {
+    display: flex;
+    gap: 3cqh;
+    justify-content: space-between;
+}
+
+#credits .creditIdentity {
+    justify-content: flex-start;
+}
+
+#credits .creditFontGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3cqh;
+    align-items: stretch;
+}
+
+#credits .creditFont {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2cqh;
+}
+
+#credits .creditName {
+    font-size: 3.8cqh;
+    line-height: 1.4;
+}
+
+#credits .creditAttribution {
+    display: block;
+    font-size: 3cqh;
+    line-height: 1.5;
+    text-wrap: wrap;
+}
+
+#credits .creditsContent .button {
+    display: inline-block;
+    font-size: 3.5cqh;
+    line-height: 1.4;
+    text-decoration: none;
+    padding-left: 1.12em;
+    flex-shrink: 0;
+}
+
+.helpReference .helpContent {
+    background: var(--panel);
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    padding: 3cqh 4cqh;
+}
+
+.helpContent .text {
+    line-height: 1.75;
+}
+
+.helpTopic {
+    color: #228899;
+}
+
+.helpReference .helpKeyGrid {
+    gap: 1.5cqh 5cqh;
+}
+
+.helpReference .helpKeyGrid > div {
+    grid-template-columns: 25cqh minmax(0, 1fr);
+    padding-bottom: 1cqh;
+}
+
+.helpReference .helpKeyGrid span {
+    font-size: 3cqh;
+    line-height: 1.5;
+    text-wrap: wrap;
+}
+
+.helpReference .helpControllerImage {
+    height: 32cqh;
+    flex: none;
+}
+
+#howToOperate .helpContent {
+    height: 64cqh;
+}
+
+.helpReference .helpMenuMappings {
+    gap: 0.5cqh;
+}
+
+.helpReference .helpMenuContent {
+    gap: 1cqh;
+}
+
+.helpReference .helpMenuContent .helpNote {
+    font-size: 2.8cqh;
+    line-height: 1.5;
+}
+
+#information .subPage {
+    padding: 3cqh 4cqh;
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    background: var(--panel);
+}
+
+#achievements .achievementDetail {
+    padding: 2cqh 3cqh;
+    border-radius: 1.5cqh;
+    background: var(--panel);
+    height: 31cqh;
+}
+
+#achievements .achievementDetail #achievementNote {
+    font-size: 2.7cqh;
+    line-height: 1.65;
+}
+
+#achievements .achievementIcon {
+    border: 0.25cqh solid #cadce4;
+    background: #fff8;
+}
+
+#achievements .achievementIcon.unachieved {
+    border-style: dashed;
+}
+
+#achievements .achievementIcon.unachieved .achievementTriangle {
+    opacity: 0.5;
+}
+
+#achievements .achievementIcon:focus {
+    border-color: #ff90be;
+}
+
+#achievementProgress {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2cqh;
+}
+
+#achievementProgress[hidden] {
+    display: none;
+}
+
+#achievementProgressText {
+    font-size: 2.7cqh;
+    min-width: 25cqh;
+}
+
+.progressTrack {
+    width: 35cqh;
+    height: 1.3cqh;
+    background: #dde8ee;
+    border-radius: 1cqh;
+    overflow: hidden;
+}
+
+#achievementProgressFill {
+    height: 100%;
+    background: #6bd;
+    border-radius: inherit;
+}
+
+@media (max-width: 900px), (max-height: 600px) {
+    .helpReference .helpContent .text {
+        font-size: 3.3cqh;
+    }
+    .helpReference .helpContent .text {
+        line-height: 1.6;
+    }
+    .helpReference .helpContent .helpNote {
+        font-size: 2.8cqh;
+    }
+    .helpContent {
+        gap: 1.5cqh;
+    }
+}

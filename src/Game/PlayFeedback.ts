@@ -1,5 +1,5 @@
 import type { SimulationClock } from "../Utilities/Loop/SimulationClock";
-import { GraphicSetting } from "../GraphicSetting";
+import { GraphicSetting } from "../UI/GraphicSetting";
 
 /** 表示だけをゲーム内時計に同期する。乱数・入力・ゲームの待機時間には触れない。 */
 export class PlayFeedback {
@@ -55,7 +55,7 @@ export class PlayFeedback {
         while (this.messages.childElementCount > 2) this.messages.firstElementChild?.remove();
         let cancel: () => void;
         cancel = this.clock.schedule(
-            this.clock.now + 1300,
+            this.clock.g$now + 1300,
             () => {
                 item.remove();
                 this.removals.delete(cancel);
@@ -96,7 +96,7 @@ export class PlayFeedback {
         this.rowFlash.style.opacity = String(peakOpacity);
         this.rowFlash.hidden = false;
         // 300ms見せてから300msで消す。壁時計ではなく、停止・倍速に追従する時計を使う。
-        const start = this.clock.now;
+        const start = this.clock.g$now;
         for (let step = 1; step <= 15; step++) {
             this.flashCancels.push(
                 this.clock.schedule(
@@ -132,7 +132,7 @@ export class PlayFeedback {
         this.boardCollapse.style.setProperty("--collapse-progress", "0");
         this.boardCollapse.style.opacity = "0.5";
         this.boardCollapse.hidden = false;
-        const start = this.clock.now;
+        const start = this.clock.g$now;
         for (let step = 1; step <= 15; step++) {
             this.collapseCancels.push(
                 this.clock.schedule(

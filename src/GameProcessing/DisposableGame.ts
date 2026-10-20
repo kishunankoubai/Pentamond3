@@ -1,4 +1,4 @@
-import { sleep } from "../Utils";
+import { sleep } from "../Utilities/Common";
 
 import { GameMode, GameModeClass } from "../Game/GameMode";
 import { GamePlayer } from "../Game/GamePlayer";
@@ -6,15 +6,17 @@ import { InputObserver } from "../Utilities/Interaction/InputObserver";
 import type { ReplayData, ReplayRandomSeeds } from "../Replay/Replay";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
 import { createRandomSeed } from "../Utilities/Random/SeededRandom";
-import { PlayStatistics } from "../PlayStatistics";
+import { PlayStatistics } from "../Storage/PlayStatistics";
 import { Achievements } from "../Achievements/Achievements";
 import { SimulationClock } from "../Utilities/Loop/SimulationClock";
 import { newRecordHighlights } from "./ResultHighlights";
+import { MyEventListener } from "../Utilities/Event/MyEventListener";
 
 /**
  * ゲームのセッティングから片付けまでやって捨てられるクラス
+ * ending: 結果算定直後。finished: 終了演出の待機後。どちらもこの試合を同期通知する。
  */
-export class DisposableGame {
+export class DisposableGame extends MyEventListener {
     readonly players: GamePlayer[];
     readonly game: GameMode;
 
@@ -26,29 +28,8 @@ export class DisposableGame {
 
     private hasStarted = false;
     private disposed = false;
-    /**
-     * すでに開始されているか
-     */
-    get g$hasStarted() {
-        return this.hasStarted;
-    }
-    /**
-     * すでに終了しているか
-     */
-    get g$hasFinished() {
-        return this.game.g$hasFinished;
-    }
-    /**
-     * プレイ中か
-     */
-    get g$isPlaying() {
-        return this.game.g$isPlaying;
-    }
-
-    onFinished = () => {};
-    onEnding = () => {};
-
     constructor(gameModeList: GameModeClass[], inputs: InputObserver[], inputCount: number, { playSetting, replayData }: { playSetting?: PlaySetting; replayData?: ReplayData }) {
+        super();
         if (replayData) {
             this.replayData = replayData;
             this.playSetting = replayData.playSetting;
@@ -73,8 +54,24 @@ export class DisposableGame {
         this.game.addHandler("gameFinish", () => this.onGameFinish(), 1);
     }
 
+    /** すでに開始されているか。 */
+    get g$hasStarted(): boolean {
+        return this.hasStarted;
+    }
+
+    /** すでに終了しているか。 */
+    get g$hasFinished(): boolean {
+        return this.game.g$hasFinished;
+    }
+
+    /** プレイ中か。 */
+    get g$isPlaying(): boolean {
+        return this.game.g$isPlaying;
+    }
+
     quit() {
         this.disposed = true;
+        this.removeAllEvent();
         this.game.stop();
         this.game.remove();
     }
@@ -100,6 +97,7 @@ export class DisposableGame {
     }
 
     private async onGameFinish() {
+        if (this.disposed) return;
         const previousStatistics = PlayStatistics.getData();
         const previousAchievements = new Set(Achievements.achievedIds());
         PlayStatistics.recordCompletedGame(this);
@@ -108,7 +106,8 @@ export class DisposableGame {
             this.highlights.records = newRecordHighlights(previousStatistics, PlayStatistics.getData());
             this.highlights.achievements = Achievements.achievedIds().filter((id) => !previousAchievements.has(id));
         }
-        this.onEnding();
+        this.executeEvent("ending", this);
+        if (this.disposed) return;
         if (this.isReplay()) {
             this.onFinishReplay();
         }
@@ -116,7 +115,8 @@ export class DisposableGame {
         await sleep(1000);
         if (this.disposed) return;
         this.game.remove();
-        this.onFinished();
+        this.executeEvent("finished", this);
+        this.removeAllEvent();
     }
 
     private onFinishReplay() {

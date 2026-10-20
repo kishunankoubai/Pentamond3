@@ -1,15 +1,15 @@
 import { GameProcessing } from "../GameProcessing/GameProcessing";
-import { qsAll, qs } from "../Utils";
+import { htmlQSAll, htmlQS } from "../Utilities/Element/Query";
 import { ReplayData, Replay } from "./Replay";
 import { ReplayDataHandler } from "./ReplayDataHandler";
 import { ElementManager } from "../Utilities/Element/ElementManager";
-import { sceneManager } from "../Utilities/SceneManager";
+import { sceneManager } from "../Utilities/Scene/SceneManager";
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 
 export class ReplayEventSetter {
     static setTempReplayPageEvent(tempDataList: ReplayData[], { replayButton, saveButton }: { replayButton: HTMLElement; saveButton: HTMLElement }) {
         replayButton.addEventListener("click", () => {
-            const replayButtons = qsAll("#replay .replayButton");
+            const replayButtons = htmlQSAll("#replay .replayButton");
             const index = replayButtons.findIndex((button) => button == replayButton);
             const data = index >= 0 ? tempDataList.at(-index - 1) : undefined;
             if (data) GameProcessing.startReplay(data);
@@ -20,7 +20,7 @@ export class ReplayEventSetter {
 
         saveButton.addEventListener("click", async () => {
             if (saveButton.getAttribute("aria-disabled") === "true") return;
-            const saveButtons = qsAll("#replay .replaySaveButton");
+            const saveButtons = htmlQSAll("#replay .replaySaveButton");
             const index = saveButtons.findIndex((button) => button == saveButton);
 
             const data = index >= 0 ? tempDataList.at(-index - 1) : undefined;
@@ -72,7 +72,7 @@ export class ReplayEventSetter {
             await pageManager.backPage(1);
         } catch (error) {
             console.warn("リプレイを削除できませんでした", error);
-            qs("#replayDeleteAlert .text").textContent = "削除できませんでした。戻ってから再度お試しください。";
+            htmlQS("#replayDeleteConfirmation .text").textContent = "削除できませんでした。戻ってから再度お試しください。";
         }
     }
 
@@ -80,10 +80,10 @@ export class ReplayEventSetter {
         const scene = sceneManager.g$currentScene;
         if (!scene) return Promise.resolve(false);
         const pageManager = scene.g$pageManager;
-        const confirmButton = qs("#replayDeleteConfirmButton");
+        const confirmButton = htmlQS("#replayDeleteConfirmButton");
         setInteractionEnabled(confirmButton, false);
         confirmButton.style.display = "none";
-        pageManager.openPage("replayDeleteAlert");
+        pageManager.openPage("replayDeleteConfirmation");
         return new Promise<boolean>((resolve) => {
             const ac = new AbortController();
             const complete = (approved: boolean) => {
@@ -95,11 +95,11 @@ export class ReplayEventSetter {
                 resolve(approved);
             };
             const changeEvent = pageManager.addHandler("changePage", (pageId: string) => {
-                if (pageId !== "replayDeleteAlert") complete(false);
+                if (pageId !== "replayDeleteConfirmation") complete(false);
             });
             const endEvent = scene.addHandler("sceneEnd", () => complete(false));
             const timer = setTimeout(() => {
-                if (pageManager.g$currentPageId !== "replayDeleteAlert") return;
+                if (pageManager.g$currentPageId !== "replayDeleteConfirmation") return;
                 confirmButton.style.removeProperty("display");
                 setInteractionEnabled(confirmButton, true);
             }, 1500);
@@ -110,7 +110,6 @@ export class ReplayEventSetter {
                 },
                 { signal: ac.signal }
             );
-
         });
     }
 }

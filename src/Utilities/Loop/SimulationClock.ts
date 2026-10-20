@@ -1,4 +1,4 @@
-import { MyEventListener } from "../MyEventListener";
+import { MyEventListener } from "../Event/MyEventListener";
 
 type Job = { at: number; priority: number; order: number; serial: number; active: boolean; run: () => void };
 
@@ -15,10 +15,18 @@ export class SimulationClock extends MyEventListener {
     private anchorTime = 0;
     private speed = 1;
 
-    get now(): number { return this.time; }
-    get isRunning(): boolean { return this.running; }
-    get playbackSpeed(): number { return this.speed; }
-    allocateOrder(): number { return this.ownerOrder++; }
+    get g$now(): number {
+        return this.time;
+    }
+    get g$isRunning(): boolean {
+        return this.running;
+    }
+    get g$playbackSpeed(): number {
+        return this.speed;
+    }
+    allocateOrder(): number {
+        return this.ownerOrder++;
+    }
 
     schedule(at: number, run: () => void, priority = 0, order = this.allocateOrder()): () => void {
         if (!Number.isFinite(at) || at < 0) throw new Error("ゲーム内時刻が不正です");
@@ -32,7 +40,9 @@ export class SimulationClock extends MyEventListener {
             index = parent;
         }
         this.jobs[index] = job;
-        return () => { job.active = false; };
+        return () => {
+            job.active = false;
+        };
     }
 
     start(): void {
@@ -70,7 +80,10 @@ export class SimulationClock extends MyEventListener {
             let budget = 10000;
             while (this.jobs.length && this.running) {
                 const job = this.jobs[0];
-                if (!job.active) { this.pop(); continue; }
+                if (!job.active) {
+                    this.pop();
+                    continue;
+                }
                 if (job.at > target) break;
                 if (--budget < 0) return;
                 this.pop();
@@ -81,7 +94,9 @@ export class SimulationClock extends MyEventListener {
         } catch (error) {
             this.stop();
             this.executeEvent("error", error);
-        } finally { this.advancing = false; }
+        } finally {
+            this.advancing = false;
+        }
     }
 
     dispose(): void {
@@ -97,7 +112,7 @@ export class SimulationClock extends MyEventListener {
     }
 
     private before(a: Job, b: Job): boolean {
-        return a.at < b.at || a.at === b.at && (a.priority < b.priority || a.priority === b.priority && (a.order < b.order || a.order === b.order && a.serial < b.serial));
+        return a.at < b.at || (a.at === b.at && (a.priority < b.priority || (a.priority === b.priority && (a.order < b.order || (a.order === b.order && a.serial < b.serial)))));
     }
 
     private pop(): void {

@@ -1,8 +1,9 @@
 /compile.bat
 /node_modules
 /run.bat
-/PWA.md
 
-# Python製の画像生成スクリプトなどが作る、一時的な実行キャッシュ
+# 開発支援用の備忘録
+/notes/
+
 __pycache__/
 *.py[cod]

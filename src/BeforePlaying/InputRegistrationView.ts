@@ -16,7 +16,7 @@ export class InputRegistrationView {
         return !inputManager.g$registering || inputManager.g$registeredInputs.includes(input);
     }
 
-    get ready(): boolean {
+    get g$ready(): boolean {
         const inputs = inputManager.g$registeredInputs;
         return inputs.length === this.requiredNumber && inputs.every((input) =>
             input.g$type === "keyboard" || input instanceof GamepadObserver && !!readGamepads()[input.g$index]?.connected);
@@ -34,7 +34,7 @@ export class InputRegistrationView {
         const connections = page.querySelector<HTMLElement>(".registrationConnections")!;
         const next = page.querySelector<HTMLElement>(".registrationNext")!;
         const inputs = inputManager.g$registeredInputs;
-        const ready = this.ready;
+        const ready = this.g$ready;
         message.textContent = ready ? "完了！" : `登録したい入力機器のボタンを押してください：あと${Math.max(0, this.requiredNumber - inputs.length)}人`;
         message.classList.toggle("registrationComplete", ready);
         connections.replaceChildren(...inputs.map((input, index) => {

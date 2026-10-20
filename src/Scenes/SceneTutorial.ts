@@ -1,19 +1,21 @@
-import { CanvasManager } from "../CanvasManager";
+import { tutorial2Introduction, tutorial2VarietyExplanation } from "../Tutorial/Tutorial2/Dialogue";
+import { tutorial3Introduction } from "../Tutorial/Tutorial3/Dialogue";
+import { CanvasManager } from "../Rendering/CanvasManager";
 import { OperateName } from "../Game/GameMode";
 import { operationKeyCodes } from "../Game/Operations";
-import { gamepadConfigPresets, input as repeatSetting } from "../Settings";
+import { gamepadConfigPresets, input as repeatSetting } from "../Config/GameConfig";
 import type { PracticePhase } from "../Tutorial/TutorialTypes";
 import { TutorialSession } from "../Tutorial/TutorialSession";
 import { tutorialLessonCount } from "../Tutorial/TutorialUnits";
-import { BasicRuleBoard } from "../Tutorial/BasicRuleBoard";
-import { AdvancedBoard } from "../Tutorial/AdvancedBoard";
-import { TrickPracticeBoard } from "../Tutorial/TrickPracticeBoard";
+import { Tutorial2Board } from "../Tutorial/Tutorial2/Board";
+import { Tutorial3Board } from "../Tutorial/Tutorial3/Board";
+import { Tutorial4Board } from "../Tutorial/Tutorial4/Board";
 import { TutorialProgress } from "../Tutorial/TutorialProgress";
 import { TutorialInput } from "../Tutorial/TutorialInput";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
-import { EventScope } from "../Utilities/EventScope";
+import { EventScope } from "../Utilities/Event/EventScope";
 import { inputManager } from "../Utilities/Interaction/InputManager";
 import { InputInfo, InputObserver } from "../Utilities/Interaction/InputObserver";
 import { PageInteraction } from "../Utilities/Interaction/PageInteraction";
@@ -21,10 +23,11 @@ import { PageInteractionSetter } from "../Utilities/Interaction/PageInteractionS
 import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { PageManager } from "../Utilities/Page/PageManager";
-import { Scene, sceneManager } from "../Utilities/SceneManager";
+import { Scene, sceneManager } from "../Utilities/Scene/SceneManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
-import { spaceJapanesePunctuation } from "../Utilities/Text/JapaneseText";
+import { spaceJapaneseHTML, spaceJapanesePunctuation } from "../Utilities/Text/JapaneseText";
+import { setupMenuFeedback } from "../UI/Presentation";
 
 const padKeys: Record<OperateName, keyof (typeof gamepadConfigPresets)[0]> = {
     "move-left": "moveLeft",
@@ -99,9 +102,10 @@ export class SceneTutorial extends Scene {
         this.session = new TutorialSession(validIndex);
         this.model = this.session.board;
         const elements = new ElementManager(this);
+        setupMenuFeedback(this.interaction);
         this.sceneSetters.push(new ElementEventSetter(elements), new PageInteractionSetter(this.interaction), new DynamicTextSetter(this.talk));
         this.talk.masterSetting.frequency = 30;
-        this.talk.talkPanel.s$htmlResolver = (html) => this.resolveSpeechControls(html);
+        this.talk.talkPanel.s$htmlResolver = (html) => spaceJapaneseHTML(this.resolveSpeechControls(html));
     }
 
     protected initialize(): void {
@@ -109,7 +113,7 @@ export class SceneTutorial extends Scene {
         const board = document.getElementById("lessonBoard")!;
         board.append(this.canvas.g$playCanvas, this.canvas.g$nextCanvas);
         this.setText("lessonHeading", `${this.session.unit.name} ${this.model.index - this.session.unit.offset + 1}：${this.model.lesson.name}`);
-        if (this.model instanceof TrickPracticeBoard) {
+        if (this.model instanceof Tutorial4Board) {
             document.querySelector(".tutorialScene")!.classList.add("trickLessonScene");
             const example = document.getElementById("lessonTrickExample")!;
             example.hidden = false;
@@ -211,12 +215,18 @@ export class SceneTutorial extends Scene {
         this.hideIntroMond = this.model.lesson.id === "move" && this.model.phase === "horizontal";
         this.setText("lessonStatus", "");
         this.render();
-        if (this.model instanceof TrickPracticeBoard) {
+        if (this.model instanceof Tutorial4Board) {
             await this.say([...this.model.lesson.introduction, "表示された位置へ、順に置いてみましょう。"], token);
-        } else if (this.model instanceof AdvancedBoard) {
-            await this.say(this.advancedIntroduction(), token);
-        } else if (this.model instanceof BasicRuleBoard) {
-            await this.say(this.basicIntroduction(), token);
+        } else if (this.model instanceof Tutorial3Board) {
+            await this.say(
+                tutorial3Introduction(this.model, (operation) => this.controlMarkup(operation)),
+                token
+            );
+        } else if (this.model instanceof Tutorial2Board) {
+            await this.say(
+                tutorial2Introduction(this.model, (operation) => this.controlMarkup(operation)),
+                token
+            );
         } else if (this.model.lesson.id === "move" && this.model.phase === "horizontal") {
             await this.say(
                 [
@@ -276,7 +286,7 @@ export class SceneTutorial extends Scene {
         }
         if (!this.canOperate() || info.consumed) return;
         const operation = (Object.keys(operationKeyCodes) as OperateName[]).find((op) => (controller ? gamepadConfigPresets[0][padKeys[op]].includes(info.name) : operationKeyCodes[op] === info.name));
-        if (!operation || !this.model.allowed.includes(operation)) return;
+        if (!operation || !this.model.g$allowed.includes(operation)) return;
         info.consumed = true;
         this.perform(operation);
         if (operation.startsWith("move-") && this.canOperate()) {
@@ -291,7 +301,7 @@ export class SceneTutorial extends Scene {
         this.lastTickAt = now;
         this.session.setActive(this.canOperate() && !document.hidden);
         if (!this.canOperate()) return;
-        if (this.model instanceof BasicRuleBoard) {
+        if (this.model instanceof Tutorial2Board) {
             if (this.model.phase === "damageReview") {
                 this.busy = true;
                 void this.afterBoardObservation(() => this.explainPhase());
@@ -328,23 +338,27 @@ export class SceneTutorial extends Scene {
         if (outcome.sound) MusicManager.get(outcome.sound)?.play();
         if (outcome.message) this.setText("lessonStatus", outcome.message);
         else if (outcome.trick) this.setText("lessonStatus", `${outcome.trick}の列を消去しました。`);
-        else if (this.model.placed > placedBefore) this.setText("lessonStatus", this.model instanceof TrickPracticeBoard ? "モンドを設置しました！" : "黄色の枠に設置できました！");
+        else if (this.model.placed > placedBefore) this.setText("lessonStatus", this.model instanceof Tutorial4Board ? "モンドを設置しました！" : "黄色の枠に設置できました！");
         this.render();
         if (outcome.failed) {
             this.busy = true;
             void this.afterBoardObservation(() => this.retryAfterMistake());
-        } else if (outcome.explain && this.model instanceof AdvancedBoard) {
+        } else if (outcome.explain && this.model instanceof Tutorial3Board) {
             this.busy = true;
             void this.afterBoardObservation(() => this.explainAdvancedStep());
         } else if (outcome.advance) {
-            if (this.model instanceof BasicRuleBoard && this.model.lesson.id === "variety") {
+            if (this.model instanceof Tutorial2Board && this.model.lesson.id === "variety") {
+                const model = this.model;
                 // 新しい役の説明に入る前だけ、消去後の盤面を見せる。
                 this.busy = true;
                 void this.afterBoardObservation(async () => {
                     this.model.continueAfterObservation();
                     this.render();
                     const token = this.generation;
-                    await this.say(this.varietyExplanation(), token);
+                    await this.say(
+                        tutorial2VarietyExplanation(model, (operation) => this.controlMarkup(operation)),
+                        token
+                    );
                     if (this.isCurrent(token)) this.releasePractice();
                 });
             } else {
@@ -383,7 +397,7 @@ export class SceneTutorial extends Scene {
 
     private async retryAfterMistake(timedOut = false): Promise<void> {
         const token = this.generation;
-        if (this.model instanceof TrickPracticeBoard) {
+        if (this.model instanceof Tutorial4Board) {
             await this.say(["置き方を確かめてもう一度やってみましょう。"], token);
             if (!this.isCurrent(token)) return;
             this.model.restart();
@@ -401,15 +415,15 @@ export class SceneTutorial extends Scene {
     }
 
     private async explainPhase(): Promise<void> {
-        if (this.model instanceof TrickPracticeBoard) {
+        if (this.model instanceof Tutorial4Board) {
             await this.explainTrickPhase();
             return;
         }
-        if (this.model instanceof AdvancedBoard) {
+        if (this.model instanceof Tutorial3Board) {
             await this.explainAdvancedStep();
             return;
         }
-        if (this.model instanceof BasicRuleBoard) {
+        if (this.model instanceof Tutorial2Board) {
             await this.explainBasicPhase();
             return;
         }
@@ -443,49 +457,8 @@ export class SceneTutorial extends Scene {
         else this.releasePractice();
     }
 
-    private basicIntroduction(): string[] {
-        if (!(this.model instanceof BasicRuleBoard)) return [];
-        const id = this.model.lesson.id;
-        if (id === "chain")
-            return [
-                "Pentamondは、モンドを組み合わせて「役」を揃えるゲームです！ただ積むだけでなく、役の形を作ることが大切です。",
-                "役は一列の、三角形の特定の並び方です。一番下の列を消したときにその列の形で役が判定されます。",
-                "今回は3個のモンドを設置するとちょうど10個の役が完成します。",
-            ];
-        if (id === "variety") return ["一列揃え以外にもいろいろな役があります！空いている場所も形の一部なのですべて埋めればよいわけではありません。", ...this.varietyExplanation()];
-        if (id === "survival")
-            return [
-                "サバイバルでは持ち時間が少しずつ減り、0になると終了です。持ち時間は実時間の0.5秒ごとに1減ります。",
-                "役を消去すると持ち時間が回復し、スコアも増えます。チェインではさらにスコアにボーナスがつきます！",
-                "マルチプレイなら攻撃もできます。時間は設定された上限を超えて回復しません。",
-                "今回は最大持ち時間30で、一列揃えを1回成立させましょう。",
-                `黄色の枠にモンドを設置して${this.controlMarkup("removeLine")}で消去しましょう。`,
-            ];
-        if (id === "penalty")
-            return [
-                "一手戻しは便利ですが、サバイバルでは持ち時間が3減るペナルティを受けます。",
-                "役なし消去は最初の1回にはペナルティがありません。ただし、続けて消すと1回につき持ち時間が3減ります。",
-                "役を成立させると、役なし消去のペナルティ待ちはなくなります。設置でも1ずつ軽くなります。",
-                "まずモンドを1個設置し、一手戻ししてみましょう。そのあと役なし消去のペナルティも体験します。",
-            ];
-        return [
-            "マルチのサバイバルでは、役を消去してためた攻撃を次のモンドの設置で相手へ送ります。チェインでも攻撃が増えます。",
-            "こちらに攻撃が届いていると設置時にこちらの攻撃と相殺します。それでも受けた攻撃が残っている場合、待機時間後の設置でダメージが始まります。",
-            "ダメージでは灰色の「じゃまモンド」が落ちてきて地形のモンドを壊します。地面まで届くと持ち時間も1ずつ減ります。",
-            `今回は待機を終えた攻撃12がある場面です。${this.controlMarkup("put")}で設置して、ダメージによる地形の変化を見てみましょう。`,
-        ];
-    }
-
-    private varietyExplanation(): string[] {
-        if (!(this.model instanceof BasicRuleBoard)) return [];
-        if (this.model.tricks === 0) return ["まずは「三つ子山」。3つの山の間に空きがある形です。黄色の枠にモンドを設置しましょう。"];
-        if (this.model.tricks === 1)
-            return ["次は「トゲトゲ(下)」。下向きの三角形がひとつおきに並ぶ役です。", `回転と${this.controlMarkup("move-down")}での滑り移動を使って、黄色の枠に合うように設置しましょう。`];
-        return ["最後は「地割れ(上)」。左右で三角形の向きが変わり、間に1か所の空きがあります。空きを残すことが大切です。", "黄色の枠にモンドを設置して、役を完成させましょう。"];
-    }
-
     private async explainBasicPhase(): Promise<void> {
-        if (!(this.model instanceof BasicRuleBoard)) return;
+        if (!(this.model instanceof Tutorial2Board)) return;
         const model = this.model;
         const token = this.generation;
         if (model.phase === "damaging") {
@@ -538,51 +511,8 @@ export class SceneTutorial extends Scene {
         this.session.setActive(this.pageManager.g$currentPageId === "practice" && !document.hidden);
     }
 
-    private advancedIntroduction(): string[] {
-        if (!(this.model instanceof AdvancedBoard)) return [];
-        switch (this.model.lesson.id) {
-            case "next":
-                return [
-                    "盤面の右側にあるNEXTを見てみましょう。これから出現するモンドが上から順番に並んでいます。",
-                    "今のモンドだけでなく、次に来る形も見ておくと、置き場所を考えやすくなります。",
-                    "NEXTの一番上の形を確かめてから、今のモンドを黄色の枠に設置してください。予告と出現する形を見比べながら、4個設置しましょう。",
-                ];
-            case "holdReset":
-                return [
-                    "Pentamondには上へ移動する操作はありません。しかし、下へ動かしすぎたときはホールドを使って戻すことができます。",
-                    "ホールドにすでにモンドがあるなら、2回入れ替えると元のモンドに戻ります。入れ替えたモンドは初期位置・初期の向きで出現します。",
-                    `${this.controlMarkup("move-down")}で下へ動かし、${this.controlMarkup("hold")}で2回ホールドしてみましょう。黄色の枠は初期位置です。`,
-                ];
-            case "juggling":
-                return [
-                    "今のモンドも、ホールドのモンドも都合が悪いとき、ネクストを取り出す「ジャグリング」というテクニックがあります。",
-                    "設置、ホールド、一手戻し、ホールドの順で行います。出現したネクストをホールドに取り、一手戻ししたあとに取り出す手順です。",
-                    "一手戻しを使うためサバイバルでは持ち時間が3減ります。便利ですが、必要なときに使いましょう。",
-                    `まず${this.controlMarkup("put")}で設置し、右の課題に沿って順番に操作しましょう。最後に、取り出したモンドを黄色の枠に設置してください。`,
-                ];
-            case "rotation":
-                return [
-                    "屋根の下などには滑り移動したあとに回転すると入る形があります。いわゆる「回転入れ」です。",
-                    `まず2回左回転して形を変え、${this.controlMarkup("move-down")}で滑り込んでみてください。そのあと2回右回転すると、黄色の枠の形に戻せます。`,
-                    "滑り移動だけではなく、滑ったあとに回転してから設置することがポイントです。",
-                ];
-            case "leftPriority":
-                return [
-                    "下方向の入力ではまず真下へ進もうとします。真下に進めない場合には左下、右下の順に滑れるかを調べます。",
-                    "つまり、左右のどちらにも滑れるときは左が優先されます。今回は灰色の三角形の左右が、どちらも空いています。",
-                    `${this.controlMarkup("move-down")}で下へ進んでみましょう。左へ滑ったら黄色の枠の位置に設置してください。`,
-                ];
-            case "blockedSpawn":
-                return [
-                    "地形が高くなり初期位置にモンドを出せなくなることがあります。その間は移動・回転・設置・ホールドができません。",
-                    "しかし、これで終わりではありません。一手戻しをするか一番下の列の消去で出現する場所を作れます。",
-                    `まず${this.controlMarkup("put")}でそのまま設置し、次のモンドが出現できない場面を見てみましょう。`,
-                ];
-        }
-    }
-
     private async explainAdvancedStep(): Promise<void> {
-        if (!(this.model instanceof AdvancedBoard)) return;
+        if (!(this.model instanceof Tutorial3Board)) return;
         const model = this.model;
         const token = this.generation;
         if (model.phase === "done") {
@@ -612,7 +542,7 @@ export class SceneTutorial extends Scene {
         } else if (model.lesson.id === "blockedSpawn" && model.stage === 1) {
             await this.say(["初期位置が埋まり次のモンドが出現できませんね。移動やホールドでは動かせません。", `${this.controlMarkup("unput")}で直前の設置を戻してみましょう。`], token);
         } else if (model.lesson.id === "blockedSpawn" && model.stage === 2) {
-            if (!model.recoveryConfirmed) {
+            if (!model.g$recoveryConfirmed) {
                 await this.say(["一手戻しで設置前に戻りました！見た目は似ていますが、今のモンドはまた操作できます。", "左と右へ、それぞれ3回動かして確かめてみましょう。"], token);
                 if (this.isCurrent(token)) this.releasePractice();
                 return;
@@ -631,7 +561,7 @@ export class SceneTutorial extends Scene {
     }
 
     private async explainTrickPhase(): Promise<void> {
-        if (!(this.model instanceof TrickPracticeBoard)) return;
+        if (!(this.model instanceof Tutorial4Board)) return;
         const model = this.model;
         const token = this.generation;
         if (model.phase === "erasing") {
@@ -653,8 +583,8 @@ export class SceneTutorial extends Scene {
 
     private render(): void {
         if (this.disposed) return;
-        this.canvas.targetMondStates = this.model.targets;
-        const graphics = this.model.graphics;
+        this.canvas.targetMondStates = this.model.g$targets;
+        const graphics = this.model.g$graphics;
         if (this.hideIntroMond) {
             graphics.blockProperties?.forEach((column) => column.forEach((property) => (property[2] = false)));
             graphics.ghostMondState = [];
@@ -689,22 +619,22 @@ export class SceneTutorial extends Scene {
             recoveryReview: "回復とスコアを見てみよう",
         };
         this.setText("lessonTask", tasks[this.model.phase]);
-        if (this.model instanceof BasicRuleBoard || this.model instanceof AdvancedBoard || this.model instanceof TrickPracticeBoard) {
-            this.setText("lessonCondition", this.model.condition);
-            this.setText("lessonProgress", this.model.progress);
-            this.setText("lessonKnowledge", this.model.knowledge);
-            this.setText("lessonTask", this.model.task);
-            this.setText("lessonRuleSummary", this.model.summary);
+        if (this.model instanceof Tutorial2Board || this.model instanceof Tutorial3Board || this.model instanceof Tutorial4Board) {
+            this.setText("lessonCondition", this.model.g$condition);
+            this.setText("lessonProgress", this.model.g$progress);
+            this.setText("lessonKnowledge", this.model.g$knowledge);
+            this.setText("lessonTask", this.model.g$task);
+            this.setText("lessonRuleSummary", this.model.g$summary);
         }
-        const allowed = this.model.allowed;
+        const allowed = this.model.g$allowed;
         const controls: string[] = [];
         if (allowed.includes("move-left")) controls.push(this.usingController ? "スティック／方向キーで移動" : "矢印キーで移動");
         else if (allowed.includes("move-down")) controls.push(`${this.controlsFor("move-down")}：下`);
         for (const op of allowed.filter((op) => !op.startsWith("move-"))) controls.push(`${this.controlsFor(op)}：${operationLabels[op]}`);
         if (this.usingController) controls.push("教習中は初期配置を使用します。");
-        this.setText("lessonControls", controls.join(this.model instanceof TrickPracticeBoard ? "　" : "\n"));
+        this.setText("lessonControls", controls.join(this.model instanceof Tutorial4Board ? "　" : "\n"));
         const pauseHint = this.usingController ? "中央左／中央右ボタン：ポーズ" : "Esc／P：ポーズ";
-        this.setText("lessonPauseHint", this.model instanceof BasicRuleBoard && Number.isFinite(this.model.gameTime) ? pauseHint : `時間制限なし ／ ${pauseHint}`);
+        this.setText("lessonPauseHint", this.model instanceof Tutorial2Board && Number.isFinite(this.model.g$gameTime) ? pauseHint : `時間制限なし ／ ${pauseHint}`);
     }
 
     private controlsFor(op: OperateName): string {
@@ -745,7 +675,6 @@ export class SceneTutorial extends Scene {
         if (this.disposed) return;
         const back = PageManager.getBackIndex(pageId);
         if (back <= 0) return;
-        // 読み込みに失敗した場合も、説明・課題を壊さず元の教習に戻れるようにする。
         await this.pageManager.backPage(back);
     }
 }

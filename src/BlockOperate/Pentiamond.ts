@@ -1,7 +1,7 @@
 import { BlockKind } from "./Block";
 import { placement } from "./MondInfo";
 import { MondState, Monoiamond } from "./Monoiamond";
-import * as Setting from "../Settings";
+import * as Setting from "../Config/GameConfig";
 
 /**
  * 仮想的な盤面上におけるMonoiamondを5つ合わせたモンド(Pentiamond)を表す

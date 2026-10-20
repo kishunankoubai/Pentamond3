@@ -26,7 +26,7 @@ export class Music {
         void this.resumeContext().catch((error) => console.warn("音声を再開できませんでした", error));
     };
 
-    // 初回はpageStartの直接クリック中に呼ぶ。復帰後も同じContextを再利用する。
+    // 初回はユーザーの直接操作中に呼ぶ。復帰後も同じContextを再利用する。
     static async init() {
         if (!this.audioContext) {
             this.audioContext = new AudioContext();
@@ -41,7 +41,7 @@ export class Music {
         if (context && context.state !== "running" && context.state !== "closed") await context.resume();
     }
 
-    private static get context(): AudioContext {
+    private static get g$context(): AudioContext {
         if (!this.audioContext) throw new Error("Music.init() を先に呼んでください");
         return this.audioContext;
     }
@@ -70,8 +70,8 @@ export class Music {
         this.data = data;
         this.volume = volume;
 
-        this.gainNode = Music.context.createGain();
-        this.gainNode.connect(Music.context.destination);
+        this.gainNode = Music.g$context.createGain();
+        this.gainNode.connect(Music.g$context.destination);
 
         this.updateGain();
     }
@@ -92,7 +92,7 @@ export class Music {
                 try {
                     const res = await fetch(src);
                     if (!res.ok) throw new Error(`音声の読み込みに失敗しました: ${res.status}`);
-                    this.audioBuffer = await Music.context.decodeAudioData(await res.arrayBuffer());
+                    this.audioBuffer = await Music.g$context.decodeAudioData(await res.arrayBuffer());
                     this.isLoaded = true;
                     return;
                 } catch (error) { lastError = error; }
@@ -124,9 +124,9 @@ export class Music {
         await Music.resumeContext();
 
         if (!this.audioBuffer || generation !== this.playGeneration) return;
-        this.gainNode.gain.cancelScheduledValues(Music.context.currentTime);
+        this.gainNode.gain.cancelScheduledValues(Music.g$context.currentTime);
 
-        const source = Music.context.createBufferSource();
+        const source = Music.g$context.createBufferSource();
 
         source.buffer = this.audioBuffer;
 
@@ -148,7 +148,7 @@ export class Music {
         };
 
         this.sourceNode = source;
-        this.startedAt = Music.context.currentTime - this.pausedAt;
+        this.startedAt = Music.g$context.currentTime - this.pausedAt;
 
         source.start(0, this.pausedAt);
         this.isPlaying = true;
@@ -190,12 +190,12 @@ export class Music {
     setLoop(loop: boolean): void {
         if (!this.sourceNode || this.sourceNode.loop === loop) return;
         // 何周も再生した後でループを解除しても、再開位置が音声長を超えないようにする。
-        this.startedAt = Music.context.currentTime - this.getPlaybackOffset();
+        this.startedAt = Music.g$context.currentTime - this.getPlaybackOffset();
         this.sourceNode.loop = loop;
     }
 
     private getPlaybackOffset(): number {
-        let offset = Music.context.currentTime - this.startedAt;
+        let offset = Music.g$context.currentTime - this.startedAt;
         const loopStart = this.sourceNode!.loopStart || 0;
         const loopEnd = this.sourceNode!.loopEnd || this.audioBuffer!.duration;
         if (this.sourceNode!.loop && offset >= loopEnd && loopEnd > loopStart) {
@@ -208,7 +208,7 @@ export class Music {
         if (!this.sourceNode || !this.isPlaying) return;
         const generation = ++this.fadeGeneration;
 
-        const now = Music.context.currentTime;
+        const now = Music.g$context.currentTime;
         const currentGain = this.gainNode.gain.value;
         const masterVolume = this.data.type === "BGM" ? Music.masterBGMVolume : Music.masterSEVolume;
         const goalGain = this.data.srcVolume * Music.clamp(goalVolume) * masterVolume;
@@ -233,7 +233,7 @@ export class Music {
 
     setVolume(volume: number) {
         ++this.fadeGeneration;
-        this.gainNode.gain.cancelScheduledValues(Music.context.currentTime);
+        this.gainNode.gain.cancelScheduledValues(Music.g$context.currentTime);
         this.volume = Music.clamp(volume);
         this.updateGain();
     }

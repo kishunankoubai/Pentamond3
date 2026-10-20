@@ -1,0 +1,883 @@
+/* 音量・BGM・操作・グラフィック・プレイルール・データ管理の設定画面。 */
+#musicSetting .options:first-child * {
+    gap: 10cqh;
+    transform: translateX(-5cqh);
+}
+
+#musicSetting .selectorPanel {
+    height: 20cqh;
+    width: 55cqh;
+    flex-direction: column;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+#musicSetting .selectorPanel .selector {
+    width: 50cqh;
+    font-size: 4cqh;
+    border: 1px solid black;
+    text-align: center;
+    background-color: rgb(180, 255, 255);
+    border-top: 0px solid rgb(147, 228, 255);
+    border-bottom: 3px solid rgb(147, 228, 255);
+    border-left: 1px solid rgb(147, 228, 255);
+    border-right: 1px solid rgb(147, 228, 255);
+    outline: none;
+}
+
+#musicSetting .selectorPanel .selector option {
+    background-color: lightcyan;
+}
+
+#musicSetting .selectorPanel .selector:focus-visible {
+    border-top: 0px solid rgb(147, 228, 255);
+    border-bottom: 1px solid rgb(147, 228, 255);
+    border-left: 0px solid rgb(147, 228, 255);
+    border-right: 0px solid rgb(147, 228, 255);
+}
+
+#controllerSetting {
+    justify-content: flex-start;
+    padding-top: 18cqh;
+    box-sizing: border-box;
+}
+
+#controllerSetting .controllerPresetRow {
+    display: flex;
+    gap: 7cqh;
+}
+
+#controllerSetting .controllerPresetRow .button {
+    position: relative;
+    margin-left: 0;
+    font-size: 4.5cqh;
+}
+
+#controllerSetting .controllerPresetRow .selectedValue {
+    color: #ee8888;
+    border-bottom-color: #ee8888;
+}
+
+#controllerSetting #controllerSettingStatus {
+    margin: 2cqh 0;
+    min-height: 5cqh;
+    max-width: 128cqh;
+    font-size: 3.2cqh;
+    color: #6bd;
+}
+
+#controllerSetting .controllerMappingGrid {
+    display: grid;
+    width: 128cqh;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7cqh 8cqh;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton {
+    position: relative;
+    margin-left: 0;
+    min-width: 0;
+    height: 8.5cqh;
+    padding: 0.3cqh 0;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 13cqh minmax(0, 1fr);
+    gap: 1cqh;
+    align-items: center;
+    border: none;
+    border-bottom: 0.3cqh solid #6bd5;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton::before {
+    position: absolute;
+    right: 100%;
+    font-size: 4.5cqh;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton:focus {
+    border-bottom: 0.3cqh solid #ff90be;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton:focus .controllerMappingLabel {
+    color: inherit;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton span {
+    font-size: 2.9cqh;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton .controllerMappingLabel {
+    color: #6bd;
+    text-align: left;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton .controllerMappingValue {
+    color: inherit;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5cqh 1.5cqh;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton .controllerMappingValue .controllerMappingInput {
+    color: inherit;
+    white-space: nowrap;
+    line-height: 1.2;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton.waitingInput {
+    border-color: #ff90be;
+    background-color: #fff0f6;
+}
+
+#controllerSetting #controllerSettingReset {
+    position: relative;
+    margin: 2cqh 0 0;
+    font-size: 4.5cqh;
+    background: none;
+    border-color: #22222200;
+}
+
+#controllerSetting #controllerSettingReset:focus {
+    border-color: #ff90be;
+}
+
+#controllerSetting #controllerSettingReset[aria-disabled="true"] {
+    pointer-events: none;
+    opacity: 0.35;
+}
+
+#controllerBindingSetting .controllerBindingPopup {
+    box-sizing: border-box;
+    justify-content: flex-start;
+    padding: 16cqh 5cqh 13cqh;
+    gap: 2cqh;
+}
+
+#controllerBindingSetting .controllerBindingPopup #controllerBindingStatus {
+    font-size: 3.2cqh;
+    min-height: 6cqh;
+    flex-shrink: 0;
+}
+
+#controllerBindingSetting .controllerBindingPopup #controllerBindingList {
+    width: 100%;
+    min-height: 27cqh;
+    flex-shrink: 0;
+    gap: 0.5cqh;
+}
+
+#controllerBindingSetting .controllerBindingPopup #controllerBindingList .controllerBindingDelete {
+    position: relative;
+    margin-left: 0;
+    font-size: 4cqh;
+    line-height: 1.4;
+}
+
+#controllerBindingSetting .controllerBindingPopup #controllerBindingList .controllerBindingEmpty {
+    font-size: 4cqh;
+    color: #6bd;
+}
+
+#controllerBindingSetting .controllerBindingPopup #controllerBindingAdd {
+    position: relative;
+    margin-left: 0;
+    font-size: 4cqh;
+    flex-shrink: 0;
+}
+
+#controllerBindingSetting .controllerBindingPopup #controllerBindingAdd[aria-disabled="true"] {
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+#controllerBindingSetting .controllerBindingPopup #controllerBindingAdd.waitingInput {
+    color: #ff90be;
+}
+
+#playerInputSetting > .text {
+    font-size: 3.2cqh;
+}
+
+#playerInputSetting .playerInputRows {
+    display: flex;
+    flex-direction: column;
+}
+
+#playerInputSetting .playerInputRows .playerInputRow {
+    display: flex;
+}
+
+#playerInputSetting .playerInputRows .playerInputRow .label {
+    font-size: 3.5cqh;
+    color: #567;
+}
+
+#playerInputSetting .playerInputRows .playerInputRow .button {
+    margin-left: 0;
+    font-size: 3.2cqh;
+}
+
+#playerInputSetting .playerInputRows .playerInputRow .button.selectedValue {
+    color: #ee8888;
+    border-bottom-color: #ee8888;
+}
+
+#survivalPlaySetting,
+#linePlaySetting {
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+:is(#survivalPlaySetting, #linePlaySetting) .playSettingPanel {
+    width: 125cqh;
+    display: flex;
+    flex-direction: column;
+    gap: 2cqh;
+}
+
+:is(#survivalPlaySetting, #linePlaySetting) .playSettingSection {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1cqh;
+}
+
+:is(#survivalPlaySetting, #linePlaySetting) .playSettingSectionTitle {
+    font-size: 4cqh;
+    color: #6bd;
+}
+
+:is(#survivalPlaySetting, #linePlaySetting) .button:not(.back) {
+    margin-left: 0;
+    font-size: 3.2cqh;
+    height: 6cqh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 2cqh;
+    margin-bottom: -2cqh;
+}
+
+:is(#survivalPlaySetting, #linePlaySetting) .selectedValue {
+    color: #ee8888;
+    border-bottom-color: #ee8888;
+}
+
+#survivalPlaySetting .handyRow {
+    display: flex;
+    justify-content: center;
+}
+
+#survivalPlaySetting .handyRow .playerSettingLabel {
+    width: 8cqh;
+    font-size: 3.2cqh;
+}
+
+#survivalPlaySetting .handyRow .handyValue {
+    font-size: 3.5cqh;
+    color: #d76;
+}
+
+#linePlaySetting .settingValue {
+    width: 16cqh;
+    font-size: 5cqh;
+    color: #d76;
+}
+
+#linePlaySetting .text {
+    font-size: 3cqh;
+}
+
+#graphicSetting .options {
+    margin-right: 45cqh;
+}
+
+#graphicSetting .options .button {
+    color: #888;
+}
+
+#bgmSetting .options .label {
+    font-size: 5cqh;
+    margin-right: 5cqh;
+}
+
+#bgmSetting .options .selector {
+    color: #ee8888;
+}
+
+#soundTest {
+    padding: 14cqh 0 11cqh;
+    box-sizing: border-box;
+    justify-content: center;
+}
+
+#soundTest .soundTestPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 7cqh;
+    width: 128cqh;
+}
+
+#soundTest #soundTestStatus {
+    width: 100%;
+    font-size: 4cqh;
+    line-height: 1.6;
+    text-align: center;
+    min-height: 8cqh;
+}
+
+#soundTest .soundTestTrackSelection {
+    gap: 3cqh;
+    width: 100%;
+}
+
+#soundTest .soundTestTrackSelection .label,
+#soundTest .soundTestTrackSelection .selector {
+    font-size: 5cqh;
+}
+
+#soundTest .soundTestTrackSelection .selector {
+    color: #ee8888;
+    margin-left: 0;
+    position: relative;
+    max-width: 100cqh;
+    text-wrap: wrap;
+    text-align: center;
+}
+
+#soundTest .soundTestControls {
+    gap: 8cqh;
+}
+
+#soundTest .soundTestControls .button {
+    position: relative;
+    font-size: 4.8cqh;
+}
+
+#soundTest .button:not(.back) {
+    margin-left: 0;
+}
+
+#soundTestSelector .scrollableContainer {
+    width: 90%;
+}
+
+#dataSetting {
+    padding-top: 19cqh;
+    box-sizing: border-box;
+    justify-content: flex-start;
+    gap: 3cqh;
+}
+
+#dataSetting #dataInformation {
+    width: 124cqh;
+    display: flex;
+    flex-direction: column;
+    gap: 2cqh;
+}
+
+#dataSetting .dataManagementRow {
+    display: grid;
+    grid-template-columns: 47cqh 28cqh minmax(0, 1fr);
+    gap: 4cqh;
+    width: 100%;
+    height: 12cqh;
+    border-bottom: 0.3cqh solid #6bd5;
+}
+
+#dataSetting .dataManagementLabel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8cqh;
+    font-size: 4.5cqh;
+}
+
+#dataSetting .dataManagementLabel .dataManagementNote {
+    font-size: 3cqh;
+    text-align: left;
+}
+
+#dataSetting .dataManagementSize {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1.5cqh;
+}
+
+#dataSetting .dataManagementSize span {
+    font-size: 4.5cqh;
+}
+
+#dataSetting .button:not(.back) {
+    position: relative;
+    margin-left: 0;
+    justify-self: end;
+    font-size: 4.5cqh;
+}
+
+#dataSetting .dataManagementTotal .dataManagementLabel {
+    color: #289;
+    font-size: 5.5cqh;
+}
+
+#dataSetting .dataManagementTotal .button {
+    color: #ee8888;
+}
+
+#dataSetting .dataManagementTotal .button:focus {
+    color: #ff90be;
+}
+
+#dataSetting #dataDeleteStatus {
+    font-size: 3.5cqh;
+    text-align: center;
+    min-height: 3.5cqh;
+    max-width: 90%;
+}
+
+#dataDeleteConfirmation #dataDeleteConfirmButton {
+    background: transparent;
+    border: none;
+    border-bottom: 0.5cqh solid transparent;
+    font-size: 6cqh;
+    margin-left: 0;
+}
+
+#dataDeleteConfirmation #dataDeleteConfirmButton:focus {
+    border-bottom-color: #ff90be;
+}
+
+#dataDeleteConfirmation #dataDeleteConfirmButton[aria-disabled="true"] {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+}
+
+#volumeSetting .container {
+    flex-direction: column;
+}
+
+#volumeSetting .container .container {
+    flex-direction: row;
+}
+
+#volumeSetting .container .container .label:first-child {
+    left: 40cqh;
+    position: absolute;
+}
+
+#volumeSetting .container .container .button {
+    height: 8cqh;
+    aspect-ratio: 1/1;
+    font-size: 8cqh;
+    box-sizing: border-box;
+    border: #22222200 0.2cqh solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin-left: 0cqh;
+}
+
+#volumeSetting .container .container .button::before {
+    content: "";
+}
+
+#volumeSetting .container .container .button:focus {
+    outline: none;
+    border: #ff90be 0.5cqh solid;
+}
+
+.button[data-controller-slot],
+.button[data-keyboard-custom],
+.button[data-max-time] {
+    padding-inline: 1.25cqh;
+    padding-inline-start: calc(1.25cqh + 1.12em);
+    border-radius: 0.6cqh;
+}
+
+#keyboardSetting {
+    justify-content: flex-start;
+    padding-top: 18cqh;
+}
+
+#keyboardSetting .controllerPresetOptions {
+    gap: 9cqh;
+}
+
+#keyboardSetting .controllerPresetOptions .button {
+    font-size: 4.5cqh;
+}
+
+#keyboardSetting .controllerSettingStatus {
+    margin: 2cqh 0;
+    min-height: 5cqh;
+    max-width: 128cqh;
+    font-size: 3cqh;
+}
+
+#keyboardSetting .controllerMappingGrid {
+    display: grid;
+    width: 128cqh;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7cqh 8cqh;
+}
+
+#keyboardSetting .controllerMappingButton {
+    margin-left: 0;
+    min-height: 8.5cqh;
+    padding: 0.7cqh 0;
+    display: grid;
+    grid-template-columns: 13cqh minmax(0, 1fr);
+    gap: 1cqh;
+    border-bottom: 0.3cqh solid #6bd5;
+}
+
+#keyboardSetting .controllerMappingLabel {
+    color: #6bd;
+    font-size: 2.9cqh;
+    text-align: left;
+}
+
+#keyboardSetting .controllerMappingValue {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.5cqh 1.5cqh;
+    color: inherit;
+}
+
+#keyboardSetting .controllerMappingInput {
+    font-size: 2.9cqh;
+    color: inherit;
+    white-space: nowrap;
+}
+
+#keyboardSetting .mappingReset {
+    font-size: 4.5cqh;
+    margin-top: 2cqh;
+}
+
+#keyboardSetting .controllerMappingButton:focus {
+    border-bottom-color: #ff90be;
+}
+
+.controllerMappingGrid {
+    border-radius: 1.5cqh;
+    background: #fff9;
+    padding: 0 2cqh;
+}
+
+.controllerMappingInput {
+    padding: 0.2cqh 0.6cqh;
+    border-radius: 0.5cqh;
+    background: none;
+}
+
+#keyboardBindingSetting .bindingPopup,
+#controllerBindingSetting .controllerBindingPopup {
+    box-sizing: border-box;
+    justify-content: flex-start;
+    padding: 16cqh 5cqh 13cqh;
+    gap: 2cqh;
+}
+
+#keyboardBindingSetting .bindingStatus,
+#controllerBindingSetting #controllerBindingStatus {
+    font-size: 3.2cqh;
+    min-height: 6cqh;
+    flex-shrink: 0;
+}
+
+#keyboardBindingList,
+#controllerBindingSetting #controllerBindingList {
+    display: flex;
+    width: 100%;
+    min-height: 27cqh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 0.5cqh;
+}
+
+#keyboardBindingList .button,
+#controllerBindingSetting #controllerBindingList .button {
+    position: relative;
+    margin-left: 0;
+    font-size: 4cqh;
+    line-height: 1.4;
+}
+
+#keyboardBindingList .text,
+#controllerBindingSetting .controllerBindingEmpty {
+    font-size: 4cqh;
+}
+
+#keyboardBindingAdd,
+#controllerBindingSetting #controllerBindingAdd {
+    position: relative;
+    margin-left: 0;
+    font-size: 4cqh;
+    flex-shrink: 0;
+}
+
+.waitingInput {
+    background: #fff0f7;
+    border-bottom-color: #ff90be;
+}
+
+#graphicSetting {
+    gap: 0.6cqh;
+    padding-top: 18cqh;
+    justify-content: flex-start;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+#graphicSetting > .options {
+    min-height: 5.6cqh;
+    margin-top: 0;
+    margin-right: 0;
+    width: 108cqh;
+    display: grid;
+    grid-template-columns: 66cqh 15cqh 15cqh;
+    gap: 6cqh;
+}
+
+#graphicSetting .graphicMaster {
+    border-bottom: 0.2cqh solid #bbdfe9;
+    padding-bottom: 1cqh;
+    margin-bottom: 1cqh;
+}
+
+#graphicSetting .graphicSubSetting .label {
+    padding-left: 5cqh;
+}
+
+#graphicSetting .graphicIndependent {
+    border-top: 0.2cqh solid #bbdfe9;
+    padding-top: 1cqh;
+    margin-top: 2cqh;
+}
+
+#graphicSetting .options .label {
+    text-align: left;
+    font-size: 4cqh;
+}
+
+#graphicSetting .options .button {
+    margin-left: 0;
+    font-size: 4cqh;
+    text-align: center;
+}
+
+#graphicSetting .options .button:focus {
+    color: #ff90be;
+}
+
+#graphicSetting .options .button.selectedValue {
+    background: transparent;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton,
+#keyboardSetting .controllerMappingGrid .controllerMappingButton {
+    grid-template-columns: 3.5cqh 12cqh minmax(0, 1fr);
+    gap: 1cqh;
+}
+
+#controllerSetting .controllerMappingGrid .controllerMappingButton::before,
+#keyboardSetting .controllerMappingGrid .controllerMappingButton::before {
+    position: static;
+    right: auto;
+    transform: none;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    align-self: center;
+    font-size: 2.9cqh;
+    margin: 0;
+}
+
+#controllerSetting .controllerMappingLabel,
+#keyboardSetting .controllerMappingLabel {
+    justify-self: start;
+    grid-column: 2;
+    grid-row: 1;
+}
+
+#controllerSetting .controllerMappingValue,
+#keyboardSetting .controllerMappingValue {
+    grid-column: 3;
+    grid-row: 1;
+}
+
+#controllerSetting .controllerMappingButton:focus .controllerMappingLabel,
+#keyboardSetting .controllerMappingButton:focus .controllerMappingLabel {
+    color: inherit;
+}
+
+#controllerSetting .controllerMappingValue .controllerMappingInput,
+#keyboardSetting .controllerMappingValue .controllerMappingInput {
+    background: none;
+}
+
+#controllerSetting .controllerPresetOptions .button::before,
+#playerInputSetting .button::before,
+#controllerBindingSetting .button::before,
+#dataSetting .button::before,
+#soundTest .button::before,
+#soundTest .selector::before {
+    position: static;
+    right: auto;
+    font-size: 1em;
+}
+
+#playerInputSetting {
+    justify-content: flex-start;
+    padding-top: 18cqh;
+    box-sizing: border-box;
+    gap: 3cqh;
+}
+
+#playerInputSetting > .text {
+    margin-bottom: 0;
+}
+
+#playerInputSetting .playerInputRows {
+    width: 126cqh;
+    padding: 2cqh;
+    box-sizing: border-box;
+    background: var(--panel);
+    border: 0.3cqh solid var(--panel-border);
+    border-radius: 2cqh;
+    gap: 1.5cqh;
+}
+
+#playerInputSetting .playerInputRows .playerInputRow {
+    width: 100%;
+    grid-template-columns: 22cqh repeat(4, minmax(0, 1fr));
+    gap: 2cqh;
+    min-height: 9cqh;
+}
+
+#playerInputSetting .playerInputRows .playerInputRow .label {
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3cqh;
+}
+
+#playerInputSetting .playerSettingName {
+    font-size: 3.5cqh;
+    color: #228899;
+}
+
+#playerInputSetting .playerInputType {
+    font-size: 2.4cqh;
+}
+
+#playerInputSetting .playerInputRow .button {
+    padding-block: 0.6cqh;
+    box-sizing: border-box;
+}
+
+#playerOperationSettingButton {
+    font-size: 4.5cqh;
+    margin-top: 1cqh;
+}
+
+#survivalPlaySetting,
+#linePlaySetting {
+    padding-top: 19cqh;
+}
+
+#survivalPlaySetting .playSettingPanel,
+#linePlaySetting .playSettingPanel {
+    width: 124cqh;
+    padding: 3cqh 4cqh;
+    box-sizing: border-box;
+    gap: 3cqh;
+    background: var(--panel);
+    border: 0.3cqh solid var(--panel-border);
+    border-radius: 2cqh;
+}
+
+#survivalPlaySetting .playSettingSectionTitle,
+#linePlaySetting .playSettingSectionTitle {
+    color: #228899;
+    font-size: 4cqh;
+}
+
+#survivalPlaySetting .button:not(.back),
+#linePlaySetting .button:not(.back) {
+    height: auto;
+    padding-block: 0.6cqh;
+    margin-bottom: 0;
+    font-size: 3.5cqh;
+}
+
+#survivalPlaySetting .maxTimeOptions {
+    gap: 5cqh;
+    margin-top: 1cqh;
+}
+
+#survivalPlaySetting .handySettingSection {
+    gap: 1cqh;
+    padding-top: 2cqh;
+    border-top: 0.2cqh solid #bbdfe9;
+}
+
+#survivalPlaySetting .handyRow {
+    width: 100%;
+    gap: 4.75cqh;
+    min-height: 7cqh;
+}
+
+#survivalPlaySetting .handyRow .button::before {
+    margin-right: 0.25em;
+    margin-left: -1.25em;
+}
+
+#survivalPlaySetting .handyRow .playerSettingLabel {
+    color: #228899;
+}
+
+#survivalPlaySetting .handyRow .handyValue {
+    width: 16cqh;
+    flex: none;
+}
+
+#survivalPlaySetting .handyRow .handyValue,
+#linePlaySetting .settingValue {
+    color: #6bd;
+    background: #e5f2fa;
+    border-radius: 1cqh;
+    padding: 0.5cqh 1cqh;
+}
+
+#linePlaySetting .lineTargetSetting {
+    margin-top: 12cqh;
+    gap: 4cqh;
+    padding-block: 5cqh;
+}
+
+#linePlaySetting .lineTargetSetting .options {
+    gap: 5cqh;
+}
+
+#dataInformation {
+    background: var(--panel);
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    padding: 1cqh 3cqh;
+}
+
+#dataSetting .dataManagementTotal {
+    background: #e5f2fa;
+    border-radius: 1cqh;
+}

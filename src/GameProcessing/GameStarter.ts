@@ -1,7 +1,7 @@
 import { PlaySettingSetter } from "../BeforePlaying/PlaySettingSetter";
 import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
-import { ControllerSettingManager } from "../ControllerSettingManager";
-import { sceneManager } from "../Utilities/SceneManager";
+import { ControllerSettingManager } from "../Input/ControllerSettingManager";
+import { sceneManager } from "../Utilities/Scene/SceneManager";
 import { ScenePlay } from "../Scenes/ScenePlay";
 import { GameProcessing } from "./GameProcessing";
 

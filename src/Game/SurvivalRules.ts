@@ -1,5 +1,5 @@
-import { defaultMaxGameTime, maxGameTimeScoreInterval, minimumMaxGameTime, penalty } from "../Settings";
-import { TrickInfo } from "../Trick";
+import { defaultMaxGameTime, maxGameTimeScoreInterval, minimumMaxGameTime, penalty } from "../Config/GameConfig";
+import { TrickInfo } from "./Tricks";
 
 /** 比較条件を揃える記録・実績は、該当プレイヤー自身の設定で判定する。 */
 export function isStandardSurvivalRecord(info: { initialMaxGameTime: number; handy: number }): boolean {

@@ -1,0 +1,375 @@
+/* 通常／リプレイの結果画面とリプレイ一覧。 */
+#result .resultLabel {
+    color: #ee8888;
+    font-size: 10cqh;
+    font-family: "RocknRoll One", Arial;
+}
+
+#result .options:nth-child(3) {
+    gap: 8cqh;
+    margin-bottom: 8cqh;
+}
+
+#replayResult .resultLabel {
+    color: #ee8888;
+    font-size: 10cqh;
+    font-family: "RocknRoll One", Arial;
+}
+
+#replayResult .options:nth-child(3) {
+    gap: 8cqh;
+    margin-right: -2cqh;
+}
+
+#detailedResult .subPage {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    justify-content: start;
+    padding-left: 10cqh;
+}
+
+#replay .text {
+    font-size: 5cqh;
+}
+
+#replay .options {
+    padding-top: 4cqh;
+    padding-bottom: 4cqh;
+    height: 50cqh;
+    width: 130cqh;
+    overflow-y: auto;
+    background-color: #dddddd88;
+    border-radius: 4cqh;
+    justify-content: start;
+    border: 1cqh #5acd solid;
+}
+
+#replay .options::-webkit-scrollbar {
+    width: 3.5cqh;
+}
+
+#replay .options::-webkit-scrollbar-track {
+    background: #ccc0;
+    border-radius: 2cqh;
+}
+
+#replay .options::-webkit-scrollbar-thumb {
+    background: #678;
+    border-radius: 2cqh;
+    border: 0.4cqh solid #456;
+}
+
+#replay .options::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+#replay .options .replayDataContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2cqh;
+}
+
+#replay .options .replayDataContainer .replayButton {
+    font-size: 4.5cqh;
+    margin-left: -10cqh;
+}
+
+#replay .options .replayDataContainer .replayButton:focus {
+    scale: 1;
+}
+
+#replay .options .replayDataContainer .replayDataDescription {
+    font-size: 3cqh;
+    width: 25cqh;
+}
+
+#replay .options .replayDataContainer .replaySaveButton {
+    position: relative;
+    height: 7cqh;
+    aspect-ratio: 1;
+    background-image: url("../../assets/images/descriptions/save.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#replay .options .replayDataContainer .replaySaveButton::before {
+    font-size: 3cqh;
+    content: "保存する";
+    position: absolute;
+    bottom: 10%;
+    left: 120%;
+    background-color: #eee8;
+    border-radius: 1cqh;
+    border: 0.2cqh #2894 solid;
+    padding: 1cqh;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#replay .options .replayDataContainer .replaySaveButton:focus::before {
+    opacity: 1;
+}
+
+#replay .options .replayDataContainer .replaySaveButton.replaySavedButton {
+    opacity: 0.5;
+    filter: hue-rotate(30deg);
+}
+
+#replay .options .replayDataContainer .replaySaveButton.replaySavedButton#replay .options .replayDataContainer .replaySaveButton.replaySavedButton::before {
+    content: "保存済み";
+}
+
+#savedReplay .text {
+    font-size: 5cqh;
+}
+
+#savedReplay .options {
+    padding-top: 4cqh;
+    padding-bottom: 4cqh;
+    height: 50cqh;
+    width: 130cqh;
+    overflow-y: auto;
+    background-color: #dddddd88;
+    border-radius: 4cqh;
+    justify-content: start;
+    border: 1cqh #5acd solid;
+}
+
+#savedReplay .options::-webkit-scrollbar {
+    width: 3.5cqh;
+}
+
+#savedReplay .options::-webkit-scrollbar-track {
+    background: #ccc0;
+    border-radius: 2cqh;
+}
+
+#savedReplay .options::-webkit-scrollbar-thumb {
+    background: #678;
+    border-radius: 2cqh;
+    border: 0.4cqh solid #456;
+}
+
+#savedReplay .options::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+#savedReplay .options .replayDataContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2cqh;
+}
+
+#savedReplay .options .replayDataContainer .replayButton {
+    font-size: 4.5cqh;
+    margin-left: -10cqh;
+}
+
+#savedReplay .options .replayDataContainer .replayButton:focus {
+    scale: 1;
+}
+
+#savedReplay .options .replayDataContainer .replayDataDescription {
+    font-size: 3cqh;
+    width: 25cqh;
+}
+
+#savedReplay .options .replayDataContainer .replayDeleteButton {
+    position: relative;
+    height: 7cqh;
+    aspect-ratio: 1;
+    background-image: url("../../assets/images/descriptions/delete.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+#savedReplay .options .replayDataContainer .replayDeleteButton::before {
+    font-size: 3cqh;
+    content: "削除する";
+    position: absolute;
+    bottom: 10%;
+    left: 120%;
+    background-color: #eee8;
+    border-radius: 1cqh;
+    border: 0.2cqh #2894 solid;
+    padding: 1cqh;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#savedReplay .options .replayDataContainer .replayDeleteButton:focus::before {
+    opacity: 1;
+}
+
+:is(#replay, #savedReplay) .options .replayDataContainer {
+    display: grid;
+    grid-template-columns: 65cqh 25cqh 7cqh;
+    gap: 2cqh;
+    flex-shrink: 0;
+    margin-left: -10cqh;
+    height: 13cqh;
+}
+
+:is(:is(#replay, #savedReplay) .options .replayDataContainer) .button {
+    background-color: transparent;
+    border: 0;
+    border-bottom: 0.5cqh solid transparent;
+    margin-left: 0;
+}
+
+:is(:is(:is(#replay, #savedReplay) .options .replayDataContainer) .button):focus {
+    border-bottom-color: #ff90be;
+}
+
+:is(:is(#replay, #savedReplay) .options .replayDataContainer) .replayButton {
+    font-size: 4.5cqh;
+    margin-left: 0;
+}
+
+:is(:is(#replay, #savedReplay) .options .replayDataContainer) .replayDataDescription {
+    width: 35cqh;
+    font-size: 2.8cqh;
+    text-wrap: wrap;
+}
+
+.replaySaveButton::before,
+.replayDeleteButton::before {
+    width: max-content;
+    margin: 0;
+    white-space: nowrap;
+}
+
+#result,
+#replayResult {
+    padding: 17cqh 8cqh 5cqh;
+    justify-content: flex-start;
+    gap: 3cqh;
+}
+
+#result .resultLabel,
+#replayResult .resultLabel {
+    font-size: 8cqh;
+    line-height: 1.25;
+}
+
+#result .options,
+#replayResult .options {
+    gap: 8cqh;
+    margin: 0;
+}
+
+#result .options .button,
+#replayResult .options .button {
+    font-size: 4.7cqh;
+}
+
+.resultSummary {
+    display: flex;
+    justify-content: center;
+    width: 116cqh;
+    gap: 5cqh;
+    padding: 2cqh;
+    border-radius: 1.5cqh;
+    border: 0.3cqh solid var(--panel-border);
+    background: var(--panel);
+}
+
+.resultSummaryCell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5cqh;
+    min-width: 27cqh;
+}
+
+.resultSummaryCell span:first-child {
+    font-size: 2.8cqh;
+    color: #228899;
+}
+
+.resultSummaryCell span:last-child {
+    font-size: 4cqh;
+    font-family: "RocknRoll One", Arial;
+}
+
+.resultHighlights {
+    width: 116cqh;
+    min-height: 12cqh;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1cqh 3cqh;
+    align-content: center;
+}
+
+.recordBadge {
+    font-size: 3cqh;
+    padding: 0.8cqh 1.5cqh;
+    background: #fff6df;
+    border: 0.25cqh solid #e1bb64;
+    border-radius: 1cqh;
+}
+
+.achievementEarned {
+    display: flex;
+    gap: 1.5cqh;
+    width: 100%;
+}
+
+.achievementEarned span:last-child {
+    font-size: 2.8cqh;
+}
+
+.achievementEarned .achievementTriangle {
+    display: block;
+    flex: none;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    background: linear-gradient(135deg, #ffffff90, transparent 45%, #00000030), var(--trophy-color, #e5b833);
+    width: 3cqh;
+    height: 2.6cqh;
+}
+
+.achievementEarned .achievementTriangle.bronze {
+    --trophy-color: #ba793f;
+}
+
+.achievementEarned .achievementTriangle.silver {
+    --trophy-color: #a1b1c3;
+}
+
+.achievementEarned .achievementTriangle.gold {
+    --trophy-color: #e5b833;
+}
+
+#detailedResult .subPage {
+    width: 132cqh;
+    padding: 3cqh;
+    background: var(--panel);
+    border-radius: 2cqh;
+    border: 0.3cqh solid #bbdfe9;
+    gap: 4cqh;
+}
+
+#detailedResult .subPage .text {
+    font-size: 3.3cqh;
+    line-height: 1.7;
+}
+
+#detailedResult .resultAccomplishments {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+#detailedResult .resultAccomplishments .text {
+    font-size: 3.6cqh;
+}
+
+@media (max-width: 900px), (max-height: 600px) {
+    #detailedResult .subPage {
+        flex-wrap: wrap;
+    }
+    #detailedResult .subPage {
+        gap: 2cqh 4cqh;
+    }
+}

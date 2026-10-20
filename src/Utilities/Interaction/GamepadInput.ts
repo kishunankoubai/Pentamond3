@@ -1,5 +1,5 @@
 import { LoopManager } from "../Loop/LoopManager";
-import { MyEventListener } from "../MyEventListener";
+import { MyEventListener } from "../Event/MyEventListener";
 import { readGamepads } from "./GamepadAccess";
 
 export interface GamepadButtonInfo {

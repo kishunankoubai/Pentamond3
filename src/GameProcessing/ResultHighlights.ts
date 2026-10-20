@@ -1,4 +1,4 @@
-import type { PlayStatisticData, PlayStatisticKey } from "../PlayStatistics";
+import type { PlayStatisticData, PlayStatisticKey } from "../Storage/PlayStatistics";
 
 /** 集計前後の差だけを見るので、従来と同じ比較条件・保存形式を維持する。 */
 export function newRecordHighlights(before: Readonly<PlayStatisticData>, after: Readonly<PlayStatisticData>): string[] {

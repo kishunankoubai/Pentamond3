@@ -1,7 +1,7 @@
-import { qsAddEvent } from "../Utils";
-import { sceneManager } from "../Utilities/SceneManager";
-import { defaultMaxGameTime } from "../Settings";
-import { getModeHelpPageId } from "../HelpPages";
+import { htmlQSAddEvent } from "../Utilities/Element/Query";
+import { sceneManager } from "../Utilities/Scene/SceneManager";
+import { defaultMaxGameTime } from "../Config/GameConfig";
+import { getModeHelpPageId } from "../UI/HelpPages";
 
 export type PlaySetting = Readonly<EditablePlaySetting>;
 
@@ -35,19 +35,19 @@ export class PlaySettingSetter {
 
     static setEvents() {
         // モードを決める
-        qsAddEvent(".button[data-mode]", "click", (element) => {
+        htmlQSAddEvent(".button[data-mode]", "click", (element) => {
             // 一人プレイの時は聞かれないので1にしておく
             this.playSetting.playerNumber = 1;
             this.playSetting.mode = Number(element.dataset.mode);
         });
 
         // 人数を決める
-        qsAddEvent(".button[data-player]", "click", (element) => {
+        htmlQSAddEvent(".button[data-player]", "click", (element) => {
             this.playSetting.playerNumber = Number(element.dataset.player);
             this.playSetting.handy = Array.from({ length: this.playSetting.playerNumber }, (_, index) => this.playSetting.handy[index] ?? 1);
         });
 
-        qsAddEvent("#playPrepareSettingButton", "click", () => {
+        htmlQSAddEvent("#playPrepareSettingButton", "click", () => {
             sceneManager.g$currentPageManager?.openPage(this.playSetting.mode === 1 ? "survivalPlaySetting" : "linePlaySetting");
         });
 

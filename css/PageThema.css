@@ -1,3 +1,4 @@
+/* ゲーム共通の書体・配色・基本レイアウト・操作部品。個別ページはpages/へ。 */
 @font-face {
     font-family: "RocknRoll One";
     src: url("../assets/fonts/rocknrollone/RocknRollOne-Regular.ttf") format("truetype");
@@ -5,9 +6,7 @@
     font-weight: 400;
     font-display: swap;
 }
-/* Mochiy Pop P Oneの幅の狭い全角約物がSafariで前の文字へ重なる場合がある。
-   記号だけ全角幅のRocknRoll Oneを使い、本文・文字送り・フォント原本は変えない。
-   unicode-rangeは描画対象の指定であり、フォントファイルの加工ではない。 */
+
 @font-face {
     font-family: "Pentamond Punctuation";
     src: url("../assets/fonts/rocknrollone/RocknRollOne-Regular.ttf") format("truetype");
@@ -16,26 +15,26 @@
     font-display: swap;
     unicode-range: U+FF01, U+FF1A;
 }
+
 @font-face {
     font-family: "Mochiy Pop P One";
     src: url("../assets/fonts/mochiypoppone/MochiyPopPOne-Regular.ttf") format("truetype");
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    /* 比例幅の約物を、ブラウザー側でさらに詰めない。フォント自体は改変しない。 */
-    font-feature-settings: "palt" 0, "halt" 0, "chws" 0;
+    font-feature-settings:
+        "palt" 0,
+        "halt" 0,
+        "chws" 0;
 }
+
 * {
-    /* min-height: fit-content;
-    min-width: fit-content; */
     font-family: "Pentamond Punctuation", "Mochiy Pop P One", Arial;
     font-size: 6cqh;
     align-items: center;
     justify-content: center;
-    /* color: #6bd; */
     color: #6bd;
     text-wrap: nowrap;
-    /* box-sizing: border-box; */
 }
 
 .cursorHidden,
@@ -45,7 +44,6 @@
 
 html {
     background-color: #9ce;
-    /* Safariの文字自動拡大で、ゲーム領域の寸法と文字サイズがずれるのを防ぐ。 */
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     font-kerning: none;
@@ -57,7 +55,6 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    /* 画面高ではなくゲーム領域の高さ(cqh)を各画面の共通単位にする。 */
     width: min(100vw, calc(100vh * 14 / 9));
     height: min(100vh, calc(100vw * 9 / 14));
     container-type: size;
@@ -66,36 +63,20 @@ body {
     max-height: 100%;
     min-width: 0;
     min-height: 0;
-    background-color: #ffffff;
     border: min(1vh, calc(9vw / 14)) white solid;
     border-radius: 1cqh;
-    &::before {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        content: "";
-        inset: 0;
-        background-image: url("../assets/images/backgrounds/背景1.png");
-        background-repeat: no-repeat;
-        background-size: cover;
-        z-index: -1;
-        opacity: 0.05;
-    }
 }
 
-.texture {
-    left: -66%;
-    top: -66%;
-    width: 166%;
-    height: 166%;
+body::before {
     position: absolute;
-    /* background-image: url("../assets/images/backgrounds/washi-pattern-03.jpg"); */
-    opacity: 0.1;
-    z-index: 10;
-    background-repeat: repeat;
-    background-size: 16.6% 16.6%;
-    pointer-events: none;
-    /* display: none; */
+    width: 100%;
+    height: 100%;
+    content: "";
+    inset: 0;
+    background-image: url("../assets/images/backgrounds/背景1.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index: -1;
 }
 
 .page {
@@ -117,60 +98,54 @@ body {
     align-items: center;
     flex-direction: column;
     gap: 3cqh;
-    &[data-direction="row"] {
-        flex-direction: row;
-    }
+}
+
+.options[data-direction="row"] {
+    flex-direction: row;
 }
 
 .button,
 .selector {
     color: #ffca3e;
     cursor: pointer;
-    /* padding: 2cqh; */
     border-bottom: #22222200 0.5cqh solid;
-    margin-left: -6cqh;
-    transition:
-        border-color 150ms ease-in-out,
-        color 150ms ease-in-out;
-    &:active {
-        scale: 0.98;
-    }
-    &::before {
-        content: "★ ";
-        font-size: 6cqh;
-        opacity: 0;
-        transition: opacity 100ms ease-in-out;
-        color: #ff90be;
-    }
+}
 
-    &:focus {
-        outline: none;
-        border: none;
-        border-bottom: #ff90be 0.5cqh solid;
-        color: #ff90be;
-        &::before {
-            opacity: 1;
-            transition: opacity 200ms ease-in-out;
-        }
-    }
+:is(.button, .selector):active {
+    scale: 0.98;
+}
+
+:is(.button, .selector)::before {
+    content: "★ ";
+    font-size: 6cqh;
+    opacity: 0;
+    color: #ff90be;
+}
+
+:is(.button, .selector):focus {
+    outline: none;
+    border: none;
+    border-bottom: #ff90be 0.5cqh solid;
+    color: #ff90be;
+}
+
+:is(:is(.button, .selector):focus)::before {
+    opacity: 1;
 }
 
 .headingLabel {
     background-color: #aee5;
     position: absolute;
-    padding: 0.5cqh;
     padding-left: 7cqh;
     padding-right: 140cqh;
     top: 2cqh;
     left: 5cqh;
-    font-size: 8cqh;
     border: 1cqh double #8aba;
     border-radius: 0.5cqh;
     color: #289;
 }
 
 .back {
-    position: absolute;
     bottom: 3cqh;
     left: 8cqh;
     padding: 1.5cqh;
@@ -184,51 +159,395 @@ p {
     justify-content: center;
 }
 
-#talk {
-    & .namePanel {
-        top: 49cqh;
-        left: 17.5cqh;
-        height: 9cqh;
-        aspect-ratio: 4 / 1;
-        border: #222244 0.6cqh solid;
-        border-radius: 3cqh;
-        background-color: #8888aa;
-        font-size: 6cqh;
-        box-shadow: 1cqh 1cqh 2cqh #33333366;
-        text-align: center;
-        line-height: 7cqh;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
+#talk .namePanel {
+    top: 49cqh;
+    left: 17.5cqh;
+    height: 9cqh;
+    aspect-ratio: 4 / 1;
+    border: #222244 0.6cqh solid;
+    border-radius: 3cqh;
+    background-color: #8888aa;
+    font-size: 6cqh;
+    box-shadow: 1cqh 1cqh 2cqh #33333366;
+    text-align: center;
+    line-height: 7cqh;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+}
+
+#talk .talkPanel {
+    top: 60cqh;
+    display: block;
+    aspect-ratio: 14 / 4;
+    height: 35cqh;
+    border: #222244 0.8cqh solid;
+    border-radius: 4cqh;
+    background-color: #eeeeeecc;
+    text-align: left;
+    align-items: start;
+    justify-content: left;
+    overflow-wrap: anywhere;
+    text-wrap: wrap;
+    padding-top: 2cqh;
+    padding-left: 3cqh;
+    padding-right: 3cqh;
+    font-size: 6cqh;
+    line-height: 1.6;
+    outline: none;
+    box-shadow: 1cqh 1cqh 2cqh #33333366;
+    position: absolute;
+}
+
+#talk .talkPanel * {
+    text-wrap: wrap;
+}
+
+#talk .talkPanel ruby rt {
+    font-size: 2.5cqh;
+}
+
+.text {
+    text-wrap: wrap;
+}
+
+.subPage {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.subPage .text {
+    font-size: 4cqh;
+}
+
+.subPage .text b {
+    font-size: 4cqh;
+}
+
+.subPageController {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 10cqh;
+    position: absolute;
+    bottom: 4cqh;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.page:has(.popup) {
+    background-color: #0000;
+}
+
+.page:has(.popup) .popup {
+    display: flex;
+    flex-direction: column;
+    gap: 2cqh;
+    background-color: #ddeeff;
+    width: 80%;
+    height: 80%;
+    padding: 3cqh;
+    border: 0.5cqh #bde8 solid;
+    border-radius: 3cqh;
+    position: relative;
+}
+
+.page:has(.popup) .popup .headingLabel {
+    padding: 0.5cqh;
+    padding-left: 7cqh;
+    padding-right: 7cqh;
+    border: 1cqh solid #4aba;
+    border-radius: 2cqh;
+    font-size: 6cqh;
+}
+
+.page:has(.popup) .popup .text {
+    font-size: 4cqh;
+    text-align: center;
+    line-height: 1.8;
+    max-width: 90%;
+}
+
+#replayDeleteConfirmButton,
+#dataDeleteConfirmButton {
+    color: #ee8888;
+    font-size: 8cqh;
+}
+
+.scrollableContainer {
+    padding-top: 4cqh;
+    padding-bottom: 4cqh;
+    height: 50cqh;
+    width: 130cqh;
+    overflow-y: auto;
+    background-color: #dddddd88;
+    border-radius: 4cqh;
+    justify-content: start;
+    align-items: center;
+    border: 1cqh #5acd solid;
+    display: flex;
+    flex-direction: column;
+    gap: 2cqh;
+}
+
+.scrollableContainer::-webkit-scrollbar {
+    width: 3.5cqh;
+}
+
+.scrollableContainer::-webkit-scrollbar-track {
+    background: #ccc0;
+    border-radius: 2cqh;
+}
+
+.scrollableContainer::-webkit-scrollbar-thumb {
+    background: #678;
+    border-radius: 2cqh;
+    border: 0.4cqh solid #456;
+}
+
+.scrollableContainer::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+.scrollableContainer .selectedValue {
+    color: #ee8888;
+    border: #2ac 0.5cqh dashed;
+    border-radius: 1cqh;
+}
+
+.selectWithDescription {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.selectWithDescriptionOptions {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.selectWithDescriptionOptions * {
+    font-size: 5cqh;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(1):focus) ~ .selectOptionDescriptions :nth-child(1) {
+    display: flex;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(2):focus) ~ .selectOptionDescriptions :nth-child(2) {
+    display: flex;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(3):focus) ~ .selectOptionDescriptions :nth-child(3) {
+    display: flex;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(4):focus) ~ .selectOptionDescriptions :nth-child(4) {
+    display: flex;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(5):focus) ~ .selectOptionDescriptions :nth-child(5) {
+    display: flex;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(6):focus) ~ .selectOptionDescriptions :nth-child(6) {
+    display: flex;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(7):focus) ~ .selectOptionDescriptions :nth-child(6) {
+    display: flex;
+}
+
+.selectWithDescriptionOptions:has(.button:nth-child(8):focus) ~ .selectOptionDescriptions :nth-child(6) {
+    display: flex;
+}
+
+.selectOptionDescriptions > * {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.selectOptionDescriptions .text {
+    margin-left: 5cqh;
+    margin-right: auto;
+}
+
+:root {
+    --ink: #6bd;
+    --heading-ink: #228899;
+    --panel: #f4faffed;
+    --panel-border: #8cc8db;
+}
+
+body {
+    background-color: #f9fcff;
+}
+
+body::before {
+    opacity: 0.035;
+}
+
+.text,
+.label,
+.helpContent,
+.lessonGuide,
+.statisticRow,
+.controllerMappingLabel,
+.achievementCategory,
+.achievementDetail,
+.resultSummary {
+    text-shadow:
+        0 0 0.12cqh #fff,
+        0.07cqh 0.07cqh 0 #417c9359;
+}
+
+.button,
+.selector {
+    position: relative;
+    margin-left: 0;
+    text-shadow:
+        0 0 0.14cqh #fff,
+        0.08cqh 0.08cqh 0 #805a3a88;
+}
+
+.button::before,
+.selector::before {
+    content: "★";
+    position: static;
+    display: inline-block;
+    font-size: 1em;
+    width: 1em;
+    margin: 0 0.12em 0 -1.12em;
+    vertical-align: baseline;
+    white-space: normal;
+    pointer-events: none;
+}
+
+.button:focus,
+.selector:focus {
+    border-bottom-color: #ff90be;
+    text-shadow:
+        0 0 0.14cqh #fff,
+        0.08cqh 0.08cqh 0 #a94b7388;
+}
+
+.selectedValue:not(:focus) {
+    color: #228899 !important;
+    border-bottom-color: #228899 !important;
+    background-color: #dceff7;
+    box-shadow: inset 0 0 0 0.2cqh #78bbcd;
+    border-radius: 0.6cqh;
+}
+
+.selectedValue:focus {
+    color: #ff90be !important;
+    background-color: #dceff7;
+    box-shadow: inset 0 0 0 0.2cqh #78bbcd;
+    border-radius: 0.6cqh;
+}
+
+.selector {
+    padding-inline: 1.12em;
+}
+
+.button[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: default;
+    pointer-events: none;
+}
+
+.button[aria-disabled="true"][data-focus-when-disabled="true"] {
+    pointer-events: auto;
+}
+
+.back {
+    position: absolute;
+}
+
+.headingLabel {
+    width: calc(100% - 10cqh);
+    padding: 0.8cqh 5cqh;
+    text-align: left;
+    font-size: 7cqh;
+    background: linear-gradient(90deg, #ddf2fa, #edf7fcdd);
+    border-color: #8cc8db;
+    box-shadow: 0 0.3cqh 0.6cqh #40708014;
+}
+
+.page:has(.popup) {
+    background: #172d4933;
+}
+
+.page:has(.popup) .popup {
+    background: #eff8ff;
+    border-color: #8cc8db;
+    box-shadow: 0 1cqh 4cqh #17304b33;
+}
+
+.page:has(.popup) .popup > .headingLabel {
+    left: 5cqh;
+    right: 5cqh;
+    width: auto;
+    padding: 1cqh 3cqh;
+    font-size: 5.5cqh;
+}
+
+.popup .text {
+    text-wrap: wrap;
+}
+
+.selectWithDescription {
+    width: max-content;
+    max-width: 140cqh;
+    gap: 5cqh;
+    align-items: center;
+}
+
+.selectWithDescriptionOptions {
+    flex: none;
+    margin-left: 0;
+    gap: 4cqh;
+    min-width: 0;
+    align-items: flex-end;
+}
+
+.selectOptionDescriptions {
+    flex: none;
+    width: 77cqh;
+}
+
+.selectOptionDescriptions > div {
+    min-height: 30cqh;
+    padding: 3cqh;
+    box-sizing: border-box;
+    border: 0.3cqh solid #bbdfe9;
+    border-radius: 2cqh;
+    background: var(--panel);
+    margin-left: 10cqh;
+}
+
+.selectOptionDescriptions .text {
+    margin: 0;
+    font-size: 4cqh;
+    line-height: 1.65;
+    text-wrap: nowrap;
+}
+
+@media (max-width: 900px), (max-height: 600px) {
+    .selectWithDescription {
+        gap: 5cqh;
     }
-    & .talkPanel {
-        top: 60cqh;
-        display: block;
-        aspect-ratio: 14 / 4;
-        height: 35cqh;
-        border: #222244 0.8cqh solid;
-        border-radius: 4cqh;
-        background-color: #eeeeeecc;
-        text-align: left;
-        align-items: start;
-        justify-content: left;
-        overflow-wrap: anywhere;
-        text-wrap: wrap;
-        padding-top: 2cqh;
-        padding-left: 3cqh;
-        padding-right: 3cqh;
-        font-size: 6cqh;
-        line-height: 1.6;
-        outline: none;
-        box-shadow: 1cqh 1cqh 2cqh #33333366;
-        position: absolute;
-        & * {
-            text-wrap: wrap;
-        }
-        & ruby {
-            & rt {
-                font-size: 2.5cqh;
-            }
-        }
+    .selectOptionDescriptions > div {
+        padding: 3cqh;
+    }
+    .selectOptionDescriptions .text {
+        font-size: 4cqh;
+    }
+    .selectOptionDescriptions .text {
+        line-height: 1.65;
     }
 }

@@ -1,12 +1,12 @@
 import { AutoInputData } from "../Utilities/Interaction/AutoInputObserver";
-import * as Setting from "../Settings";
+import * as Setting from "../Config/GameConfig";
 
 import { ReplayDom } from "./ReplayDom";
 import { ReplayDataHandler } from "./ReplayDataHandler";
 import { ReplayEventSetter } from "./ReplayEventSetter";
 import { PlaySetting } from "../BeforePlaying/PlaySettingSetter";
-import { qsAll } from "../Utils";
-import { sceneManager } from "../Utilities/SceneManager";
+import { htmlQSAll } from "../Utilities/Element/Query";
+import { sceneManager } from "../Utilities/Scene/SceneManager";
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 
@@ -26,18 +26,6 @@ export type ReplayData = {
     date: number;
 };
 
-/**
- * replay関係のインターフェース
- * これ以外は触ってはいけない
- * 親から子へ命令を送る
- * 子が親または兄弟の情報を使うべきではない
- *
- * まだそれは為されていない
- *
- * model: DataHandler
- * view: Dom
- * controller: Replay, EventSetter
- */
 export class Replay {
     private static renderedSavedPages = new WeakMap<Element, string>();
     static async deleteAllData(): Promise<void> {
@@ -85,17 +73,17 @@ export class Replay {
 
         return ReplayDataHandler.saveReplayData(replayData, {
             onOverMax: () => {
-                pageManager.openPage("replaySaveAlert");
+                pageManager.openPage("replaySaveLimit");
             },
             onError: () => {
-                pageManager.openPage("replaySaveAlert2");
+                pageManager.openPage("replaySaveFailure");
             },
         });
     }
 
     static updateTempReplaySaveButton() {
         const dateList = ReplayDataHandler.getDateList();
-        const saveButtons = qsAll("#replay .replaySaveButton");
+        const saveButtons = htmlQSAll("#replay .replaySaveButton");
 
         saveButtons.forEach((saveButton) => {
             const index = saveButtons.findIndex((button) => button == saveButton);

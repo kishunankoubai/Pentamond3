@@ -1,4 +1,4 @@
-import { MyEvent, MyEventListener } from "../MyEventListener";
+import { MyEvent, MyEventListener } from "../Event/MyEventListener";
 import { AutoInputObserver } from "./AutoInputObserver";
 import { GamepadObserver } from "./GamepadObserver";
 import { InputObserver } from "./InputObserver";

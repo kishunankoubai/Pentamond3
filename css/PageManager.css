@@ -1,3 +1,4 @@
+/* ページシステムに必要なリセット・表示領域。ゲームの装飾や個別ページは含めない。 */
 * {
     margin: 0;
     padding: 0;
@@ -43,8 +44,7 @@ body {
     overflow: hidden;
 }
 
-.page,
-#invalidPanel {
+.page {
     left: 0;
     top: 0;
     display: none;

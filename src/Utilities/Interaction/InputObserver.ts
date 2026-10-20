@@ -1,5 +1,5 @@
 import { getMaxElements } from "../Common";
-import { MyEventListener } from "../MyEventListener";
+import { MyEventListener } from "../Event/MyEventListener";
 
 export type InputInfo = {
     readonly name: string;

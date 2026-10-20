@@ -2,7 +2,7 @@
 export class InputActivation {
     private static depth = 0;
 
-    static get active(): boolean {
+    static get g$active(): boolean {
         return this.depth > 0;
     }
 

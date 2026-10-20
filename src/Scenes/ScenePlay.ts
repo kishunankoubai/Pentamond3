@@ -1,6 +1,6 @@
 import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
 import { GameProcessing } from "../GameProcessing/GameProcessing";
-import { playBackground, setupPlayBackground } from "../PlayBackground";
+import { playBackground, setupPlayBackground } from "../Rendering/PlayBackground";
 import { ElementEventSetter } from "../Utilities/Element/ElementEventSetter";
 import { ElementManager } from "../Utilities/Element/ElementManager";
 import { inputManager } from "../Utilities/Interaction/InputManager";
@@ -8,13 +8,14 @@ import { InputInfo, InputObserver } from "../Utilities/Interaction/InputObserver
 import { PageInteraction } from "../Utilities/Interaction/PageInteraction";
 import { PageInteractionSetter } from "../Utilities/Interaction/PageInteractionSetter";
 import { MusicManager } from "../Utilities/Music/MusicManager";
-import { Scene } from "../Utilities/SceneManager";
-import { MyEvent } from "../Utilities/MyEventListener";
+import { Scene } from "../Utilities/Scene/SceneManager";
+import { MyEvent } from "../Utilities/Event/MyEventListener";
 import { PageManager } from "../Utilities/Page/PageManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
-import { KeyboardSettingManager } from "../KeyboardSettingManager";
-import { applyPageTransitions } from "../Utilities/Element/PageTransitions";
+import { KeyboardSettingManager } from "../Input/KeyboardSettingManager";
+import { applyPageTransitions, setupMenuFeedback } from "../UI/Presentation";
+import { spaceJapaneseHTML } from "../Utilities/Text/JapaneseText";
 
 export class ScenePlay extends Scene {
     private elementManager: ElementManager;
@@ -27,7 +28,9 @@ export class ScenePlay extends Scene {
         super(htmlPath);
         this.elementManager = new ElementManager(this);
         this.pageInteraction = new PageInteraction(this);
+        setupMenuFeedback(this.pageInteraction);
         this.talkManager = new TalkManager(this);
+        this.talkManager.talkPanel.s$htmlResolver = spaceJapaneseHTML;
         this.sceneSetters.push(
             new ElementEventSetter(this.elementManager),
             new PageInteractionSetter(this.pageInteraction),

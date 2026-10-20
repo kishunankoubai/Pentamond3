@@ -1,6 +1,6 @@
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
-import type { PlayStatisticData } from "../PlayStatistics";
-import { globalValues } from "../Global";
+import type { PlayStatisticData } from "../Storage/PlayStatistics";
+import { globalValues } from "../Config/UserSettings";
 import { isStandardSurvivalRecord } from "../Game/SurvivalRules";
 import { UInt32Codec } from "../Utilities/Data/UInt32Codec";
 import { PageNotice } from "../Utilities/Feedback/PageNotice";
@@ -23,19 +23,22 @@ export class Achievements {
         const count = (grade?: AchievementGrade) => {
             const items = achievements.filter((achievement) => !grade || achievement.grade === grade);
             const achieved = items.filter((achievement) => this.isAchieved(achievement.id)).length;
-            return { achieved, total: items.length, percentage: items.length ? achieved / items.length * 100 : 0 };
+            return { achieved, total: items.length, percentage: items.length ? (achieved / items.length) * 100 : 0 };
         };
         return { ...count(), grades: { gold: count("gold"), silver: count("silver"), bronze: count("bronze") } };
     }
 
-    static get allAchieved(): boolean { return achievements.every(({ id }) => this.isAchieved(id)); }
+    static get g$allAchieved(): boolean {
+        return achievements.every(({ id }) => this.isAchieved(id));
+    }
 
-    static achievedIds(): string[] { return achievements.filter(({ id }) => this.isAchieved(id)).map(({ id }) => id); }
+    static achievedIds(): string[] {
+        return achievements.filter(({ id }) => this.isAchieved(id)).map(({ id }) => id);
+    }
 
     static getProgress(id: string): { current: number; target: number; unit: string } | null {
         const achievement = achievements.find((item) => item.id === id);
-        if (achievement?.counter !== undefined && achievement.target !== undefined)
-            return { current: this.counters[achievement.counter], target: achievement.target, unit: "回" };
+        if (achievement?.counter !== undefined && achievement.target !== undefined) return { current: this.counters[achievement.counter], target: achievement.target, unit: "回" };
         if (id === "tricks-all") return { current: this.counters.slice(0, achievementTricks.length).filter((count) => count > 0).length, target: achievementTricks.length, unit: "種類" };
         return null;
     }
@@ -86,12 +89,16 @@ export class Achievements {
 
     static reflectTutorial(units: readonly { id: string; cleared: boolean }[]): void {
         this.change(() => {
-            units.forEach(({ id, cleared }) => { if (cleared) this.unlock(`tutorial-${id}`); });
+            units.forEach(({ id, cleared }) => {
+                if (cleared) this.unlock(`tutorial-${id}`);
+            });
             if (units.length && units.every(({ cleared }) => cleared)) this.unlock("tutorial-all");
         });
     }
 
-    static recordReplaySaved(): void { this.change(() => this.unlock("replay-saved")); }
+    static recordReplaySaved(): void {
+        this.change(() => this.unlock("replay-saved"));
+    }
 
     static recordCompletedGame(game: DisposableGame): void {
         if (!game.g$hasStarted || !game.g$hasFinished || game.isReplay() || this.recordedGames.has(game)) return;
@@ -102,7 +109,7 @@ export class Achievements {
             this.counters[countIndex] = Math.min(UInt32Codec.max, this.counters[countIndex] + 1);
             game.players.forEach((player) => {
                 const info = player.playInfo;
-                player.trickCounts.forEach((count, i) => this.counters[i] = Math.min(UInt32Codec.max, this.counters[i] + count));
+                player.trickCounts.forEach((count, i) => (this.counters[i] = Math.min(UInt32Codec.max, this.counters[i] + count)));
                 if (mode === 1) {
                     const standard = isStandardSurvivalRecord(info);
                     this.evaluateSurvival(info.score, info.playTime, standard);
@@ -136,7 +143,9 @@ export class Achievements {
 
     private static evaluateSprintTime(time: number): void {
         if (!Number.isFinite(time) || time <= 0) return;
-        achievements.forEach(({ id, target }) => { if (id.startsWith("sprint-time-") && target !== undefined && time <= target) this.unlock(id); });
+        achievements.forEach(({ id, target }) => {
+            if (id.startsWith("sprint-time-") && target !== undefined && time <= target) this.unlock(id);
+        });
     }
 
     private static change(action: () => void): void {
@@ -145,14 +154,17 @@ export class Achievements {
         if (before === this.values().join(",") || globalValues.nosave) return;
         const values = this.values();
         while (values.at(-1) === 0) values.pop();
-        try { localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values)); }
-        catch (error) {
+        try {
+            localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values));
+        } catch (error) {
             console.warn("実績を保存できませんでした。 今回の起動中は保持します。", error);
             PageNotice.notify("実績を保存できませんでした。 今回の起動中は保持しますが、 再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
         }
     }
 
-    private static values(): number[] { return [...this.flags, ...this.counters]; }
+    private static values(): number[] {
+        return [...this.flags, ...this.counters];
+    }
 
     static reset(): void {
         // 空の現行形式を残し、明示的な削除後に旧リプレイから実績を復元しない。
@@ -162,7 +174,10 @@ export class Achievements {
     }
 
     static getDataSize(): number {
-        try { return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size; }
-        catch { return 0; }
+        try {
+            return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size;
+        } catch {
+            return 0;
+        }
     }
 }

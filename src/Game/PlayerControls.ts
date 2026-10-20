@@ -1,11 +1,11 @@
 import { ControllerRegisterer } from "../BeforePlaying/ControllerRegisterer";
-import * as Setting from "../Settings";
-import { EventScope } from "../Utilities/EventScope";
+import * as Setting from "../Config/GameConfig";
+import { EventScope } from "../Utilities/Event/EventScope";
 import type { GamePlayer } from "./GamePlayer";
 import type { OperateName } from "./GameMode";
 import { operationKeyCodes } from "./Operations";
 import type { InputInfo } from "../Utilities/Interaction/InputObserver";
-import { KeyboardSettingManager } from "../KeyboardSettingManager";
+import { KeyboardSettingManager } from "../Input/KeyboardSettingManager";
 
 /** モードによらない操作・押しっぱなし処理。入力の観測はUtilitiesに任せる。 */
 export function bindPlayerControls(player: GamePlayer, playerIndex: number, events: EventScope): void {
@@ -53,7 +53,7 @@ export function bindPlayerControls(player: GamePlayer, playerIndex: number, even
             const pressTime = Date.now() - input.getPressTime(key);
             if (key && pressTime >= Setting.input.delayTime) {
                 if (pressTime - lastRepeatTime >= Setting.input.repeatTime) {
-                    player.clock.schedule(player.clock.now, () => operate(key), 1);
+                    player.clock.schedule(player.clock.g$now, () => operate(key), 1);
                     lastRepeatTime = pressTime;
                 }
             } else lastRepeatTime = 0;

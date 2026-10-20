@@ -1,155 +1,229 @@
-#operateTutorial, #BasicRule, #advancedRule, #trickTutorial {
-    & .text {
-        font-size: 3.2cqh;
-        margin: 1cqh 0;
-    }
-    & .lessonList {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        grid-auto-rows: minmax(10cqh, auto);
-        align-items: stretch;
-        width: 132cqh;
-        gap: 3cqh;
-        margin-top: 4cqh;
-    }
-    & .lessonButton {
-        font-size: 3.8cqh;
-        width: 100%;
-        min-width: 0;
-        min-height: 10cqh;
-        padding: 0.6cqh 1cqh 0.6cqh calc(1cqh + 1.12em);
-        white-space: normal;
-        text-wrap: wrap;
-        overflow-wrap: anywhere;
-        line-height: 1.5;
-    }
-    & .lessonCleared {
-        border-color: #6bd;
-    }
-    & .lessonLocked {
-        color: #929bad;
-        opacity: 0.65;
-    }
-    & .back {
-        margin-top: 5cqh;
-    }
+/* 養成所の単元一覧と教習画面。 */
+#tutorial .options {
+    gap: 7cqh;
 }
-#BasicRule .lessonButton, #advancedRule .lessonButton {
+
+:is(#operateTutorial, #basicRuleTutorial, #advancedRule, #trickTutorial) .text {
+    font-size: 3.2cqh;
+    margin: 1cqh 0;
+}
+
+:is(#operateTutorial, #basicRuleTutorial, #advancedRule, #trickTutorial) .lessonList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: minmax(10cqh, auto);
+    align-items: stretch;
+    width: 132cqh;
+    gap: 3cqh;
+    margin-top: 4cqh;
+}
+
+:is(#operateTutorial, #basicRuleTutorial, #advancedRule, #trickTutorial) .lessonButton {
+    font-size: 3.8cqh;
+    width: 100%;
+    min-width: 0;
+    min-height: 10cqh;
+    padding: 0.6cqh 1cqh 0.6cqh calc(1cqh + 1.12em);
+    white-space: normal;
+    text-wrap: wrap;
+    overflow-wrap: anywhere;
+    line-height: 1.5;
+}
+
+:is(#operateTutorial, #basicRuleTutorial, #advancedRule, #trickTutorial) .lessonCleared {
+    border-color: #6bd;
+}
+
+:is(#operateTutorial, #basicRuleTutorial, #advancedRule, #trickTutorial) .lessonLocked {
+    color: #929bad;
+    opacity: 0.65;
+}
+
+:is(#operateTutorial, #basicRuleTutorial, #advancedRule, #trickTutorial) .back {
+    margin-top: 5cqh;
+}
+
+#basicRuleTutorial .lessonButton,
+#advancedRule .lessonButton {
     font-size: 3.4cqh;
 }
-#trickTutorial {
-    & #trickLessonList { width: 132cqh; }
-    & .lessonList { width: 100%; gap: 5cqh; }
-    & .lessonButton { font-size: 4.5cqh; }
+
+#trickTutorial #trickLessonList {
+    width: 132cqh;
 }
+
+#trickTutorial .lessonList {
+    width: 100%;
+    gap: 5cqh;
+}
+
+#trickTutorial .lessonButton {
+    font-size: 4.5cqh;
+}
+
 .tutorialScene.trickLessonScene #lessonGuide {
     height: 82cqh;
     gap: 0.6cqh;
-    & * { font-size: 2.3cqh; line-height: 1.3; }
-    & .lessonSectionHeading { font-size: 2.7cqh; line-height: 1.2; }
-    & #lessonProgress { font-size: 2.6cqh; }
-    & #lessonRuleSummary { font-size: 2.3cqh; }
-    & #lessonTrickExample {
-        width: 100%;
-        & canvas { display: block; width: 100%; height: auto; margin-top: 0.7cqh; }
-    }
-    & #lessonControls { font-size: 2.3cqh; line-height: 1.3; }
 }
-.tutorialScene {
-    & #lessonHeading {
-        position: absolute;
-        top: 2cqh;
-        font-size: 4.5cqh;
-    }
-    & #lessonBoard {
-        position: absolute;
-        top: 10cqh;
-        left: 5cqh;
-        width: 62cqh;
-        height: 82cqh;
-        display: flex;
-        gap: 3cqh;
-        align-items: flex-start;
-        justify-content: flex-start;
-        & .playCanvas {
-            height: 82cqh;
-            width: auto;
-        }
-        & .nextCanvas {
-            width: 15cqh;
-            height: auto;
-            margin-top: 5cqh;
-        }
-    }
-    & #lessonNextLabel {
-        position: absolute;
-        left: 44cqh;
-        top: 1cqh;
-        font-size: 2cqh;
-    }
-    & #lessonGuide {
-        position: absolute;
-        left: 74cqh;
-        top: 11cqh;
-        width: 72cqh;
-        height: 80cqh;
-        padding: 2.5cqh;
-        border-radius: 3cqh;
-        background: #eefc;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 1.2cqh;
-        & * {
-            font-size: 2.7cqh;
-            text-wrap: wrap;
-            line-height: 1.5;
-        }
-        & .lessonSectionHeading {
-            font-size: 3.2cqh;
-            color: #228899;
-            border-bottom: 0.2cqh solid #6bd;
-            width: 100%;
-        }
-        & #lessonProgress {
-            font-size: 3.2cqh;
-            white-space: pre-line;
-        }
-        & #lessonRuleSummary {
-            white-space: pre-line;
-            font-size: 2.8cqh;
-        }
-        & #lessonControls {
-            white-space: pre-line;
-        }
-        & #lessonStatus {
-            margin-top: auto;
-        }
-    }
-    & #lessonPauseHint {
-        position: absolute;
-        left: 5cqh;
-        bottom: 2cqh;
-        font-size: 2.5cqh;
-    }
-    & #talk {
-        background: #2234;
-    }
-    & #talk .talkPanel {
-        left: 6cqh;
-        width: 140cqh;
-        height: 31cqh;
-        top: 61cqh;
-        aspect-ratio: auto;
-        font-size: 4.3cqh;
-    }
-    & #talk .talkPanel * {
-        font-size: inherit;
-    }
-    & #lessonTalkHint {
-        position: absolute;
-        bottom: 2cqh;
-        font-size: 2.5cqh;
-    }
+
+.tutorialScene.trickLessonScene #lessonGuide * {
+    font-size: 2.3cqh;
+    line-height: 1.3;
+}
+
+.tutorialScene.trickLessonScene #lessonGuide .lessonSectionHeading {
+    font-size: 2.7cqh;
+    line-height: 1.2;
+}
+
+.tutorialScene.trickLessonScene #lessonGuide #lessonProgress {
+    font-size: 2.6cqh;
+}
+
+.tutorialScene.trickLessonScene #lessonGuide #lessonRuleSummary {
+    font-size: 2.3cqh;
+}
+
+.tutorialScene.trickLessonScene #lessonGuide #lessonTrickExample {
+    width: 100%;
+}
+
+.tutorialScene.trickLessonScene #lessonGuide #lessonTrickExample canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-top: 0.7cqh;
+}
+
+.tutorialScene.trickLessonScene #lessonGuide #lessonControls {
+    font-size: 2.3cqh;
+    line-height: 1.3;
+}
+
+.tutorialScene #lessonHeading {
+    position: absolute;
+    top: 2cqh;
+    font-size: 4.5cqh;
+}
+
+.tutorialScene #lessonBoard {
+    position: absolute;
+    top: 10cqh;
+    left: 5cqh;
+    width: 62cqh;
+    height: 82cqh;
+    display: flex;
+    gap: 3cqh;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.tutorialScene #lessonBoard .playCanvas {
+    height: 82cqh;
+    width: auto;
+}
+
+.tutorialScene #lessonBoard .nextCanvas {
+    width: 15cqh;
+    height: auto;
+    margin-top: 5cqh;
+}
+
+.tutorialScene #lessonNextLabel {
+    position: absolute;
+    left: 44cqh;
+    top: 1cqh;
+    font-size: 2cqh;
+}
+
+.tutorialScene #lessonGuide {
+    position: absolute;
+    left: 74cqh;
+    top: 11cqh;
+    width: 72cqh;
+    height: 80cqh;
+    padding: 2.5cqh;
+    border-radius: 3cqh;
+    background: #eefc;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1.2cqh;
+}
+
+.tutorialScene #lessonGuide * {
+    font-size: 2.7cqh;
+    text-wrap: wrap;
+    line-height: 1.5;
+}
+
+.tutorialScene #lessonGuide .lessonSectionHeading {
+    font-size: 3.2cqh;
+    color: #228899;
+    border-bottom: 0.2cqh solid #6bd;
+    width: 100%;
+}
+
+.tutorialScene #lessonGuide #lessonProgress {
+    font-size: 3.2cqh;
+    white-space: pre-line;
+}
+
+.tutorialScene #lessonGuide #lessonRuleSummary {
+    white-space: pre-line;
+    font-size: 2.8cqh;
+}
+
+.tutorialScene #lessonGuide #lessonControls {
+    white-space: pre-line;
+}
+
+.tutorialScene #lessonGuide #lessonStatus {
+    margin-top: auto;
+}
+
+.tutorialScene #lessonPauseHint {
+    position: absolute;
+    left: 5cqh;
+    bottom: 2cqh;
+    font-size: 2.5cqh;
+}
+
+.tutorialScene #talk {
+    background: #2234;
+}
+
+.tutorialScene #talk .talkPanel {
+    left: 6cqh;
+    width: 140cqh;
+    height: 31cqh;
+    top: 61cqh;
+    aspect-ratio: auto;
+    font-size: 4.3cqh;
+}
+
+.tutorialScene #talk .talkPanel * {
+    font-size: inherit;
+}
+
+.tutorialScene #lessonTalkHint {
+    position: absolute;
+    bottom: 2cqh;
+    font-size: 2.5cqh;
+}
+
+#tutorialUnlockHint {
+    min-height: 5cqh;
+    margin-top: 2cqh;
+    font-size: 3cqh;
+    color: var(--heading-ink);
+}
+
+.lessonList .lessonButton {
+    text-align: center;
+}
+
+.tutorialScene #lessonNextLabel {
+    display: none;
 }

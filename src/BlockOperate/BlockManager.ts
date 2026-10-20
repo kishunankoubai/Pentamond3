@@ -2,8 +2,8 @@ import { Block, BlockProperty } from "./Block";
 import { spinCorrection, moveCorrection } from "./MondInfo";
 import { Monoiamond } from "./Monoiamond";
 import { Pentiamond } from "./Pentiamond";
-import * as Setting from "../Settings";
-import { TrickInfo, trickInfos } from "../Trick";
+import * as Setting from "../Config/GameConfig";
+import { TrickInfo, trickInfos } from "../Game/Tricks";
 
 export class BlockManager {
     private blocks: Block[][];

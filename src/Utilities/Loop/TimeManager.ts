@@ -1,4 +1,4 @@
-import { MyEventListener } from "../MyEventListener";
+import { MyEventListener } from "../Event/MyEventListener";
 
 export class TimeManager extends MyEventListener {
     /*

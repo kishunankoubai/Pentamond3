@@ -1,3 +1,31 @@
+/* 画面・ボタン・通知のアニメーションとトランジション。 */
+.button,
+.selector {
+    transition:
+        border-color 150ms ease-in-out,
+        color 150ms ease-in-out;
+}
+
+:is(.button, .selector)::before {
+    transition: opacity 100ms ease-in-out;
+}
+
+:is(:is(.button, .selector):focus)::before {
+    transition: opacity 200ms ease-in-out;
+}
+
+#replay .options .replayDataContainer .replaySaveButton::before {
+    transition: opacity 200ms;
+}
+
+#savedReplay .options .replayDataContainer .replayDeleteButton::before {
+    transition: opacity 200ms;
+}
+
+#graphicSetting .options .button {
+    transition: color 100ms ease-in-out;
+}
+
 @keyframes shake {
     0% {
         transform: translateX(0cqh);
@@ -13,48 +41,6 @@
     }
     100% {
         transform: translateX(0cqh);
-    }
-}
-
-#invalidPanel {
-    animation-duration: 200ms;
-    animation-timing-function: ease-out;
-    animation-delay: 0;
-    animation-direction: normal;
-    animation-iteration-count: 1;
-    animation-name: loading;
-}
-
-@keyframes loading {
-    0% {
-        padding-top: 2cqh;
-    }
-    100% {
-        padding-top: 0;
-    }
-}
-
-#loadingCircle {
-    animation-duration: 800ms;
-    animation-timing-function: linear;
-    animation-delay: 0;
-    animation-direction: normal;
-    animation-iteration-count: infinite;
-    animation-name: loadingCircle;
-}
-
-@keyframes loadingCircle {
-    0% {
-        transform: rotate(0deg);
-        filter: hue-rotate(0deg);
-    }
-    50% {
-        transform: rotate(180deg) translateY(-12cqh);
-        filter: hue-rotate(180deg);
-    }
-    100% {
-        transform: rotate(360deg);
-        filter: hue-rotate(0deg);
     }
 }
 
@@ -82,12 +68,6 @@
 #startEffectBase {
     transition-duration: 250ms;
     transition-property: background-color, border;
-    animation-timing-function: ease-in-out;
-    animation-direction: normal;
-    animation-duration: 500ms;
-    animation-name: startEffectBaseAnimation;
-    animation-timing-function: ease-out;
-    animation-fill-mode: forwards;
 }
 
 .startEffectLabel {
@@ -123,7 +103,6 @@
 
 @keyframes startEffectAnimation {
     0% {
-        /* rotate: -10deg; */
         transform: translate3d(0, -50cqh, -20cqh);
         opacity: 0;
         filter: blur(0.5cqh);
@@ -142,7 +121,6 @@
     }
     100% {
         transform: translate3d(0, 50cqh, -40cqh);
-        /* rotate: 270deg; */
         filter: blur(0.5cqh);
         opacity: 0;
     }
@@ -238,5 +216,93 @@
         transform: translate(0cqh);
         filter: blur(0cqh);
         opacity: 1;
+    }
+}
+
+.selectOptionDescriptions * {
+    animation-direction: normal;
+    animation-duration: 400ms;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+    animation-name: none;
+}
+
+.selectOptionDescriptions > div {
+    animation:
+        descriptionAppear 240ms ease-out both,
+        descriptionFloat 4s ease-in-out 240ms infinite;
+}
+
+@keyframes descriptionFloat {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-0.8cqh);
+    }
+}
+
+@keyframes descriptionAppear {
+    from {
+        opacity: 0;
+        transform: translateX(1.5cqh);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .selectOptionDescriptions > div {
+        animation: descriptionFade 120ms ease-out both;
+    }
+}
+
+@keyframes descriptionFade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.playCanvas {
+    transition: background-color 240ms ease-out;
+}
+
+.reducedPlayMotion .playCanvas {
+    transition: none;
+}
+
+.feedbackMessage {
+    animation: feedbackAppear var(--feedback-duration, 200ms) ease-out;
+}
+
+.feedbackPaused .feedbackMessage {
+    animation-play-state: paused;
+}
+
+.reducedPlayMotion .feedbackMessage {
+    animation: none;
+}
+
+#replayControls,
+#replayControls.disabled {
+    transition:
+        opacity 250ms ease-out,
+        visibility 250ms;
+}
+
+@keyframes feedbackAppear {
+    from {
+        opacity: 0;
+        transform: translateY(0.5cqh);
+    }
+    to {
+        opacity: 1;
+        transform: none;
     }
 }

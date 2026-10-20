@@ -1,8 +1,8 @@
 import { getConstructor, getFilteredArray, getMaxElements } from "../Common";
-import { LifeCounter } from "../Flags";
-import { MyEventListener } from "../MyEventListener";
+import { LifeCounter } from "../Event/LifeCounter";
+import { MyEventListener } from "../Event/MyEventListener";
 import { Page } from "./Page";
-import { Scene, SceneClass, sceneManager } from "../SceneManager";
+import { Scene, SceneClass, sceneManager } from "../Scene/SceneManager";
 import { initializeInteractionElements, isInteractionFocusable } from "../Element/InteractionElement";
 import { InputActivation } from "../Interaction/InputActivation";
 
@@ -206,7 +206,7 @@ export class PageManager extends MyEventListener {
      */
     async backPage(back: number, eventIgnore: boolean = false): Promise<boolean> {
         // シーン読み込みのawaitを挟んでも、戻る操作の入力手段を引き継ぐ。
-        const restoreInputFocus = InputActivation.active;
+        const restoreInputFocus = InputActivation.g$active;
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
         if (back <= 0) return false;
 
@@ -260,7 +260,7 @@ export class PageManager extends MyEventListener {
      * @param back 戻るページ数
      */
     async backPageImmediately(back: number): Promise<boolean> {
-        const restoreInputFocus = InputActivation.active;
+        const restoreInputFocus = InputActivation.g$active;
         if (!PageManager.pageMemories.length) throw Error("遷移記録がありません");
         if (back <= 0) return false;
 

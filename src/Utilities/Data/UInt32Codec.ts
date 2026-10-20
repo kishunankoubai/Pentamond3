@@ -12,10 +12,16 @@ export class UInt32Codec {
                 bytes.push(payload + (value ? 128 : 0));
             } while (value);
         }
-        return btoa(String.fromCharCode(...bytes));
+        // 大きな整数列でも、関数呼び出しの引数上限を超えないようにする。
+        const chunks: string[] = [];
+        for (let start = 0; start < bytes.length; start += 0x8000) {
+            chunks.push(String.fromCharCode(...bytes.slice(start, start + 0x8000)));
+        }
+        return btoa(chunks.join(""));
     }
 
     static decode(encoded: string, maxCount: number): number[] {
+        if (!Number.isSafeInteger(maxCount) || maxCount < 0) throw new Error("最大項目数が不正です");
         if (!/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(encoded)) throw new Error("整数データの形式が不正です");
         if (encoded.length > Math.ceil(maxCount * 5 / 3) * 4) throw new Error("整数データが大きすぎます");
         const bytes = atob(encoded);

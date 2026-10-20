@@ -1,8 +1,8 @@
 import { bindPlayerControls } from "../PlayerControls";
 import { GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
-import { playBackground } from "../../PlayBackground";
-import { GraphicSetting } from "../../GraphicSetting";
+import { playBackground } from "../../Rendering/PlayBackground";
+import { GraphicSetting } from "../../UI/GraphicSetting";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
 import { SimulationClock } from "../../Utilities/Loop/SimulationClock";
 

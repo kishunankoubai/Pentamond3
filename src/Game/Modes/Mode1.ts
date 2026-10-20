@@ -1,9 +1,9 @@
 import { bindPlayerControls } from "../PlayerControls";
 import { GameMode } from "../GameMode";
 import { GamePlayer } from "../GamePlayer";
-import * as Setting from "../../Settings";
-import { playBackground } from "../../PlayBackground";
-import { GraphicSetting } from "../../GraphicSetting";
+import * as Setting from "../../Config/GameConfig";
+import { playBackground } from "../../Rendering/PlayBackground";
+import { GraphicSetting } from "../../UI/GraphicSetting";
 import { MusicManager } from "../../Utilities/Music/MusicManager";
 import { emptyRemovalPenalty, sharedSurvivalDamage, survivalMaximumTime, survivalTrickReward } from "../SurvivalRules";
 import { SimulationClock } from "../../Utilities/Loop/SimulationClock";
@@ -123,7 +123,6 @@ export class Mode1 extends GameMode {
             });
         };
 
-
         this.events.add(
             p.loop.addHandler("loop", () => {
                 p.playInfo.playTime = p.loop.g$elapsedTime;
@@ -162,25 +161,16 @@ export class Mode1 extends GameMode {
                     const offset = Math.min(p.damageInfo.damageTask, p.damageInfo.attackTask);
                     if (offset > 0) p.feedback.show("相殺", `攻撃 ${offset}`, "attack");
                     if (p.damageInfo.damageTask > p.damageInfo.attackTask) {
-                        console.log(`Player ${index + 1} damage has offset : ${p.damageInfo.attackTask}`);
                         p.damageInfo.damageTask -= p.damageInfo.attackTask;
-                        console.log(`Rest damage is ${p.damageInfo.damageTask}`);
                         p.damageInfo.attackTask = 0;
                     } else {
-                        console.log(`Player ${index + 1} attack has offset : ${p.damageInfo.damageTask}`);
                         p.damageInfo.attackTask -= p.damageInfo.damageTask;
-                        if (p.damageInfo.damageTask) {
-                            console.log(`Rest attack is ${p.damageInfo.attackTask}`);
-                        } else {
-                            console.log(`Damage and attack have just offset`);
-                        }
                         p.damageInfo.damageTask = 0;
                         p.animations.caution.cancel();
                         p.animations.warning.cancel();
                     }
                 }
                 if (p.damageInfo.damageTask && p.loop.g$elapsedTime - p.damageInfo.lastDamageTime >= Setting.damageWaitingTime) {
-                    console.log(`Player ${index + 1} has damaged: ${p.damageInfo.damageTask}`);
                     p.damage();
                     p.damageInfo.totalDamage += p.damageInfo.damageTask;
                 }
@@ -192,7 +182,6 @@ export class Mode1 extends GameMode {
                         MusicManager.get("攻撃音")?.play();
                     }
                     p.damageInfo.maxAttack = Math.max(p.damageInfo.maxAttack, p.damageInfo.attackTask);
-                    console.log(`Player ${index + 1} has attacked: ${p.damageInfo.attackTask}`);
                     recipients.forEach((player) => player.addDamageTask(damage));
                     p.damageInfo.totalAttack += p.damageInfo.attackTask;
                     p.damageInfo.attackTask = 0;
@@ -252,7 +241,6 @@ export class Mode1 extends GameMode {
     }
 
     private updateMaximumGameTimes(): void {
-        // 脱落で分母が変わらないよう、開始時の全参加者を対象にする。
         const averageScore = this.players.reduce((total, player) => total + player.playInfo.score, 0) / this.players.length;
         this.players.forEach((player) => {
             if (player.state.hasFinished) return;
@@ -260,7 +248,6 @@ export class Mode1 extends GameMode {
             const maximum = survivalMaximumTime(info.initialMaxGameTime, info.maxGameTime, averageScore);
             if (maximum === info.maxGameTime) return;
             info.maxGameTime = maximum;
-            // 上限を超えた残りだけを余剰回復として差し引く。
             player.updateGameTime();
         });
     }

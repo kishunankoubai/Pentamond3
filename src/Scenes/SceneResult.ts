@@ -3,12 +3,13 @@ import { ElementManager } from "../Utilities/Element/ElementManager";
 import { PageInteraction } from "../Utilities/Interaction/PageInteraction";
 import { PageInteractionSetter } from "../Utilities/Interaction/PageInteractionSetter";
 import { MusicManager } from "../Utilities/Music/MusicManager";
-import { Scene } from "../Utilities/SceneManager";
+import { Scene } from "../Utilities/Scene/SceneManager";
 import { DynamicTextSetter } from "../Utilities/Text/DynamicTextSetter";
 import { TalkManager } from "../Utilities/Text/TalkManager";
 import { GameProcessing } from "../GameProcessing/GameProcessing";
 import { PageManager } from "../Utilities/Page/PageManager";
-import { applyPageTransitions } from "../Utilities/Element/PageTransitions";
+import { applyPageTransitions, setupMenuFeedback } from "../UI/Presentation";
+import { spaceJapaneseHTML } from "../Utilities/Text/JapaneseText";
 
 export class SceneResult extends Scene {
     private elementManager: ElementManager;
@@ -18,7 +19,9 @@ export class SceneResult extends Scene {
         super("src/HTML/SceneResult.html");
         this.elementManager = new ElementManager(this);
         this.pageInteraction = new PageInteraction(this);
+        setupMenuFeedback(this.pageInteraction);
         this.talkManager = new TalkManager(this);
+        this.talkManager.talkPanel.s$htmlResolver = spaceJapaneseHTML;
         this.sceneSetters.push(
             new ElementEventSetter(this.elementManager),
             new PageInteractionSetter(this.pageInteraction),

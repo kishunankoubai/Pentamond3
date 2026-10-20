@@ -1,5 +1,5 @@
-import { MyEventListener } from "../Utilities/MyEventListener";
-import { EventScope } from "../Utilities/EventScope";
+import { MyEventListener } from "../Utilities/Event/MyEventListener";
+import { EventScope } from "../Utilities/Event/EventScope";
 import { GamePlayer } from "./GamePlayer";
 import { operationKeyCodes } from "./Operations";
 import { SimulationClock } from "../Utilities/Loop/SimulationClock";
@@ -35,7 +35,7 @@ export abstract class GameMode extends MyEventListener {
                 this.events.add(
                     p.operator.addHandler(operateName, () => {
                         this.operateMemories[i].push({
-                            time: clock.now,
+                            time: clock.g$now,
                             operateName: operateName as OperateName,
                             sequence: this.operationSequence++,
                         });

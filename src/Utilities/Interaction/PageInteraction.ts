@@ -1,8 +1,7 @@
-import { Scene } from "../SceneManager";
+import type { Scene } from "../Scene/SceneManager";
 import { inputManager } from "./InputManager";
 import { InputInfo, InputObserver } from "./InputObserver";
-import { MyEvent } from "../MyEventListener";
-import { MusicManager } from "../Music/MusicManager";
+import { MyEventListener, type MyEvent } from "../Event/MyEventListener";
 import { initializeInteractionElements, isInteractionFocusable } from "../Element/InteractionElement";
 import { InputActivation } from "./InputActivation";
 
@@ -11,7 +10,11 @@ type InteractionElement = {
     coordinate: [number, number];
 };
 
-export class PageInteraction {
+/**
+ * ページ内の選択・決定・戻るを管理する。
+ * focus / activate: 対象のHTMLElementを同期通知する。SEなどは利用側で購読する。
+ */
+export class PageInteraction extends MyEventListener {
     private static lastOperateTime: number = Date.now();
     static inputBlocked = false;
     static operateDebounce: number = 300;
@@ -26,18 +29,17 @@ export class PageInteraction {
     private readonly focusHandler = (event: FocusEvent) => {
         if (event.target instanceof HTMLElement && event.target.matches("[data-xy]")) {
             this.scene.g$pageManager.rememberFocus(event.target);
-            MusicManager.get("フォーカス")?.play();
+            this.executeEvent("focus", event.target);
         }
     };
     private readonly clickHandler = (event: MouseEvent) => {
-        if (event.target instanceof HTMLElement && event.target.closest("[data-xy]")) {
-            const sound = event.target.closest(".subPagePrev, .subPageNext") ? "サブページボタン" : "ボタン";
-            MusicManager.get(sound)?.play();
-        }
+        const element = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>("[data-xy]") : null;
+        if (element) this.executeEvent("activate", element);
     };
     private readonly pointerHandler = () => { PageInteraction.firstFocus = false; };
 
     constructor(scene: Scene, private readonly acceptsInput: (input: InputObserver) => boolean = () => true) {
+        super();
         this.scene = scene;
     }
 

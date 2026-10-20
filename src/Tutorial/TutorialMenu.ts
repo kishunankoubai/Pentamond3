@@ -1,7 +1,7 @@
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 import { inputManager } from "../Utilities/Interaction/InputManager";
 import { InputObserver } from "../Utilities/Interaction/InputObserver";
-import { Scene, sceneManager } from "../Utilities/SceneManager";
+import { Scene, sceneManager } from "../Utilities/Scene/SceneManager";
 import { SceneTutorial } from "../Scenes/SceneTutorial";
 import { TutorialProgress } from "./TutorialProgress";
 import { TutorialInput } from "./TutorialInput";
@@ -73,7 +73,7 @@ export function setupTutorialMenu(scene: Scene, elementManager: ElementManager):
         registrationView.render(true);
     });
     next.addEventListener("click", async () => {
-        if (proceeding || !registering || inputManager.g$registering || !registrationView.ready) return;
+        if (proceeding || !registering || inputManager.g$registering || !registrationView.g$ready) return;
         proceeding = true;
         const lesson = pendingLesson;
         pendingLesson = null;
@@ -116,7 +116,7 @@ export function setupTutorialMenu(scene: Scene, elementManager: ElementManager):
                 lists.push(grid);
             }
         } else lists.push(list);
-        const buttons = lessons.map((lesson, localIndex) => {
+        const buttons = lessons.map((_, localIndex) => {
             const index = offset + localIndex;
             const button = document.createElement("div");
             button.className = "button lessonButton";
@@ -128,7 +128,7 @@ export function setupTutorialMenu(scene: Scene, elementManager: ElementManager):
             button.addEventListener("click", () => {
                 if (!TutorialProgress.isUnlocked(index) || sceneManager.g$currentScene !== scene) return;
                 if (perPage < lessons.length) trickMenuPage = pageIndex;
-                if (!TutorialInput.available) {
+                if (!TutorialInput.g$available) {
                     pendingLesson = index;
                     pageManager.openPage("tutorialInputRegister");
                     return;

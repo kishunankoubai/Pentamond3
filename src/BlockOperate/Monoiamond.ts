@@ -1,5 +1,5 @@
 import { BlockKind } from "./Block";
-import * as Setting from "../Settings";
+import * as Setting from "../Config/GameConfig";
 
 /**
  * monoiamondの状態

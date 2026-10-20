@@ -8,7 +8,13 @@ export class PageNotice {
     private static container: HTMLElement | null = null;
     private static scheduled = false;
     private static previousFocus: HTMLElement | null = null;
-    private static readonly deferredPages = new Set(["pageStart", "play", "startEffect", "practice", "talk"]);
+    private static deferredPages = new Set<string>();
+
+    /** 入力待ち・会話など、通知で遮ってはいけない画面は利用側が指定する。 */
+    static setDeferredPages(pageIds: Iterable<string>): void {
+        this.deferredPages = new Set(pageIds);
+        this.schedule();
+    }
 
     static notify(message: string): void {
         this.pending.add(message);
@@ -26,7 +32,8 @@ export class PageNotice {
         page.setAttribute("aria-modal", "true");
         page.setAttribute("aria-labelledby", "systemNoticeHeading");
         page.setAttribute("aria-describedby", "systemNoticeMessage");
-        page.innerHTML = '<div class="popup"><div class="label headingLabel" id="systemNoticeHeading">お知らせ</div><div class="text" id="systemNoticeMessage"></div><div class="back button" data-xy="[0,0]">閉じる</div></div>';
+        page.innerHTML =
+            '<div class="popup"><div class="label headingLabel" id="systemNoticeHeading">お知らせ</div><div class="text" id="systemNoticeMessage"></div><div class="back button" data-xy="[0,0]">閉じる</div></div>';
         // 戻る操作は、削除確認などと同じElementEventSetterに任せる。
         manager.addHandler(`closePage-${this.id}`, () => {
             queueMicrotask(() => {
@@ -46,7 +53,10 @@ export class PageNotice {
     private static schedule(): void {
         if (this.scheduled) return;
         this.scheduled = true;
-        queueMicrotask(() => { this.scheduled = false; this.flush(); });
+        queueMicrotask(() => {
+            this.scheduled = false;
+            this.flush();
+        });
     }
 
     private static flush(): void {

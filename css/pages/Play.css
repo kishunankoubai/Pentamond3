@@ -1,0 +1,501 @@
+/* プレイ準備・盤面・ポーズ・リプレイ操作とプレイ通知。 */
+#play {
+    background-color: #eee;
+    flex-direction: row;
+    gap: 0cqh;
+}
+
+#play .playField {
+    z-index: 1;
+    box-shadow: 0 0 1cqh #2224;
+    flex: 1;
+    background-color: #bde;
+    border-radius: 2%;
+    aspect-ratio: 9/10;
+    display: flex;
+    flex-direction: row;
+    margin-left: 0.5cqh;
+    margin-right: 0.5cqh;
+}
+
+#play .playField .playCanvas {
+    height: 95%;
+}
+
+#play .playField .nextCanvas {
+    height: 70%;
+}
+
+#play .playField .informationLabelBase {
+    height: 100%;
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+
+#play .playField .informationLabelBase .informationLabel {
+    font-family: "RocknRoll One", Arial;
+    color: #2ac;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+}
+
+#play .playField .informationLabelBase .informationLabel .informationLabelHeader {
+    font-family: "RocknRoll One", Arial;
+    color: #444;
+    text-align: center;
+}
+
+#play #playBackground {
+    background-color: #88aaee;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    inset: 0;
+}
+
+#play #playBackground canvas {
+    width: 100%;
+    height: 100%;
+}
+
+#playPrepare .options .playStart {
+    color: #d76;
+}
+
+#playPrepare .playPrepareStartRow {
+    gap: 10cqh;
+}
+
+#playPrepare .playPrepareStartRow .button {
+    position: relative;
+    width: max-content;
+    flex: none;
+    margin-left: 0;
+}
+
+#startEffect {
+    background-color: #00000000;
+}
+
+#startEffect #startEffectBase {
+    background-color: #eeaa0066;
+    border: #eeaa0099 1cqh solid;
+    height: 20cqh;
+    width: 120%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#startEffect #startEffectBase .startEffectLabel {
+    font-family: "RocknRoll One", Arial;
+    text-align: center;
+    font-size: 20cqh;
+    margin-bottom: 3cqh;
+}
+
+#startEffect #startEffectBase #startLabel {
+    font-family: "RocknRoll One", Arial;
+    text-align: center;
+    font-size: 20cqh;
+    color: #ee8888;
+}
+
+.pauseMenu .container,
+.pauseMenu .options {
+    gap: 8cqh;
+}
+
+#replayControls {
+    position: absolute;
+    z-index: 2;
+    top: 2cqh;
+    right: 2cqh;
+    display: flex;
+    align-items: center;
+    gap: 2cqh;
+    padding: 1cqh 2cqh;
+    border: 0.8cqh solid #2898;
+    border-radius: 1cqh;
+    background-color: #eefc;
+    pointer-events: none;
+}
+
+#replayControls span {
+    font-size: 3cqh;
+}
+
+#replayControls #replayPlaybackStatus {
+    color: #e86;
+}
+
+#replayControls #replayPlaybackSpeed {
+    min-width: 7cqh;
+    color: #289;
+}
+
+#replayControls .replayControlHelp {
+    color: #678;
+    font-size: 2.2cqh;
+}
+
+#replayControls.disabled {
+    opacity: 0.5;
+}
+
+#playPrepare {
+    gap: 4.5cqh;
+    padding-top: 12cqh;
+}
+
+#playPrepare .options {
+    display: grid;
+    grid-template-columns: repeat(2, 43cqh);
+    justify-items: center;
+    gap: 4.5cqh 8cqh;
+}
+
+#playPrepareTrickListButton {
+    grid-column: 1 / -1;
+}
+
+#playPrepareTrickListButton[hidden] {
+    display: none;
+}
+
+#playPrepare .playPrepareStartRow .button::before {
+    position: static;
+    right: auto;
+    white-space: normal;
+}
+
+.playPrepareSummary {
+    width: 120cqh;
+    padding: 2cqh 4cqh;
+    background: var(--panel);
+    border: 0.3cqh solid var(--panel-border);
+    border-radius: 1.5cqh;
+    text-align: center;
+}
+
+.prepareRule {
+    font-size: 3.7cqh;
+    color: #228899;
+}
+
+.prepareHandicaps {
+    margin-top: 1cqh;
+    font-size: 3cqh;
+}
+
+#playPrepare .options .button {
+    margin-left: 0;
+    font-size: 5cqh;
+}
+
+#playPrepare .playPrepareStartRow .playStart {
+    font-size: 6cqh;
+}
+
+.pauseMenu {
+    background-color: #edf6ffed;
+    gap: 5cqh;
+}
+
+.pauseMenu .pausePrimary {
+    margin-bottom: 2cqh;
+    padding: 2cqh 7cqh;
+    border-radius: 2cqh;
+    background: #fff;
+    border: 0.3cqh solid #bbdfe9;
+}
+
+.pauseMenu .pausePrimary .button {
+    font-size: 6cqh;
+}
+
+.pauseMenu .pauseSecondary .button {
+    font-size: 4.7cqh;
+}
+
+.pauseMenu .pauseSecondary {
+    gap: 10cqh;
+}
+
+.playCanvas {
+    background-color: var(--normal-play-background, #222233);
+}
+
+.playCanvas.finalTimeWarning {
+    background-color: #3d1119;
+}
+
+#play .playField .nextCanvas {
+    border-radius: 0;
+}
+
+#play .playField {
+    position: relative;
+    gap: 1.2cqh;
+    padding-left: 1.5cqh;
+}
+
+#play .boardView {
+    height: 95%;
+    position: relative;
+    flex: none;
+    aspect-ratio: 1 / 1.973;
+}
+
+#play .boardView .playCanvas {
+    height: 100%;
+    width: 100%;
+    display: block;
+    border-radius: 0.6cqh;
+}
+
+.clearedRowFlash {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(100% / 20.5);
+    background: var(--clear-color, #fff);
+    border: 0.15cqh solid var(--clear-color, #fff);
+    box-shadow: 0 0 1cqh var(--clear-color, #fff);
+    pointer-events: none;
+}
+
+.clearedRowFlash[hidden] {
+    display: none;
+}
+
+.boardCollapse {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.boardCollapse[hidden] {
+    display: none;
+}
+
+.boardCollapse::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%), linear-gradient(65deg, transparent 49.5%, #e9a1ae 49.5% 50%, transparent 50%);
+}
+
+.boardCollapse span {
+    position: absolute;
+    width: 16%;
+    height: 15%;
+    background: #e9a1ae;
+    clip-path: polygon(50% 0, 100% 100%, 0 100%);
+    transform: translate(calc(var(--collapse-progress) * var(--fragment-drift)), calc(var(--collapse-progress) * 28cqh)) rotate(calc(var(--collapse-progress) * var(--fragment-turn)));
+}
+
+#play .playField .informationLabelBase {
+    min-width: 0;
+    padding-top: 2cqh;
+    margin-left: 0;
+    gap: 2.5cqh;
+}
+
+.informationLabelHeader,
+.informationLabelContent,
+.infinitySymbol {
+    font-family: "RocknRoll One", Arial, sans-serif;
+}
+
+.infinitySymbol {
+    font-size: inherit;
+    color: inherit;
+}
+
+.informationLabelHeader {
+    text-shadow: none;
+}
+
+.informationLabelContent {
+    text-shadow: 0 0.1cqh #fff;
+}
+
+.informationLabelContent.survivalTimeValue {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    line-height: 1.15;
+    min-height: 1.75em;
+    max-width: 100%;
+}
+
+.survivalTimeCurrent {
+    font: inherit;
+    color: inherit;
+}
+
+.survivalTimeMaximum {
+    font-family: inherit;
+    font-size: 0.48em;
+    color: inherit;
+}
+
+.informationLabel.hasChain .informationLabelContent {
+    color: #f298b4;
+    transform: scale(1.12);
+}
+
+.lowTime .informationLabel[data-label="time"] .informationLabelContent {
+    color: #d66;
+}
+
+.playFeedback {
+    position: absolute;
+    right: 1.5cqh;
+    bottom: 2cqh;
+    width: 40%;
+    pointer-events: none;
+    z-index: 2;
+}
+
+#play .playField:not(.multiplayerField) .playFeedback {
+    left: calc(100% + 2cqh);
+    right: auto;
+    width: 29cqh;
+    bottom: 3cqh;
+}
+
+.playFeedbackMessages {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.7cqh;
+}
+
+.feedbackMessage,
+.pendingAttack {
+    background: #f0faffee;
+    border: 0.25cqh solid #76bace;
+    border-radius: 1cqh;
+    padding: 1cqh;
+    text-wrap: wrap;
+}
+
+.feedbackTitle {
+    font-size: 2.8cqh;
+    color: #228899;
+    text-wrap: wrap;
+}
+
+.feedbackValue {
+    font-size: 2.2cqh;
+    color: #487c91;
+    line-height: 1.7;
+    white-space: pre-line;
+    text-wrap: nowrap;
+}
+
+.feedbackReward {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8cqh;
+    font: inherit;
+    color: inherit;
+}
+
+.feedbackReward span {
+    font: inherit;
+    color: inherit;
+    white-space: nowrap;
+}
+
+.feedbackMessage.penalty,
+.pendingAttack.incoming {
+    border-color: #e29898;
+    background: #fff2f2ee;
+}
+
+.feedbackMessage.penalty .feedbackTitle {
+    color: #bc697a;
+}
+
+.pendingAttack {
+    font-size: 2.4cqh;
+    margin-bottom: 1cqh;
+    white-space: pre-line;
+}
+
+.pendingAttack[hidden] {
+    display: none;
+}
+
+.playFeedback[hidden] {
+    display: none;
+}
+
+#play .multiplayerField .playFeedback {
+    width: 34%;
+    right: 0.5cqh;
+}
+
+#play .multiplayerField .feedbackMessage:not(:last-child) {
+    display: none;
+}
+
+#play .multiplayerField .informationLabelBase {
+    gap: calc(5cqh / var(--player-count));
+    padding-top: 1cqh;
+}
+
+#play .compactPlayField .playFeedback {
+    top: calc(100% + 1cqh);
+    bottom: auto;
+    width: calc(100% - 1cqh);
+}
+
+#play .compactPlayField .feedbackMessage:not(:last-child) {
+    display: none;
+}
+
+#play .multiplayerField .feedbackTitle {
+    font-size: calc(5.5cqh / var(--player-count));
+}
+
+#play .multiplayerField .feedbackValue,
+#play .multiplayerField .pendingAttack {
+    font-size: calc(5cqh / var(--player-count));
+}
+
+#replayControls,
+#replayControls.disabled {
+    opacity: 0;
+    visibility: hidden;
+    max-width: 145cqh;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    border-width: 0.3cqh;
+    gap: 0.5cqh 2cqh;
+}
+
+#replayControls.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+#replayControls.visible.disabled {
+    opacity: 0.5;
+}
+
+#replayElapsedTime {
+    font-family: "RocknRoll One", Arial;
+    font-variant-numeric: tabular-nums;
+}

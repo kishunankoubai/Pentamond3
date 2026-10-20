@@ -1,6 +1,6 @@
 import { mod } from "../Common";
-import { MyEventListener } from "../MyEventListener";
-import { Scene } from "../SceneManager";
+import { MyEventListener } from "../Event/MyEventListener";
+import type { Scene } from "../Scene/SceneManager";
 
 export class ElementManager extends MyEventListener {
     private scene: Scene;

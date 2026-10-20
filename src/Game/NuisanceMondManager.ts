@@ -1,8 +1,8 @@
 import { BlockManager } from "../BlockOperate/BlockManager";
-import { MyEventListener } from "../Utilities/MyEventListener";
+import { MyEventListener } from "../Utilities/Event/MyEventListener";
 import { LoopManager } from "../Utilities/Loop/LoopManager";
 import { Monoiamond } from "../BlockOperate/Monoiamond";
-import * as Setting from "../Settings";
+import * as Setting from "../Config/GameConfig";
 import { SeededRandom } from "../Utilities/Random/SeededRandom";
 import { SimulationClock } from "../Utilities/Loop/SimulationClock";
 import { SimulationLoop } from "../Utilities/Loop/SimulationLoop";
@@ -265,7 +265,6 @@ export class NuisanceMondManager extends MyEventListener {
         this.nuisanceMonds.forEach((mond) => this.blockManager.removeMonoiamond(mond));
         this.nuisanceMonds = [];
         this.penalty += remaining;
-        // 1個ずつdamageBoardを発火せず、通知・演出・ペナルティを一度だけ更新する。
         this.executeEvent("collapseDamage", remaining);
         this.finishDamage();
         return true;

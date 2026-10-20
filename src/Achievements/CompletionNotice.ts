@@ -1,6 +1,6 @@
-import type { Scene } from "../Utilities/SceneManager";
+import type { Scene } from "../Utilities/Scene/SceneManager";
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
-import { PlayData } from "../PlayData";
+import { PlayData } from "../Storage/PlayData";
 
 /** 全達成後、最初にタイトルへ戻ったときだけ、共通ポップアップでお祝いする。 */
 export function setupAchievementCompletionNotice(scene: Scene, onClose: () => void): () => boolean {
@@ -9,7 +9,7 @@ export function setupAchievementCompletionNotice(scene: Scene, onClose: () => vo
     const close = page.querySelector<HTMLElement>(".back")!;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const show = (): boolean => {
-        if (!page.isConnected || manager.g$currentPageId !== "title" || manager.getPage("title")!.g$element.style.display === "none" || !PlayData.needsAchievementCompletionNotice) return false;
+        if (!page.isConnected || manager.g$currentPageId !== "title" || manager.getPage("title")!.g$element.style.display === "none" || !PlayData.g$needsAchievementCompletionNotice) return false;
         setInteractionEnabled(close, false);
         manager.openPage(page.id);
         PlayData.markAchievementCompletionNoticeShown();

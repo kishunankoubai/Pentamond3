@@ -28,12 +28,6 @@ export function mod(dividend: number, divisor: number): number {
     return ((dividend % divisor) + divisor) % divisor;
 }
 
-export function nearestMod(dividend: number, divisor: number): number {
-    const remainder = mod(dividend, divisor);
-    if (Math.min(remainder, Math.abs(remainder - divisor)) == remainder) return remainder;
-    else return remainder - divisor;
-}
-
 export function observe(callbackfn: () => boolean, maxTime: number = 3000) {
     return new Promise<void>((resolve, reject) => {
         const startTime = Date.now();
@@ -61,4 +55,8 @@ export function sleep(time: number): Promise<void> {
             resolve();
         }, time);
     });
+}
+
+export function arrayPlus(a: number[], b: number[]): number[] {
+    return a.length <= b.length ? a.map((value, i) => value + b[i]) : b.map((value, i) => value + a[i]);
 }

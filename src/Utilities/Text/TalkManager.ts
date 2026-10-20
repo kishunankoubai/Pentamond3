@@ -1,9 +1,7 @@
-import { observe } from "../Common";
 import { LoopManager } from "../Loop/LoopManager";
-import { MyEventListener } from "../MyEventListener";
-import { Scene, sceneManager } from "../SceneManager";
+import { MyEventListener } from "../Event/MyEventListener";
+import { Scene, sceneManager } from "../Scene/SceneManager";
 import { WaitDynamicText } from "./DynamicText";
-import { spaceJapaneseHTML } from "./JapaneseText";
 
 export type Talk = {
     html: string;
@@ -98,7 +96,7 @@ export class TalkPanel extends WaitDynamicText {
     /** 表示途中の文字数を維持して、現在の案内だけを更新する。 */
     refreshSpeech(): void {
         if (this.talkIndex < 0 || this.talkFinished) return;
-        this.updateHTML(spaceJapaneseHTML(this.htmlResolver(this.talk[this.talkIndex].html)));
+        this.updateHTML(this.htmlResolver(this.talk[this.talkIndex].html));
     }
 
     /**
@@ -159,7 +157,7 @@ export class TalkPanel extends WaitDynamicText {
     }
 
     private readTalk(index: number) {
-        super.s$html = spaceJapaneseHTML(this.htmlResolver(this.talk[index].html));
+        super.s$html = this.htmlResolver(this.talk[index].html);
         super.s$loopFrequency = this.talk[index].frequency;
         super.s$waitFrequency = this.talk[index].waitFrequency ?? 1000;
         super.s$waitString = !this.talk[index].wait ? "" : (this.talk[index].waitString ?? "▼");

@@ -4,12 +4,12 @@ import { MondOperator } from "../BlockOperate/MondOperator";
 import { NuisanceMondManager } from "./NuisanceMondManager";
 import { AutoInputObserver } from "../Utilities/Interaction/AutoInputObserver";
 import { InputObserver } from "../Utilities/Interaction/InputObserver";
-import { CanvasManager } from "../CanvasManager";
+import { CanvasManager } from "../Rendering/CanvasManager";
 import { InformationLabelManager } from "./InformationLabelManager";
-import { TrickInfo } from "../Trick";
-import * as Setting from "../Settings";
-import { EventScope } from "../Utilities/EventScope";
-import { GraphicSetting } from "../GraphicSetting";
+import { TrickInfo } from "./Tricks";
+import * as Setting from "../Config/GameConfig";
+import { EventScope } from "../Utilities/Event/EventScope";
+import { GraphicSetting } from "../UI/GraphicSetting";
 import { MusicManager } from "../Utilities/Music/MusicManager";
 import { achievementTrickIndex, achievementTricks } from "../Achievements/Definitions";
 import { PlayFeedback } from "./PlayFeedback";
@@ -232,7 +232,12 @@ export class GamePlayer {
     private readonly events = new EventScope();
     private damagePenalty = 0;
 
-    constructor(input: InputObserver, playerCount: number, seeds: { next: number; nuisance: number }, readonly clock: SimulationClock) {
+    constructor(
+        input: InputObserver,
+        playerCount: number,
+        seeds: { next: number; nuisance: number },
+        readonly clock: SimulationClock
+    ) {
         this.loop = new SimulationLoop(clock);
         this.operator = new MondOperator(seeds.next);
         this.label = new InformationLabelManager(playerCount);
@@ -434,7 +439,6 @@ export class GamePlayer {
             return;
         }
         this.playInfo.gameTime = Math.max(
-            // 経過時間の基準は初期上限。現在の上限の低下自体では持ち時間を引かない。
             Math.ceil(this.playInfo.initialMaxGameTime - this.loop.g$elapsedTime / Setting.gameTimeRate) - this.playInfo.penalty + this.playInfo.recovery - this.playInfo.surplus,
             0
         );

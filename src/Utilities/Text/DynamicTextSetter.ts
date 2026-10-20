@@ -1,6 +1,6 @@
-import { SceneSetter } from "../SceneSetter";
+import { SceneSetter } from "../Scene/SceneSetter";
 import { DynamicText } from "./DynamicText";
-import { TalkManager, TalkPanel } from "./TalkManager";
+import { TalkManager } from "./TalkManager";
 
 export class DynamicTextSetter extends SceneSetter {
     private talkManager: TalkManager;

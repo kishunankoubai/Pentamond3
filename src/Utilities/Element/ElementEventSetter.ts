@@ -1,5 +1,5 @@
 import { ElementManager } from "./ElementManager";
-import { SceneSetter } from "../SceneSetter";
+import { SceneSetter } from "../Scene/SceneSetter";
 import { initializePopupElement } from "./PopupElement";
 
 export class ElementEventSetter extends SceneSetter {

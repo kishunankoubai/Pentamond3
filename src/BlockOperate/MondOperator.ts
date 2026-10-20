@@ -1,11 +1,11 @@
 import { BlockManager } from "./BlockManager";
-import { GraphicData } from "../CanvasManager";
-import { MyEventListener } from "../Utilities/MyEventListener";
+import { GraphicData } from "../Rendering/CanvasManager";
+import { MyEventListener } from "../Utilities/Event/MyEventListener";
 import { MondState } from "./Monoiamond";
 import { NextManager } from "./NextManager";
 import { Pentiamond } from "./Pentiamond";
-import * as Setting from "../Settings";
-import { TrickInfo } from "../Trick";
+import * as Setting from "../Config/GameConfig";
+import { TrickInfo } from "../Game/Tricks";
 
 export class MondOperator extends MyEventListener {
     blockManager: BlockManager = new BlockManager();

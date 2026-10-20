@@ -1,4 +1,4 @@
-import type { Scene } from "../Utilities/SceneManager";
+import type { Scene } from "../Utilities/Scene/SceneManager";
 import type { ElementManager } from "../Utilities/Element/ElementManager";
 import { spaceJapanesePunctuation } from "../Utilities/Text/JapaneseText";
 import { Achievements } from "./Achievements";
@@ -70,13 +70,17 @@ export function setupAchievementPage(scene: Scene, elements: ElementManager): vo
         let values = Achievements.getProgress(achievement.id);
         if (achievement.id.startsWith("tutorial-")) {
             const units = tutorialUnits.filter((unit) => achievement.id === "tutorial-all" || `tutorial-${unit.id}` === achievement.id);
-            values = { current: units.reduce<number>((total, unit) => total + unit.lessons.filter((_, i) => TutorialProgress.isCleared(unit.offset + i)).length, 0), target: units.reduce<number>((total, unit) => total + unit.lessons.length, 0), unit: "項目" };
+            values = {
+                current: units.reduce<number>((total, unit) => total + unit.lessons.filter((_, i) => TutorialProgress.isCleared(unit.offset + i)).length, 0),
+                target: units.reduce<number>((total, unit) => total + unit.lessons.length, 0),
+                unit: "項目",
+            };
         }
         progress.hidden = !values;
         if (values) {
             const current = Math.min(values.current, values.target);
             progressText.textContent = `${current.toLocaleString("ja-JP")} / ${values.target.toLocaleString("ja-JP")} ${values.unit}`;
-            progressFill.style.width = `${current / values.target * 100}%`;
+            progressFill.style.width = `${(current / values.target) * 100}%`;
         }
     };
     const showFirst = () => {

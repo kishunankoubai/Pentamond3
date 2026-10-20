@@ -1,16 +1,16 @@
 import { inputManager } from "../Utilities/Interaction/InputManager";
-import { qsAddEvent, qsAll } from "../Utils";
+import { htmlQSAddEvent, htmlQSAll } from "../Utilities/Element/Query";
 
-import * as Setting from "../Settings";
+import * as Setting from "../Config/GameConfig";
 import { PlaySettingSetter } from "./PlaySettingSetter";
-import { sceneManager } from "../Utilities/SceneManager";
-import { MyEvent } from "../Utilities/MyEventListener";
-import { ControllerSettingManager } from "../ControllerSettingManager";
+import { sceneManager } from "../Utilities/Scene/SceneManager";
+import { MyEvent } from "../Utilities/Event/MyEventListener";
+import { ControllerSettingManager } from "../Input/ControllerSettingManager";
 import { PageManager } from "../Utilities/Page/PageManager";
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 import { InputRegistrationView } from "./InputRegistrationView";
 import { GamepadObserver } from "../Utilities/Interaction/GamepadObserver";
-import { KeyboardSettingManager } from "../KeyboardSettingManager";
+import { KeyboardSettingManager } from "../Input/KeyboardSettingManager";
 
 /**
  * コントローラーの登録をしたりする
@@ -38,44 +38,51 @@ export class ControllerRegisterer {
         });
 
         // キャンセル時
-        qsAddEvent("#playerRegister .back", "click", () => {
+        htmlQSAddEvent("#playerRegister .back", "click", () => {
             inputManager.resetRegister();
         });
 
         // キャンセル時
-        qsAddEvent("#playPrepare .back", "click", () => {
+        htmlQSAddEvent("#playPrepare .back", "click", () => {
             inputManager.resetRegister();
         });
 
         // 登録されたとき
-        this.inputEvents.push(inputManager.addHandler("inputRegistered", () => {
-            if (pageManager.g$currentPageId !== "playerRegister") return;
-            // アイコンをだす
-            this.onInputRegistered(currentPlayerNumber);
-        }));
+        this.inputEvents.push(
+            inputManager.addHandler("inputRegistered", () => {
+                if (pageManager.g$currentPageId !== "playerRegister") return;
+                // アイコンをだす
+                this.onInputRegistered(currentPlayerNumber);
+            })
+        );
 
-        this.inputEvents.push(inputManager.addHandler("finishRegister", () => {
-            if (pageManager.g$currentPageId !== "playerRegister") return;
-            this.registrationView.render(true);
-        }));
+        this.inputEvents.push(
+            inputManager.addHandler("finishRegister", () => {
+                if (pageManager.g$currentPageId !== "playerRegister") return;
+                this.registrationView.render(true);
+            })
+        );
 
-        window.addEventListener("gamepaddisconnected", (event) => {
-            if (pageManager.g$currentPageId !== "playerRegister") return;
-            if (inputManager.g$registeredInputs.some((input) => input instanceof GamepadObserver && input.g$index === event.gamepad.index))
-                this.startControllerRegistration(currentPlayerNumber);
-        }, { signal: this.controller.signal });
+        window.addEventListener(
+            "gamepaddisconnected",
+            (event) => {
+                if (pageManager.g$currentPageId !== "playerRegister") return;
+                if (inputManager.g$registeredInputs.some((input) => input instanceof GamepadObserver && input.g$index === event.gamepad.index)) this.startControllerRegistration(currentPlayerNumber);
+            },
+            { signal: this.controller.signal }
+        );
 
-        qsAddEvent("#registerButton", "click", () => {
+        htmlQSAddEvent("#registerButton", "click", () => {
             this.onClickOk(currentPlayerNumber);
         });
-        qsAddEvent("#playPrepareControllerButton", "click", () => {
+        htmlQSAddEvent("#playPrepareControllerButton", "click", () => {
             const playerNumber = PlaySettingSetter.getPlaySetting().playerNumber;
-            pageManager.openPage(playerNumber === 1 ? "operationSetting" : "playerControllerSetting");
+            pageManager.openPage(playerNumber === 1 ? "operationSetting" : "playerInputSetting");
         });
         pageManager.addHandler("changePage-playPrepare", () => {
             this.refreshPlayerConfigs();
         });
-        qsAddEvent("#playerControllerSetting .back", "click", () => {
+        htmlQSAddEvent("#playerInputSetting .back", "click", () => {
             this.refreshPlayerConfigs();
         });
     }
@@ -98,7 +105,7 @@ export class ControllerRegisterer {
         if (!pageManager) return;
 
         // まだ全員登録し終わっていないならリターン
-        if (inputManager.g$registering || !this.registrationView.ready) return;
+        if (inputManager.g$registering || !this.registrationView.g$ready) return;
 
         if (playerNumber > 1) {
             ControllerSettingManager.startPlayerSelection(playerNumber);
@@ -129,7 +136,7 @@ export class ControllerRegisterer {
     }
 
     private static enablePlayerRegisterButtons(available: boolean) {
-        qsAll("#playerRegister .button").forEach((element) => {
+        htmlQSAll("#playerRegister .button").forEach((element) => {
             setInteractionEnabled(element, available);
         });
     }
