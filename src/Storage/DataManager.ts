@@ -35,8 +35,8 @@ export class DataManager {
             localStorage.setItem(DataManager.multiBGMKey, globalValues.multiBGM);
             localStorage.setItem("Pentamond3-graphicSetting", JSON.stringify(globalValues.graphic));
         } catch (error) {
-            console.warn("設定を保存できませんでした。現在のプレイには反映されます。", error);
-            PageNotice.notify("設定を保存できませんでした。 今回の起動中は反映されますが、 再読み込みすると失われる場合があります。 保存領域の空きやブラウザーの設定を確認してください。");
+            console.warn("設定を保存できませんでした", error);
+            PageNotice.notify("設定を保存できませんでした。 再読み込みすると失われるので保存領域の空きやブラウザーの設定を確認してください。");
         }
     }
 

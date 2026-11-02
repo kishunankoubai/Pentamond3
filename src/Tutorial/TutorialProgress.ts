@@ -5,7 +5,7 @@ import { Achievements } from "../Achievements/Achievements";
 
 const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const lessonCount = tutorialLessonCount;
-/** 25項目のクリア状態を5文字のビットマスクに保存する。 */
+
 export class TutorialProgress {
     static readonly storageKey = "Pentamond3-tutorial";
     private static cleared = 0;
@@ -16,16 +16,18 @@ export class TutorialProgress {
             const raw = localStorage.getItem(this.storageKey);
             if (!raw) return;
             if (/^1:[A-Za-z0-9+/]$/.test(raw)) this.cleared = alphabet.indexOf(raw[2]);
-            else if (/^2:[A-Za-z0-9+/]{2}$/.test(raw) && alphabet.indexOf(raw[3]) < 32)
-                this.cleared = alphabet.indexOf(raw[2]) | alphabet.indexOf(raw[3]) << 6;
-            else if (/^3:[A-Za-z0-9+/]{3}$/.test(raw) && alphabet.indexOf(raw[4]) < 32)
-                this.cleared = alphabet.indexOf(raw[2]) | alphabet.indexOf(raw[3]) << 6 | alphabet.indexOf(raw[4]) << 12;
+            else if (/^2:[A-Za-z0-9+/]{2}$/.test(raw) && alphabet.indexOf(raw[3]) < 32) this.cleared = alphabet.indexOf(raw[2]) | (alphabet.indexOf(raw[3]) << 6);
+            else if (/^3:[A-Za-z0-9+/]{3}$/.test(raw) && alphabet.indexOf(raw[4]) < 32) this.cleared = alphabet.indexOf(raw[2]) | (alphabet.indexOf(raw[3]) << 6) | (alphabet.indexOf(raw[4]) << 12);
             else if (/^4:[A-Za-z0-9+/]{5}$/.test(raw) && alphabet.indexOf(raw[6]) < 2)
-                this.cleared = Array.from(raw.slice(2)).reduce((bits, character, index) => bits | alphabet.indexOf(character) << (index * 6), 0);
+                this.cleared = Array.from(raw.slice(2)).reduce((bits, character, index) => bits | (alphabet.indexOf(character) << (index * 6)), 0);
             else throw new Error("未対応の教習記録です");
-        } catch (error) { console.warn("教習記録を読み込めませんでした", error); }
+        } catch (error) {
+            console.warn("教習記録を読み込めませんでした", error);
+        }
     }
-    static isCleared(index: number): boolean { return Number.isInteger(index) && index >= 0 && index < lessonCount && !!(this.cleared & (1 << index)); }
+    static isCleared(index: number): boolean {
+        return Number.isInteger(index) && index >= 0 && index < lessonCount && !!(this.cleared & (1 << index));
+    }
     static isUnitUnlocked(unitId: string): boolean {
         const unit = tutorialUnits.find((unit) => unit.id === unitId);
         return !!unit && Achievements.getSummary().achieved >= unit.requiredAchievements;
@@ -40,10 +42,11 @@ export class TutorialProgress {
         this.cleared |= 1 << index;
         this.reflectAchievements();
         if (globalValues.nosave) return;
-        try { localStorage.setItem(this.storageKey, "4:" + Array.from({ length: Math.ceil(lessonCount / 6) }, (_, i) => alphabet[this.cleared >>> (i * 6) & 63]).join("")); }
-        catch (error) {
-            console.warn("教習記録を保存できませんでした。今回の起動中は保持します。", error);
-            PageNotice.notify("養成所のクリア記録を保存できませんでした。 今回の起動中は保持しますが、 再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
+        try {
+            localStorage.setItem(this.storageKey, "4:" + Array.from({ length: Math.ceil(lessonCount / 6) }, (_, i) => alphabet[(this.cleared >>> (i * 6)) & 63]).join(""));
+        } catch (error) {
+            console.warn("教習記録を保存できませんでした。", error);
+            PageNotice.notify("養成所のクリア記録を保存できませんでした。 再読み込みすると失われるので保存領域の空きやブラウザーの設定を確認してください。");
         }
     }
     static reset(): void {
@@ -51,13 +54,18 @@ export class TutorialProgress {
         this.cleared = 0;
     }
     static reflectAchievements(): void {
-        Achievements.reflectTutorial(tutorialUnits.map((unit) => ({
-            id: unit.id,
-            cleared: unit.lessons.every((_, i) => this.isCleared(unit.offset + i)),
-        })));
+        Achievements.reflectTutorial(
+            tutorialUnits.map((unit) => ({
+                id: unit.id,
+                cleared: unit.lessons.every((_, i) => this.isCleared(unit.offset + i)),
+            }))
+        );
     }
     static getDataSize(): number {
-        try { return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size; }
-        catch { return 0; }
+        try {
+            return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size;
+        } catch {
+            return 0;
+        }
     }
 }

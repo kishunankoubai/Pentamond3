@@ -1,4 +1,4 @@
-/** 要素ごとに既知の値域を指定し、固定長のビット列をUTF-16の符号単位へ詰める。 */
+/** 要素ごとに既知の値域を指定し、固定長のビット列をUTF-16の符号単位へ変換する */
 export class DataCompressor {
     private static bitWidths(radices: readonly number[]): number[] {
         return radices.map((radix) => {
@@ -69,7 +69,7 @@ export class DataCompressor {
             let value = 0;
 
             for (let j = 0; j < bitLength; j++) {
-                // ビット演算で符号付き32bitへ変換しない（2^31以上も扱う）。
+                // ビット演算で符号付き32bitへ変換しない（2^31以上も扱う）
                 value = value * 2 + bits[bitIndex++];
             }
             if (value >= base) throw new Error("圧縮データが指定した値域を超えています");

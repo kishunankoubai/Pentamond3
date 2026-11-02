@@ -1,6 +1,6 @@
 import { MyEvent } from "./MyEventListener";
 
-/** 外部オブジェクトへ登録したイベントを、所有する機能の終了時にまとめて解除する。 */
+/** 外部オブジェクトへ登録したイベントを所有する機能の終了時にまとめて解除する用 */
 export class EventScope {
     private events: MyEvent[] = [];
 

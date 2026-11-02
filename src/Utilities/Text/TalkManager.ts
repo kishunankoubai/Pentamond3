@@ -224,10 +224,14 @@ export class TalkManager extends MyEventListener {
     constructor(scene: Scene) {
         super();
         this.scene = scene;
-        scene.addHandler("sceneEnd", () => {
-            this.talkPanel.resetTalk();
-            this.closeLoop.reset();
-        }, 1);
+        scene.addHandler(
+            "sceneEnd",
+            () => {
+                this.talkPanel.resetTalk();
+                this.closeLoop.reset();
+            },
+            1
+        );
         this.closeLoop.s$loopFrequency = 100;
         this.closeLoop.addHandler("loop", () => {
             if (this.scene.g$pageManager.g$currentPageId == "talk") this.scene.g$pageManager.backPage(1);
@@ -254,7 +258,6 @@ export class TalkManager extends MyEventListener {
 
     async talk(talks: PreTalk[]): Promise<void> {
         this.talkPanel.resetTalk();
-        // 前の会話のresetTalk通知で開始された閉鎖処理も、新しい会話には持ち越さない。
         this.closeLoop.reset();
         if (!talks.length) return;
         this.talkPanel.s$talk = talks.map((talk) => this.createTalk(talk));
@@ -271,7 +274,6 @@ export class TalkManager extends MyEventListener {
                 this.closeLoop.start();
             });
             const event2 = sceneManager.addHandler("sceneChange", () => {
-                // defaultStart内で始まった会話を、同じシーンの開始通知で終了しない。
                 if (sceneManager.g$currentScene === this.scene) return;
                 resolve();
                 this.talkPanel.removeEvent(event);

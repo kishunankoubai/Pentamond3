@@ -2,7 +2,7 @@ import type { Scene } from "../Utilities/Scene/SceneManager";
 import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 import { PlayData } from "../Storage/PlayData";
 
-/** 全達成後、最初にタイトルへ戻ったときだけ、共通ポップアップでお祝いする。 */
+/** 全達成後、最初にタイトルへ戻ったときだけ表示する*/
 export function setupAchievementCompletionNotice(scene: Scene, onClose: () => void): () => boolean {
     const manager = scene.g$pageManager;
     const page = document.getElementById("achievementCompletion")!;
@@ -13,7 +13,7 @@ export function setupAchievementCompletionNotice(scene: Scene, onClose: () => vo
         setInteractionEnabled(close, false);
         manager.openPage(page.id);
         PlayData.markAchievementCompletionNoticeShown();
-        // マウス・決定・キャンセルすべての入力手段で3秒間は閉じられない。
+        // 3秒間は閉じないようにする
         timer = setTimeout(() => {
             timer = undefined;
             if (!page.isConnected || manager.g$currentPageId !== page.id) return;
@@ -23,7 +23,11 @@ export function setupAchievementCompletionNotice(scene: Scene, onClose: () => vo
         return true;
     };
     manager.addHandler("changePage-title", () => queueMicrotask(show));
-    manager.addHandler(`closePage-${page.id}`, () => { clearTimeout(timer); timer = undefined; onClose(); });
+    manager.addHandler(`closePage-${page.id}`, () => {
+        clearTimeout(timer);
+        timer = undefined;
+        onClose();
+    });
     scene.addHandler("sceneEnd", () => clearTimeout(timer), 1);
     return show;
 }

@@ -156,7 +156,7 @@ export class ControllerRegisterer {
     private static onInputRegistered(playerNumber: number) {
         const registerInputs = inputManager.g$registeredInputs;
         const registeredInput = registerInputs.at(-1);
-        // このイベントはタイトル画面の登録UI専用。別Sceneでは何もしない。
+        // このイベントは登録UI専用
         if (!registeredInput) return;
         this.registrationView.render();
 

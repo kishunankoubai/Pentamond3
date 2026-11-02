@@ -51,7 +51,7 @@ export class PlayStatistics {
     }
 
     static reset(): void {
-        // 削除に失敗した場合はメモリー上の記録も維持する。
+        // 削除に失敗した場合はメモリー上の記録も維持する
         localStorage.removeItem(this.storageKey);
         this.data = this.emptyData();
     }
@@ -64,7 +64,10 @@ export class PlayStatistics {
         }
     }
 
-    /** 通常プレイのゲーム終了確定時だけ、一度だけ集計する。途中退出・リプレイは除外。 */
+    /**
+     * 通常プレイのゲーム終了時だけ集計する
+     * 途中退出・リプレイは除外
+     * */
     static recordCompletedGame(game: DisposableGame): void {
         if (!game.g$hasStarted || !game.g$hasFinished || game.isReplay() || this.recordedGames.has(game)) return;
         this.recordedGames.add(game);
@@ -79,7 +82,7 @@ export class PlayStatistics {
         add("playCount", 1);
         game.players.forEach((player) => {
             const p = player.playInfo;
-            // 詳細結果のputは一手戻し分が差し引かれているため、実行した設置回数へ戻す。
+            // 詳細結果のputは一手戻し分が差し引かれているため実行した設置回数へ戻す
             add("putCount", p.put + p.unput);
             add("trickCount", p.trickCount);
             add("lineCount", p.line);
@@ -107,14 +110,14 @@ export class PlayStatistics {
 
     private static save(): void {
         if (globalValues.nosave) return;
-        // 末尾の未達成項目(0)を省略し、小さい整数には1バイトだけ使う。
+        // 末尾の未達成項目(0)を省略し、小さい整数には1バイトだけ使う
         const values = fields.map((field) => this.data[field]);
         while (values.at(-1) === 0) values.pop();
         try {
             localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values));
         } catch (error) {
-            console.warn("プレイ統計を保存できませんでした。今回の起動中は記録を保持します。", error);
-            PageNotice.notify("プレイ記録を保存できませんでした。 今回の起動中は保持しますが、 再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
+            console.warn("プレイ統計を保存できませんでした。", error);
+            PageNotice.notify("プレイ記録を保存できませんでした。 再読み込みすると失われるので保存領域の空きやブラウザーの設定を確認してください。");
         }
     }
 }

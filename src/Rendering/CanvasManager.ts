@@ -13,16 +13,16 @@ export type GraphicData = {
 };
 
 export class CanvasManager {
-    /** 役一覧用の、高さ1・灰色の盤面。ゲーム本体と同じ三角形を描画する。 */
+    /** 役一覧用の高さ1・灰色の盤面 */
     static createRowCanvas(shape: readonly ShapeInfo[]): HTMLCanvasElement {
         const canvas = document.createElement("canvas");
         this.paintRowCanvas(canvas, shape);
         return canvas;
     }
 
-    /** 同じ盤面を再描画し、役の形のバリエーションを切り替える。 */
+    /** 同じ盤面を再描画し役の形のバリエーションを切り替える */
     static paintRowCanvas(canvas: HTMLCanvasElement, shape: readonly ShapeInfo[]): void {
-        canvas.width = Math.round(Setting.blockWidth * (shape.length + 1) / 2);
+        canvas.width = Math.round((Setting.blockWidth * (shape.length + 1)) / 2);
         canvas.height = Setting.blockHeight;
         const context = canvas.getContext("2d")!;
         context.fillStyle = Setting.backgroundColor;
@@ -36,7 +36,7 @@ export class CanvasManager {
             context.stroke();
         }
         shape.forEach(([direction, visible], x) => {
-            this.paintTriangle(context, [Setting.blockWidth * x / 2, 0], ["g", direction, visible]);
+            this.paintTriangle(context, [(Setting.blockWidth * x) / 2, 0], ["g", direction, visible]);
         });
     }
 
@@ -51,7 +51,10 @@ export class CanvasManager {
         hold: null,
     };
     guideBorder: boolean = false;
-    /** 教習の指定位置。通常プレイでは空のまま。 */
+    /**
+     * 教習の指定位置
+     * 通常プレイでは空のまま
+     * */
     targetMondStates: MondState[] = [];
     guideBorderHeight: number = 15;
     constructor() {
@@ -91,7 +94,7 @@ export class CanvasManager {
 
     paintPlayCanvas() {
         this.pct.clearRect(0, 0, this.playCanvas.width, this.playCanvas.height);
-        // 背景はCSSで切り替え、ブロック自体の色を変えずに警告を遷移させる。
+        // 背景はCSSで切り替える
         if (this.guideBorder) {
             this.paintGuideBorder();
         }
@@ -148,7 +151,7 @@ export class CanvasManager {
         }
         context.lineCap = "round";
         const p1 = arrayPlus([0, property[1] ? Setting.blockHeight * scale : 0], position);
-        const p2 = arrayPlus([Setting.blockWidth * scale / 2, property[1] ? 0 : Setting.blockHeight * scale], position);
+        const p2 = arrayPlus([(Setting.blockWidth * scale) / 2, property[1] ? 0 : Setting.blockHeight * scale], position);
         const p3 = arrayPlus([Setting.blockWidth * scale, property[1] ? Setting.blockHeight * scale : 0], position);
         context.beginPath();
         context.moveTo(p1[0], p1[1]);
@@ -168,7 +171,7 @@ export class CanvasManager {
             context.lineWidth = 4 * scale;
             context.strokeStyle = "#222233cc";
             context.fillStyle = "#ffffff";
-            const x = position[0] + Setting.blockWidth * scale / 2;
+            const x = position[0] + (Setting.blockWidth * scale) / 2;
             const y = position[1] + Setting.blockHeight * scale * (property[1] ? 2 / 3 : 1 / 3);
             context.strokeText(marks[property[0]], x, y);
             context.fillText(marks[property[0]], x, y);
@@ -214,7 +217,7 @@ export class CanvasManager {
         this.nct.fillStyle = "#bbddff";
         this.nct.textAlign = "center";
         this.nct.fillText("HOLD", this.nextCanvas.width / 2, 55);
-        this.nct.fillText("NEXT", Setting.blockWidth * Setting.next.width * Setting.next.scale.normal / 2, this.g$nextPanelTop + 52);
+        this.nct.fillText("NEXT", (Setting.blockWidth * Setting.next.width * Setting.next.scale.normal) / 2, this.g$nextPanelTop + 52);
         this.nct.restore();
     }
 
@@ -223,19 +226,12 @@ export class CanvasManager {
     }
 
     private paintNextBackground() {
-        // キャンバスの大きさとモンドの位置は保ち、透明な隙間で二つの枠を分ける。
         this.nct.fillStyle = Setting.backgroundColor;
         this.nct.beginPath();
         this.nct.roundRect(0, 0, Setting.blockWidth * Setting.next.width * Setting.next.scale.hold, Setting.blockHeight * Setting.next.height * Setting.next.scale.hold + Setting.next.gap / 8, 20);
         this.nct.fill();
         this.nct.beginPath();
-        this.nct.roundRect(
-            0,
-            this.g$nextPanelTop,
-            Setting.blockWidth * Setting.next.width * Setting.next.scale.normal,
-            this.nextCanvas.height - this.g$nextPanelTop,
-            20
-        );
+        this.nct.roundRect(0, this.g$nextPanelTop, Setting.blockWidth * Setting.next.width * Setting.next.scale.normal, this.nextCanvas.height - this.g$nextPanelTop, 20);
         this.nct.fill();
     }
 

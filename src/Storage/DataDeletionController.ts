@@ -56,7 +56,6 @@ export class DataDeletionController {
                                 ? "情報ページの累計・最高記録、 養成所のクリア記録、 実績をすべて削除します。 初回案内も次の起動時に再び表示されます。 設定とリプレイは残ります。 この操作は取り消せません。"
                                 : "設定を初期値に戻し、プレイデータと保存済み・直近のリプレイをすべて削除します。 この操作は取り消せません。";
                 pageManager.openPage("dataDeleteConfirmation");
-                // 開いた直後の決定入力で削除されないよう、コントローラーでも無効化する。
                 this.confirmTimer = setTimeout(() => {
                     if (this.pendingGroup === group && pageManager.g$currentPageId === "dataDeleteConfirmation") setConfirmEnabled(true);
                 }, 1500);

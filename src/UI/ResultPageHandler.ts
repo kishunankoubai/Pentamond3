@@ -18,7 +18,7 @@ export class ResultPageHandler {
     static setSaveButton(game: DisposableGame) {
         const saveButton = htmlQS("#result .saveReplayButton");
         let saving = false;
-        // 初期化は新しい結果に対して一度だけ行う。詳細結果から戻った際は維持する。
+        // 初期化は新しい結果に対して一度だけ行う
         saveButton.innerText = "リプレイを保存する";
         setInteractionEnabled(saveButton, true);
 

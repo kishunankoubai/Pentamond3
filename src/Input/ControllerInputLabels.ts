@@ -1,4 +1,4 @@
-/** 標準Gamepadの入力は、配置が分かる名前を設定と案内で共用する。 */
+/** 標準Gamepadの入力は配置が分かる名前を設定と案内で共用する */
 export function formatControllerInput(input: string): string {
     const names: Record<string, string> = {
         "button:0": "丸下ボタン",

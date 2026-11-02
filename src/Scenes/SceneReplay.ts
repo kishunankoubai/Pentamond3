@@ -30,11 +30,14 @@ export class SceneReplay extends ScenePlay {
             }
         });
         const timer = window.setInterval(() => GameProcessing.updateReplayTimeDisplay(), 100);
-        this.addHandler("sceneEnd", () => {
-            window.clearInterval(timer);
-            window.clearTimeout(this.controlsHideTimer);
-        }, 1);
-        // 実際の操作だけで表示する。再生データの入力では表示しない。
+        this.addHandler(
+            "sceneEnd",
+            () => {
+                window.clearInterval(timer);
+                window.clearTimeout(this.controlsHideTimer);
+            },
+            1
+        );
         document.addEventListener("pointerdown", () => this.showControls(), { signal: this.controller.signal });
         document.addEventListener("keydown", () => this.showControls(), { signal: this.controller.signal });
         this.pageManager.addHandler("changePage", () => {
@@ -42,18 +45,22 @@ export class SceneReplay extends ScenePlay {
             document.getElementById("replayControls")?.classList.remove("visible");
         });
 
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) this.pauseGame();
-        }, { signal: this.controller.signal });
+        document.addEventListener(
+            "visibilitychange",
+            () => {
+                if (document.hidden) this.pauseGame();
+            },
+            { signal: this.controller.signal }
+        );
         window.addEventListener("blur", () => this.pauseGame(), { signal: this.controller.signal });
 
         document.getElementById("replayResumeButton")?.addEventListener("click", async () => {
-            if (!await this.pageManager.backPage(1)) return;
+            if (!(await this.pageManager.backPage(1))) return;
             GameProcessing.resumeReplay();
             await MusicManager.fadeAllBGM(1, 200);
         });
         document.getElementById("replayRestartButton")?.addEventListener("click", async () => {
-            if (!await this.pageManager.backPageImmediately(1)) return;
+            if (!(await this.pageManager.backPageImmediately(1))) return;
             await this.restartGame();
         });
         document.getElementById("replayListButton")?.addEventListener("click", () => this.returnToClosest(["replay", "savedReplay"]));

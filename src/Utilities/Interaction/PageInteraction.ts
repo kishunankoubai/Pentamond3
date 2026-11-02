@@ -11,8 +11,8 @@ type InteractionElement = {
 };
 
 /**
- * ページ内の選択・決定・戻るを管理する。
- * focus / activate: 対象のHTMLElementを同期通知する。SEなどは利用側で購読する。
+ * ページ内の選択・決定・戻るを管理する
+ * focus / activate: 対象のHTMLElementを同期通知する
  */
 export class PageInteraction extends MyEventListener {
     private static lastOperateTime: number = Date.now();
@@ -36,9 +36,14 @@ export class PageInteraction extends MyEventListener {
         const element = event.target instanceof HTMLElement ? event.target.closest<HTMLElement>("[data-xy]") : null;
         if (element) this.executeEvent("activate", element);
     };
-    private readonly pointerHandler = () => { PageInteraction.firstFocus = false; };
+    private readonly pointerHandler = () => {
+        PageInteraction.firstFocus = false;
+    };
 
-    constructor(scene: Scene, private readonly acceptsInput: (input: InputObserver) => boolean = () => true) {
+    constructor(
+        scene: Scene,
+        private readonly acceptsInput: (input: InputObserver) => boolean = () => true
+    ) {
         super();
         this.scene = scene;
     }
@@ -48,12 +53,7 @@ export class PageInteraction extends MyEventListener {
     }
 
     private get g$validElements(): InteractionElement[] {
-        return this.interactionElements.filter(
-            ({ element }) =>
-                !element.classList.contains("closing") &&
-                element.getClientRects().length > 0 &&
-                isInteractionFocusable(element)
-        );
+        return this.interactionElements.filter(({ element }) => !element.classList.contains("closing") && element.getClientRects().length > 0 && isInteractionFocusable(element));
     }
 
     start() {
@@ -171,9 +171,7 @@ export class PageInteraction extends MyEventListener {
             targetDirectionalDistance = Math.min(...movementCandidates.map(({ directionalDistance }) => directionalDistance));
         }
 
-        return movementCandidates
-            .filter(({ directionalDistance }) => directionalDistance === targetDirectionalDistance)
-            .sort((a, b) => a.secondaryDistance - b.secondaryDistance)[0].candidate;
+        return movementCandidates.filter(({ directionalDistance }) => directionalDistance === targetDirectionalDistance).sort((a, b) => a.secondaryDistance - b.secondaryDistance)[0].candidate;
     }
 
     private proceedInteraction(activeElement: InteractionElement, inputName: string) {

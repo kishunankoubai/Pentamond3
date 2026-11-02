@@ -1,4 +1,3 @@
-/** 静的・動的ポップアップで、共通の枠と読み上げ用の説明を使用する。 */
 export function initializePopupElement(page: HTMLElement): void {
     const popup = page.querySelector<HTMLElement>(".popup");
     if (!popup) return;

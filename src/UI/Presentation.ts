@@ -6,7 +6,6 @@ import { PageNotice } from "../Utilities/Feedback/PageNotice";
 import { SceneRecovery } from "../Utilities/Feedback/SceneRecovery";
 import { spaceJapaneseTextNodes } from "../Utilities/Text/JapaneseText";
 
-/** 共通システムの操作通知に、このゲームのSEを結び付ける。シーン終了時に購読を解除する。 */
 export function setupMenuFeedback(interaction: PageInteraction): void {
     const events = new EventScope();
     events.add(
@@ -27,10 +26,9 @@ export function setupPresentation(): void {
     initialized = true;
     sceneManager.addHandler("sceneHTMLLoaded", spaceJapaneseTextNodes);
     PageNotice.setDeferredPages(["pageStart", "play", "startEffect", "practice", "talk"]);
-    SceneRecovery.reloadMessage = "通信状態を確認してください。 再読み込みするとタイトルからやり直せます。 保存していないプレイは失われます。";
+    SceneRecovery.reloadMessage = "通信状態を確認してください。 再読み込みするとタイトルからやり直せますが、 保存していないプレイは失われます。";
 }
 
-/** ページ内容を読みにくくする拡大・ぼかしを避け、短い移動とフェードで統一する。 */
 export function applyPageTransitions(scene: Scene): void {
     scene.g$pageManager.g$pages.forEach((page) => {
         const popup = !!page.g$element.querySelector(".popup") || page.g$element.classList.contains("pauseMenu");

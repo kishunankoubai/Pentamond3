@@ -13,17 +13,19 @@ export class ElementEventSetter extends SceneSetter {
     protected progressSet(): void {
         this.scene.g$pageManager.addHandler("restoreFocusSubPage", (index: number) => this.elementManager.openSubPage(index));
         const controller = new AbortController();
-        // 個別ボタンの設定処理が済んでから遷移する。動的なボタンにも適用する。
-        document.querySelector(".sceneContainer")?.addEventListener("click", (event) => {
-            const element = event.target instanceof Element ? event.target.closest<HTMLElement>(".back, [data-back], [data-page], .subPagePrev, .subPageNext") : null;
-            if (!element) return;
-            if (element.matches(".back, [data-back]")) this.scene.g$pageManager.backPage(Number.parseInt(element.dataset.back || "1"));
-            else if (element.matches("[data-page]")) this.scene.g$pageManager.openPage(element.dataset.page || "");
-            else if (element.classList.contains("subPagePrev")) this.elementManager.openSubPageRelatively(-1);
-            else this.elementManager.openSubPageRelatively(1);
-        }, { signal: controller.signal });
+        document.querySelector(".sceneContainer")?.addEventListener(
+            "click",
+            (event) => {
+                const element = event.target instanceof Element ? event.target.closest<HTMLElement>(".back, [data-back], [data-page], .subPagePrev, .subPageNext") : null;
+                if (!element) return;
+                if (element.matches(".back, [data-back]")) this.scene.g$pageManager.backPage(Number.parseInt(element.dataset.back || "1"));
+                else if (element.matches("[data-page]")) this.scene.g$pageManager.openPage(element.dataset.page || "");
+                else if (element.classList.contains("subPagePrev")) this.elementManager.openSubPageRelatively(-1);
+                else this.elementManager.openSubPageRelatively(1);
+            },
+            { signal: controller.signal }
+        );
         this.scene.addHandler("sceneEnd", () => controller.abort(), 1);
-        // subPageが後から生成されるページもあるため、全ページに初期化処理を登録する。
         document.querySelectorAll<HTMLElement>(".page").forEach((page) => {
             initializePopupElement(page);
             this.scene.g$pageManager.addHandler(`changePage-${page.id}`, () => {

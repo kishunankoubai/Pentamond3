@@ -2,7 +2,6 @@ import { MyEventListener } from "../Event/MyEventListener";
 
 type Job = { at: number; priority: number; order: number; serial: number; active: boolean; run: () => void };
 
-/** 入力・時間制限・ダメージを、同じ整数ミリ秒の時系列で実行する時計。 */
 export class SimulationClock extends MyEventListener {
     private jobs: Job[] = [];
     private serial = 0;
@@ -29,7 +28,7 @@ export class SimulationClock extends MyEventListener {
     }
 
     schedule(at: number, run: () => void, priority = 0, order = this.allocateOrder()): () => void {
-        if (!Number.isFinite(at) || at < 0) throw new Error("ゲーム内時刻が不正です");
+        if (!Number.isFinite(at) || at < 0) throw new Error("仮想時刻が不正です");
         const job: Job = { at: Math.max(this.time, Math.ceil(at)), run, priority, order, serial: this.serial++, active: true };
         this.jobs.push(job);
         let index = this.jobs.length - 1;

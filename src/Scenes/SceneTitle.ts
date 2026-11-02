@@ -100,13 +100,11 @@ export class SceneTitle extends Scene {
     }
 
     private setPageStart() {
-        // 音声の初期化はページ全体への直接クリックで行う。
-        // pageStart は data-xy を付けず、キーボード・コントローラーの決定対象にしない。
+        // 音声の初期化はページ全体への直接クリックで行う
         let starting = false;
         document.getElementById("firstLaunchTutorialButton")!.addEventListener("click", async () => {
             if (this.pageManager.g$currentPageId !== "firstLaunchGuide") return;
-            // 案内を履歴に残さず、通常の養成所と同じ入力登録画面へ進む。
-            if (await this.pageManager.backPage(1, true) && sceneManager.g$currentScene === this) {
+            if ((await this.pageManager.backPage(1, true)) && sceneManager.g$currentScene === this) {
                 this.pageManager.openPage("tutorialInputRegister");
             }
         });
@@ -179,7 +177,11 @@ export class SceneTitle extends Scene {
         ] as const;
         selectors.forEach(({ id, setting }) => {
             const options = Array.from(document.querySelectorAll<HTMLElement>(`#${id} .scrollableContainer .button`));
-            const updateSelection = () => this.elementManager.selectByIndex(id, options.findIndex((option) => option.dataset.soundTrack === globalValues[setting]));
+            const updateSelection = () =>
+                this.elementManager.selectByIndex(
+                    id,
+                    options.findIndex((option) => option.dataset.soundTrack === globalValues[setting])
+                );
             updateSelection();
             this.pageManager.addHandler("settingsReset", updateSelection);
             this.elementEventSetter.addHandler(`selectorChanged-${id}`, (selector: HTMLElement) => {

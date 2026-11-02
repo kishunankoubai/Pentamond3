@@ -1,4 +1,4 @@
-/** .click()による決定／戻ると、実際のマウスクリックを区別する。 */
+/** .click()による決定／戻ると、実際のマウスクリックを区別する */
 export class InputActivation {
     private static depth = 0;
 
@@ -8,7 +8,10 @@ export class InputActivation {
 
     static run(action: () => void): void {
         this.depth++;
-        try { action(); }
-        finally { this.depth--; }
+        try {
+            action();
+        } finally {
+            this.depth--;
+        }
     }
 }

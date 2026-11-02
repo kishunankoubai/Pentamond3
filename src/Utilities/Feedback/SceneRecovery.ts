@@ -4,7 +4,7 @@ import { initializeInteractionElements } from "../Element/InteractionElement";
 import { initializePopupElement } from "../Element/PopupElement";
 import type { InputInfo, InputObserver } from "../Interaction/InputObserver";
 
-/** HTMLが読めない場合も、外部ファイルに依存せず復帰操作を表示する。 */
+/** HTMLが読めない場合も外部ファイルに依存せず復帰操作を表示する */
 export class SceneRecovery {
     private static dismiss: (() => void) | null = null;
     static reloadMessage = "通信状態を確認してください。 再読み込みすると最初の画面に戻ります。 未保存の変更は失われます。";

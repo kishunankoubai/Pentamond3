@@ -7,12 +7,16 @@ import { operationKeyCodes } from "./Operations";
 import type { InputInfo } from "../Utilities/Interaction/InputObserver";
 import { KeyboardSettingManager } from "../Input/KeyboardSettingManager";
 
-/** モードによらない操作・押しっぱなし処理。入力の観測はUtilitiesに任せる。 */
+/**
+ * モードによらない操作・押しっぱなし処理
+ * 入力の観測はUtilities
+ * */
 export function bindPlayerControls(player: GamePlayer, playerIndex: number, events: EventScope): void {
     const input = player.input;
-    const config = input.g$type === "keyboard"
-        ? ControllerRegisterer.keyboardConfigs[playerIndex] ?? KeyboardSettingManager.getConfig()
-        : ControllerRegisterer.gamepadConfigs[playerIndex] ?? Setting.gamepadConfigPresets[0];
+    const config =
+        input.g$type === "keyboard"
+            ? (ControllerRegisterer.keyboardConfigs[playerIndex] ?? KeyboardSettingManager.getConfig())
+            : (ControllerRegisterer.gamepadConfigs[playerIndex] ?? Setting.gamepadConfigPresets[0]);
     const suppressedInputs = new Set(input.g$validInputNames.filter((name) => input.getLatest(name)?.consumed));
     const bindings: [OperateName, keyof Setting.GamepadConfig, () => void][] = [
         ["move-left", "moveLeft", () => player.operator.move("left")],
@@ -25,8 +29,8 @@ export function bindPlayerControls(player: GamePlayer, playerIndex: number, even
         ["hold", "hold", () => player.operator.hold()],
         ["removeLine", "removeLine", () => player.operator.removeLine()],
     ];
-    // リプレイは配置とは無関係の操作名から変換された固定キーで再生する。
-    const keysFor = (operation: OperateName, action: keyof Setting.GamepadConfig) => input.g$type === "autoKeyboard" ? [operationKeyCodes[operation]] : config[action];
+    // リプレイは配置とは無関係の操作名から変換された固定キーで再生
+    const keysFor = (operation: OperateName, action: keyof Setting.GamepadConfig) => (input.g$type === "autoKeyboard" ? [operationKeyCodes[operation]] : config[action]);
     const operate = (name: string) => {
         player.clock.synchronize();
         if (player.loop.g$isStopping) return;
@@ -40,12 +44,15 @@ export function bindPlayerControls(player: GamePlayer, playerIndex: number, even
     const moveKeys = bindings.filter(([operation]) => operation.startsWith("move-")).flatMap(([operation, action]) => keysFor(operation, action));
     events.add(
         input.addHandler("inputValid", (info: InputInfo) => {
-            if (info.consumed) { suppressedInputs.add(info.name); return; }
+            if (info.consumed) {
+                suppressedInputs.add(info.name);
+                return;
+            }
             if (!player.loop.g$isStopping) operate(input.g$latestPressingKey);
         }),
         input.addHandler("inputInvalid", (info: InputInfo) => suppressedInputs.delete(info.name)),
         player.loop.addHandler("loop", () => {
-            // リプレイは記録済みのリピートも再生するので、追加生成しない。
+            // リプレイは記録済みのリピートも再生するので、追加生成しない
             if (input.g$type === "autoKeyboard") return;
             const key = input.getLatestPressingKey(moveKeys.filter((key) => !suppressedInputs.has(key)));
             if (key !== previousKey) lastRepeatTime = 0;

@@ -25,7 +25,6 @@ export class SoundTest {
         const back = document.querySelector<HTMLElement>("#soundTestSelector .back");
         if (back) back.dataset.xy = `[0,${this.trackButtons.length}]`;
         this.selectedTrack ||= this.trackButtons[0]?.dataset.soundTrack ?? "";
-        // 選択とページ復帰はUtilitiesのselectorに任せ、曲変更だけを処理する。
         elementEventSetter.addHandler("selectorChanged-soundTestSelector", () => {
             const selected = this.trackButtons[elementManager.getSelectedIndex("soundTestSelector")];
             if (!selected) return;
@@ -64,7 +63,8 @@ export class SoundTest {
                 this.resetShuffle();
                 void this.playTrack(true);
             } else if (pageId !== "soundTestSelector" && this.active) {
-                // 戻り先が同じ曲なら、そのまま引き継ぐ。別の曲はMusicManagerが停止する。
+                // 戻り先が同じ曲ならそのまま流す
+                // 別の曲はMusicManagerが停止する。
                 this.close(false);
             }
         });
@@ -88,7 +88,7 @@ export class SoundTest {
         if (!this.music) {
             this.playing = false;
             this.loading = false;
-            this.error = "曲を読み込めませんでした。";
+            this.error = "読み込みに失敗しました。";
             this.render();
             return;
         }
@@ -143,7 +143,10 @@ export class SoundTest {
             button.setAttribute("aria-pressed", String(selected));
         });
         // シャッフルによる自動遷移でも、選択欄と次に開く選択画面を同期する。
-        this.elementManager?.selectByIndex("soundTestSelector", this.trackButtons.findIndex((button) => button.dataset.soundTrack === this.selectedTrack));
+        this.elementManager?.selectByIndex(
+            "soundTestSelector",
+            this.trackButtons.findIndex((button) => button.dataset.soundTrack === this.selectedTrack)
+        );
         const playback = document.getElementById("soundTestPlayback");
         if (playback) playback.textContent = this.playing ? "一時停止" : "再生";
         const loop = document.getElementById("soundTestLoop");

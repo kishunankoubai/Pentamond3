@@ -1,9 +1,8 @@
-/** div/spanの操作要素も、各入力手段で同じ状態にする。 */
+/** div/spanの操作要素も、各入力手段で同じ状態にする */
 export function isInteractionEnabled(element: HTMLElement): boolean {
     return element.getAttribute("aria-disabled") !== "true" && !element.hasAttribute("disabled");
 }
 
-/** 解放条件を案内する項目だけは、実行不可のままフォーカスを許可する。 */
 export function isInteractionFocusable(element: HTMLElement): boolean {
     return isInteractionEnabled(element) || element.dataset.focusWhenDisabled === "true";
 }

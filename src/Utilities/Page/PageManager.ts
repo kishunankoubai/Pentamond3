@@ -78,9 +78,7 @@ export class PageManager extends MyEventListener {
         initializeInteractionElements(page);
         const elements = Array.from(page.querySelectorAll<HTMLElement>("[data-xy]"));
         const valid = (element: HTMLElement) => element.getClientRects().length > 0 && !element.classList.contains("closing") && isInteractionFocusable(element);
-        const remembered = focus?.id
-            ? elements.find((element) => element.id === focus.id)
-            : focus && elements[focus.index]?.dataset.xy === focus.coordinate ? elements[focus.index] : undefined;
+        const remembered = focus?.id ? elements.find((element) => element.id === focus.id) : focus && elements[focus.index]?.dataset.xy === focus.coordinate ? elements[focus.index] : undefined;
         (remembered && valid(remembered) ? remembered : elements.find(valid))?.focus();
     }
 
@@ -222,7 +220,7 @@ export class PageManager extends MyEventListener {
 
         let prevLayer = 0;
         if (memory.scene !== currentMemory.scene) {
-            if (!await sceneManager.change(memory.scene, false)) return false;
+            if (!(await sceneManager.change(memory.scene, false))) return false;
             pageManager = sceneManager.g$currentScene!.g$pageManager;
             PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
             pageManager.setPagesVisibility(memory.displayingPageIds);
@@ -251,7 +249,9 @@ export class PageManager extends MyEventListener {
             }
             // 動的な一覧やサブページの更新を済ませてから復元する。
             if (restoreInputFocus && PageManager.pageMemories.at(-1) === restoredMemory) pageManager.restoreFocus(focus);
-        } finally { pageManager.returning = false; }
+        } finally {
+            pageManager.returning = false;
+        }
         return true;
     }
 
@@ -273,7 +273,7 @@ export class PageManager extends MyEventListener {
         const memory = PageManager.pageMemories[targetIndex];
         let pageManager: PageManager = this;
         if (memory.scene !== currentMemory.scene) {
-            if (!await sceneManager.change(memory.scene, false)) return false;
+            if (!(await sceneManager.change(memory.scene, false))) return false;
             pageManager = sceneManager.g$currentPageManager!;
         }
         PageManager.pageMemories = PageManager.pageMemories.slice(0, targetIndex);
@@ -294,7 +294,6 @@ export class PageManager extends MyEventListener {
         return PageManager.pageMemories.length - 1 - backIndex;
     }
 
-    /** 再戦時、終了済みのラウンドだけを履歴から取り除く（画面は変更しない）。 */
     static trimHistoryTo(pageId: string): void {
         const index = this.pageMemories.findLastIndex((memory) => memory.principlePageId === pageId);
         if (index >= 0) this.pageMemories = this.pageMemories.slice(0, index + 1);

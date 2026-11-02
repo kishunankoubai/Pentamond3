@@ -1,4 +1,4 @@
-/** HTMLElementに限定したDOM検索。ページが存在する場面でのみ使用する。 */
+/** HTMLElementに限定したDOM検索 */
 export function htmlQS(selector: string): HTMLElement {
     return document.querySelector<HTMLElement>(selector)!;
 }

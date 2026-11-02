@@ -18,12 +18,17 @@ export class ReplayDataHandler {
     }
 
     static getDataSize() {
-        try { return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size; }
-        catch { return 0; }
+        try {
+            return new Blob([localStorage.getItem(this.storageKey) ?? ""]).size;
+        } catch {
+            return 0;
+        }
     }
 
     static createReplayData({ players, game, playSetting, randomSeeds }: DisposableGame) {
-        const inputData = game.operateMemories.map((operateMemory) => operateMemory.map(({ time, operateName, sequence }) => ({ time, sequence, keyCode: operationKeyCodes[operateName], type: "downup" })));
+        const inputData = game.operateMemories.map((operateMemory) =>
+            operateMemory.map(({ time, operateName, sequence }) => ({ time, sequence, keyCode: operationKeyCodes[operateName], type: "downup" }))
+        );
         const finishTime = Math.max(...players.map((player) => player.playInfo.playTime));
         const finishPlayers = game.g$winnerIndices;
 
@@ -40,7 +45,6 @@ export class ReplayDataHandler {
         return replayData;
     }
 
-
     static async removeSavedReplayData(data: ReplayData) {
         const replayDataList = this.getReplayDataList();
         const removedList = replayDataList.filter((value) => value.date != data.date);
@@ -55,8 +59,12 @@ export class ReplayDataHandler {
         const valid: ReplayData[] = [];
         const validEncoded: string[] = [];
         let raw: string | null;
-        try { raw = localStorage.getItem(this.storageKey); }
-        catch (error) { console.warn("リプレイ保存領域を読み込めませんでした", error); return []; }
+        try {
+            raw = localStorage.getItem(this.storageKey);
+        } catch (error) {
+            console.warn("リプレイ保存領域を読み込めませんでした", error);
+            return [];
+        }
         if (!raw) return [];
         try {
             const encodedList: unknown = JSON.parse(raw);
@@ -69,14 +77,20 @@ export class ReplayDataHandler {
                     dates.add(data.date);
                     valid.push(data);
                     validEncoded.push(encoded);
-                } catch { /* 読み込めない項目だけ削除し、正常な項目は保持する。 */ }
+                } catch {
+                    /* 読み込めない項目だけ削除し、正常な項目は保持する。 */
+                }
             });
             if (validEncoded.length === encodedList.length) return valid;
-        } catch { /* 一覧そのものが壊れている場合も起動を妨げない。 */ }
+        } catch {
+            /* 一覧そのものが壊れている場合も起動を妨げない。 */
+        }
         try {
             if (validEncoded.length) localStorage.setItem(this.storageKey, JSON.stringify(validEncoded));
             else localStorage.removeItem(this.storageKey);
-        } catch (error) { console.warn("読み込めないリプレイを削除できませんでした", error); }
+        } catch (error) {
+            console.warn("読み込めないリプレイを削除できませんでした", error);
+        }
         return valid;
     }
 
@@ -99,7 +113,7 @@ export class ReplayDataHandler {
             return false;
         }
 
-        // 表示時に新しい順へ並ぶよう、保存は古い順にする。
+        // 表示時に新しい順へ並ぶよう、保存は古い順にする
         replayDataList.push(data);
         replayDataList.sort((a, b) => a.date - b.date);
 

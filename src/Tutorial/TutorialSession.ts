@@ -5,7 +5,6 @@ import { Tutorial4Board } from "./Tutorial4/Board";
 import { getTutorialUnit } from "./TutorialUnits";
 import type { PracticeOutcome } from "./TutorialTypes";
 
-/** 教材の生成・稼働・片付け。Sceneは教材ごとのリソース管理を持たない。 */
 export class TutorialSession {
     readonly unit;
     readonly board: Tutorial1Board | Tutorial2Board | Tutorial3Board | Tutorial4Board;

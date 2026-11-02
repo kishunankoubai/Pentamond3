@@ -26,11 +26,11 @@ export class Music {
         void this.resumeContext().catch((error) => console.warn("音声を再開できませんでした", error));
     };
 
-    // 初回はユーザーの直接操作中に呼ぶ。復帰後も同じContextを再利用する。
+    // 初回はユーザーの直接操作中に呼ぶ
     static async init() {
         if (!this.audioContext) {
             this.audioContext = new AudioContext();
-            // Safariのinterrupted状態や、ブラウザーによる再停止を操作時に解除する。
+            // Safariのinterrupted状態や、ブラウザーによる再停止を操作時に解除する
             for (const event of ["pointerdown", "keydown", "click"]) document.addEventListener(event, this.resumeOnInteraction, { capture: true });
         }
         await this.resumeContext();
@@ -95,14 +95,21 @@ export class Music {
                     this.audioBuffer = await Music.g$context.decodeAudioData(await res.arrayBuffer());
                     this.isLoaded = true;
                     return;
-                } catch (error) { lastError = error; }
+                } catch (error) {
+                    lastError = error;
+                }
             }
             throw lastError;
-        })().finally(() => { this.loading = undefined; });
+        })().finally(() => {
+            this.loading = undefined;
+        });
         await this.loading;
     }
 
-    /** BGMのページ遷移用。再生中・読み込み中の同じ曲を開始し直さない。 */
+    /**
+     * BGMのページ遷移用
+     * 再生中・読み込み中の同じ曲を開始し直さない
+     *  */
     ensurePlaying(): Promise<void> {
         if (this.isPlaying) return Music.resumeContext();
         return this.playbackRequest ?? this.play();
@@ -189,7 +196,7 @@ export class Music {
 
     setLoop(loop: boolean): void {
         if (!this.sourceNode || this.sourceNode.loop === loop) return;
-        // 何周も再生した後でループを解除しても、再開位置が音声長を超えないようにする。
+        // 何周も再生した後でループを解除しても再開位置が音声長を超えないようにする
         this.startedAt = Music.g$context.currentTime - this.getPlaybackOffset();
         this.sourceNode.loop = loop;
     }
@@ -219,7 +226,10 @@ export class Music {
 
         await new Promise<void>((resolve) => {
             setTimeout(() => {
-                if (generation !== this.fadeGeneration) { resolve(); return; }
+                if (generation !== this.fadeGeneration) {
+                    resolve();
+                    return;
+                }
                 if (stop) {
                     this.stop();
                 } else {

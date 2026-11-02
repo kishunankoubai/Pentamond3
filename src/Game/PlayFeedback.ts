@@ -91,11 +91,12 @@ export class PlayFeedback {
         if (!GraphicSetting.removeShake) return;
         const colors = ["#ffffff", "#fff0ee", "#ffdad5", "#ffc1b9", "#ffa296", "#ff8173", "#ff6054"];
         this.rowFlash.style.setProperty("--clear-color", colors[Math.min(6, Math.max(0, Math.floor(clearSoundIndex)))]);
-        // 下の盤面を隠さないよう、ピークでも68%は透過させる。
+        // 下の盤面を隠さないようにする
         const peakOpacity = 0.5;
         this.rowFlash.style.opacity = String(peakOpacity);
         this.rowFlash.hidden = false;
-        // 300ms見せてから300msで消す。壁時計ではなく、停止・倍速に追従する時計を使う。
+        // 300ms見せてから300msで消す
+        // 停止・倍速に追従させる
         const start = this.clock.g$now;
         for (let step = 1; step <= 15; step++) {
             this.flashCancels.push(
@@ -124,7 +125,10 @@ export class PlayFeedback {
         this.pending.classList.toggle("incoming", incoming > 0);
     }
 
-    /** ひび割れと三角の破片が落ちる。ゲーム内時計なので停止・再生速度に追従する。 */
+    /**
+     * ひび割れと三角の破片
+     * 停止・再生速度に追従する
+     *  */
     collapseBoard(): void {
         this.collapseCancels.splice(0).forEach((cancel) => cancel());
         this.boardCollapse.hidden = true;

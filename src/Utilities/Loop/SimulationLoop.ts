@@ -1,7 +1,6 @@
 import { MyEventListener } from "../Event/MyEventListener";
 import { SimulationClock } from "./SimulationClock";
 
-/** LoopManagerと同じイベントを、専用RAFではなく共通時計で発行する。 */
 export class SimulationLoop extends MyEventListener {
     private frequency = 1000 / 60;
     private elapsed = 0;

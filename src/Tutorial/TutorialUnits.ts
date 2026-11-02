@@ -4,8 +4,8 @@ import { tutorial3LessonOffset, tutorial3Lessons } from "./Tutorial3/Lessons";
 import { tutorial4LessonOffset, tutorial4Lessons } from "./Tutorial4/Lessons";
 
 /**
- * Tutorial1～4を表示順に定義し、一覧・見出し・戻り先・解放判定を一元化する。
- * 単元IDと項目順は、保存済みのクリア状態・実績との対応を維持する。
+ * Tutorial1～4を表示順に定義し一覧・見出し・戻り先・解放判定を一元化する
+ * 単元IDと項目順は保存済みのクリア状態・実績との対応を維持する
  */
 export const tutorialUnits = [
     {

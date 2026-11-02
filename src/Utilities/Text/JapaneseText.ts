@@ -3,7 +3,7 @@ export function spaceJapanesePunctuation(text: string): string {
     return text.replace(/([、。])(?! )/g, "$1 ").replace(/！(?=[^\s])/g, "！ ");
 }
 
-/** 属性・URL・コードを変更せず、表示するテキストだけを整える。 */
+/** 属性・URL・コードを変更せず表示するテキストだけを整える */
 export function spaceJapaneseTextNodes(root: Node): void {
     const lineBreaks = "br, hr, div, p, section, article, aside, header, footer, main, nav, h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dt, dd, table, tr, td, th";
     let endingExclamation: Node | null = null;
@@ -17,7 +17,6 @@ export function spaceJapaneseTextNodes(root: Node): void {
         if (node.nodeType === Node.TEXT_NODE) {
             const original = node.nodeValue ?? "";
             if (!original.length) return;
-            // インライン要素を挟んでも文章が続く場合は空白を入れる。<br>や段落境界では入れない。
             if (endingExclamation && /^\S/.test(original)) endingExclamation.nodeValue += " ";
             const formatted = spaceJapanesePunctuation(original);
             if (original !== formatted) node.nodeValue = formatted;

@@ -52,7 +52,7 @@ export function setupMusics() {
             loop: false,
             type: "SE",
         });
-        // 初回の操作やカウントダウンに、音声取得の待ち時間が重ならないようにする。
+        // 初回の操作やカウントダウンに音声取得の待ち時間が重ならないようにする
         void MusicManager.get(name)!
             .load()
             .catch((error) => console.warn(`効果音「${name}」を読み込めませんでした`, error));

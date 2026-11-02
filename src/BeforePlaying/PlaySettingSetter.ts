@@ -26,8 +26,7 @@ export class PlaySettingSetter {
     };
 
     /**
-     *
-     * @returns 絶対変更不可なplaySetting
+     * @returns 変更不可なplaySetting
      */
     static getPlaySetting(): PlaySetting {
         return Object.freeze(structuredClone(this.playSetting));
@@ -82,7 +81,7 @@ export class PlaySettingSetter {
     private static render(): void {
         const modeHelpButton = document.getElementById("playPrepareModeHelpButton");
         if (modeHelpButton) modeHelpButton.dataset.page = getModeHelpPageId(this.playSetting.mode, this.playSetting.playerNumber);
-        // 両段のボタンを同じ列に配置し、見た目と方向入力の座標を一致させる。
+        // 両段のボタンを同じ列に配置して見た目と方向入力の座標を一致させる
         const prepare = document.getElementById("playPrepare");
         if (prepare) prepare.dataset.mode = String(this.playSetting.mode);
         const trickListButton = document.getElementById("playPrepareTrickListButton");

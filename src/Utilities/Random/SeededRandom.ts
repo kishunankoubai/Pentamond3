@@ -1,4 +1,4 @@
-/** 同じseedから同じ列を生成する軽量な32bit疑似乱数。 */
+/** 同じseedから同じ列を生成する軽量な32bit疑似乱数 */
 export class SeededRandom {
     private state: number;
 

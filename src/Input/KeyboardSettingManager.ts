@@ -24,7 +24,7 @@ const operationActions: Record<OperateName, Action> = {
     hold: "hold",
     removeLine: "removeLine",
 };
-// 保存形式のキー番号。既存の並びを変更しない。
+// 保存形式のキー番号
 const codes = [
     ...Array.from({ length: 26 }, (_, i) => `Key${String.fromCharCode(65 + i)}`),
     ...Array.from({ length: 10 }, (_, i) => `Digit${i}`),
@@ -191,7 +191,7 @@ export class KeyboardSettingManager {
             button.append(label, value);
             button.addEventListener("click", () => {
                 if (!this.useCustom) {
-                    this.status("編集用を選ぶと変更できます。 養成所とメニューは初期配置を使います。");
+                    this.status("編集用を選ぶと変更できます。 （養成所と初期配置）");
                     return;
                 }
                 this.opened = action;
@@ -265,7 +265,7 @@ export class KeyboardSettingManager {
         }
         document.getElementById("keyboardBindingAdd")?.classList.remove("waitingInput");
         const status = document.getElementById("keyboardBindingStatus");
-        if (status) status.textContent = "削除するキーを選ぶか、 新しい入力を追加してください。 Escは常にポーズに使えます。";
+        if (status) status.textContent = "削除するキーを選ぶか、新しい入力を追加してください。 ";
     }
     private static status(text: string): void {
         const status = document.getElementById("keyboardSettingStatus");
@@ -278,7 +278,7 @@ export class KeyboardSettingManager {
             button.classList.toggle("selectedValue", selected);
             button.setAttribute("aria-pressed", String(selected));
         });
-        this.status(this.useCustom ? "操作を選んでキーを変更できます。 1操作につき4つまで。 変更は自動で保存されます。" : "編集用を選ぶと変更できます。 メニューと養成所は初期配置を使います。");
+        this.status(this.useCustom ? "操作を選んでキーを変更できます。 （1操作につき4つまで）" : "編集用を選ぶと変更できます。 （養成所は初期配置）");
         document.querySelectorAll<HTMLElement>("[data-keyboard-action]").forEach((button) => {
             const action = button.dataset.keyboardAction as Action;
             const value = button.querySelector<HTMLElement>(".controllerMappingValue")!;
@@ -337,7 +337,7 @@ export class KeyboardSettingManager {
         try {
             localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values));
         } catch {
-            PageNotice.notify("キーボード設定を保存できませんでした。 今回の起動中は反映されますが、 再読み込みすると失われます。");
+            PageNotice.notify("キーボード設定を保存できませんでした。 今回の起動中は反映されますが、再読み込みすると失われます。");
         }
     }
 }

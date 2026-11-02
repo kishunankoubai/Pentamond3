@@ -151,7 +151,7 @@ export class ControllerSettingManager {
         this.selectedSlot = slot;
         this.save();
         this.render();
-        this.setStatus(slot === 0 ? "初期配置を使用します。" : `編集用${slot}を使用します。 操作を選ぶと編集できます（1操作につき${maxBindingsPerAction}入力まで）。`);
+        this.setStatus(slot === 0 ? "初期配置を使用します。" : `編集用${slot}を使用します。 操作を選ぶと編集できます。 （1操作につき${maxBindingsPerAction}入力まで）`);
     }
 
     private static selectPlayerSlot(playerIndex: number, slot: number): void {
@@ -166,7 +166,7 @@ export class ControllerSettingManager {
     private static openActionSetting(action: ControllerAction): void {
         if (!actions.includes(action)) return;
         if (this.selectedSlot === 0) {
-            this.setStatus("初期配置は読み取り専用です。編集用1～3を選んでください。");
+            this.setStatus("初期配置は編集できません。");
             return;
         }
         this.openedAction = action;
@@ -338,8 +338,8 @@ export class ControllerSettingManager {
             else localStorage.setItem(this.storageKey, JSON.stringify([2, this.selectedSlot, slots] satisfies CompactControllerSettings));
         } catch (error) {
             console.warn("コントローラー設定を保存できませんでした", error);
-            PageNotice.notify("コントローラー配置を保存できませんでした。 今回の起動中は反映されますが、 再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
-            this.setStatus("設定を保存できませんでした。現在のページでは変更が有効ですが、再読み込みで失われます。");
+            PageNotice.notify("コントローラー配置を保存できませんでした。 今回の起動中は反映されますが再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
+            this.setStatus("設定を保存できませんでした。現在のページでは変更が有効ですが再読み込みで失われます。");
         }
     }
 

@@ -1,6 +1,6 @@
 import type { OperateName } from "../Game/GameMode";
 
-/** 説明文に、登録中の入力機器に対応する操作表示を埋め込む。 */
+/** 説明文に登録中の入力機器に対応する操作表示を埋め込む */
 export type TutorialControlMarkup = (operation: OperateName) => string;
 
 export type PracticePhase =

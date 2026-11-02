@@ -15,7 +15,6 @@ const bottom = Settings.playHeight - 1;
 const kinds: BlockKind[] = ["L", "J", "p", "q", "U", "I"];
 const movement: OperateName[] = ["move-left", "move-right", "move-down", "spin-left", "spin-right", "put"];
 
-/** 初期盤面から組み方を体験し、その後は本編の操作・6種一巡で自由に組む。 */
 export class Tutorial4Board {
     readonly lesson;
     readonly layout;
@@ -37,19 +36,19 @@ export class Tutorial4Board {
     constructor(readonly index: number) {
         this.lesson = tutorial4Lessons[index - tutorial4LessonOffset];
         this.layout = tutorial4Layouts[index - tutorial4LessonOffset];
-        // 地割れなどの空き位置も、教材で実際に作る形と完成見本で揃える。
         const shape: ShapeInfo[] = Array.from({ length: Settings.playWidth }, () => [true, false]);
         const targetY = bottom - this.layout.height + 1;
         for (const [kind, x, depth, direction] of this.layout.solution)
-            for (const [sx, sy, , d] of new Pentiamond(x, bottom - depth, kind, direction).g$states)
-                if (sy === targetY) shape[sx] = [d, true];
+            for (const [sx, sy, , d] of new Pentiamond(x, bottom - depth, kind, direction).g$states) if (sy === targetY) shape[sx] = [d, true];
         const trick = trickInfos.find((trick) => trick.name === this.layout.trick && trick.shape.every(([d, visible], x) => shape[x][0] === d && shape[x][1] === visible));
         if (!trick) throw new Error(`教習の完成形が「${this.layout.trick}」に一致しません`);
         this.trick = trick;
         this.restart(true);
     }
 
-    get g$guided(): boolean { return this.stage === 0; }
+    get g$guided(): boolean {
+        return this.stage === 0;
+    }
     get g$allowed(): OperateName[] {
         if (this.operator) {
             if (this.phase !== "targets") return [];
@@ -59,11 +58,21 @@ export class Tutorial4Board {
         if (this.phase === "erasing") return ["removeLine", ...(this.undo && this.erased === 0 ? ["unput" as const] : [])];
         return [];
     }
-    get g$targets() { return this.g$guided && this.phase === "targets" ? this.targetsToPlace[this.placed]?.g$states ?? [] : []; }
-    get g$condition(): string { return `「${this.lesson.name}」を2回成立させよう`; }
-    get g$progress(): string { return `成立 ${this.stage} / 2`; }
-    get g$knowledge(): string { return this.lesson.knowledge + (!this.g$guided ? "地形を整理したいときは、消去を繰り返して盤面を空に戻せます。" : ""); }
-    get g$summary(): string { return this.g$guided ? `${this.layout.height}段目が目標 ／ 時間制限なし` : "時間制限なし"; }
+    get g$targets() {
+        return this.g$guided && this.phase === "targets" ? (this.targetsToPlace[this.placed]?.g$states ?? []) : [];
+    }
+    get g$condition(): string {
+        return `「${this.lesson.name}」を2回成立させよう`;
+    }
+    get g$progress(): string {
+        return `成立 ${this.stage} / 2`;
+    }
+    get g$knowledge(): string {
+        return this.lesson.knowledge + (!this.g$guided ? "地形を整理したいときは、消去を繰り返して盤面を空に戻せます。" : "");
+    }
+    get g$summary(): string {
+        return this.g$guided ? `${this.layout.height}段目が目標 ／ 時間制限なし` : "時間制限なし";
+    }
     get g$task(): string {
         if (this.phase === "done") return "クリア！";
         if (this.phase === "recoveryReview") return "成立した役を確かめよう";
@@ -96,8 +105,12 @@ export class Tutorial4Board {
         this.spawnNext();
     }
 
-    continueAfterObservation(): void { if (this.phase === "recoveryReview") this.restart(); }
-    dispose(): void { this.operator?.stop(); }
+    continueAfterObservation(): void {
+        if (this.phase === "recoveryReview") this.restart();
+    }
+    dispose(): void {
+        this.operator?.stop();
+    }
 
     get g$graphics(): GraphicData {
         if (this.operator) return this.operator.g$graphicData;
@@ -107,7 +120,7 @@ export class Tutorial4Board {
             this.blocks.removePentiamond(this.hand);
             ghost.s$visible = false;
             this.blocks.displayPentiamond(ghost);
-            while (this.blocks.fall(ghost)) { /* 本編の着地点 */ }
+            while (this.blocks.fall(ghost));
             ghostStates = ghost.g$states;
             this.blocks.removePentiamond(ghost);
             this.blocks.displayPentiamond(this.hand);
@@ -121,7 +134,10 @@ export class Tutorial4Board {
         if (operation === "removeLine") return this.erase();
         if (operation === "unput" && this.undo) {
             const snapshot = this.undo;
-            if (this.hand) { this.blocks.removePentiamond(this.hand); this.queue.unshift(this.hand.g$kind); }
+            if (this.hand) {
+                this.blocks.removePentiamond(this.hand);
+                this.queue.unshift(this.hand.g$kind);
+            }
             this.blocks.load(snapshot.terrain);
             this.placed = snapshot.placed;
             this.undo = null;
@@ -144,7 +160,7 @@ export class Tutorial4Board {
         this.blocks.removePentiamond(this.hand);
         this.undo = { terrain: this.blocks.g$blockProperties, kind: this.hand.g$kind, placed: this.placed };
         this.blocks.displayPentiamond(this.hand);
-        while (this.blocks.fall(this.hand)) { /* 真下への設置 */ }
+        while (this.blocks.fall(this.hand));
         if (!this.matches(this.targetsToPlace[this.placed])) return { failed: true, sound: "設置音", message: "残った穴の形を確かめて、もう一度やってみましょう。" };
         this.placed++;
         this.chain = 0;
@@ -154,7 +170,6 @@ export class Tutorial4Board {
         return { sound: "設置音" };
     }
 
-    /** 時間・スコア・リプレイだけを省き、移動・設置・ホールド・戻し・消去は本編に委譲する。 */
     private applyNormal(operation: OperateName): PracticeOutcome {
         const operator = this.operator!;
         const outcome: PracticeOutcome = {};
@@ -162,7 +177,9 @@ export class Tutorial4Board {
             const event = operator.addHandler(operation, () => {
                 outcome.sound = operation.startsWith("move-") ? "移動音" : operation === "spin-left" ? "左回転音" : "右回転音";
             });
-            const slide = operator.addHandler("slide-down", () => { outcome.sound = "滑り移動音"; });
+            const slide = operator.addHandler("slide-down", () => {
+                outcome.sound = "滑り移動音";
+            });
             if (operation.startsWith("move-")) operator.move(operation.slice(5) as "left" | "right" | "down");
             else operator.spin(operation.slice(5) as "left" | "right");
             operator.removeEvent([event, slide]);
@@ -215,16 +232,38 @@ export class Tutorial4Board {
         }
         return { trick: trick?.name, sound, message: trick ? `${trick.name}が成立しました！` : undefined };
     }
-    private acceptsTrick(name: string): boolean { return this.lesson.id === "row" ? name.startsWith("一列揃え(") : this.lesson.id === "crack" ? name.startsWith("地割れ(") : this.lesson.id === "shift" ? name.startsWith("地殻変動(") : this.lesson.id === "fang" ? name.startsWith("牙(") : name === this.lesson.name; }
+    private acceptsTrick(name: string): boolean {
+        return this.lesson.id === "row"
+            ? name.startsWith("一列揃え(")
+            : this.lesson.id === "crack"
+              ? name.startsWith("地割れ(")
+              : this.lesson.id === "shift"
+                ? name.startsWith("地殻変動(")
+                : this.lesson.id === "fang"
+                  ? name.startsWith("牙(")
+                  : name === this.lesson.name;
+    }
     private matches(target: Pentiamond): boolean {
-        const key = (piece: Pentiamond) => piece.g$states.map(([x, y, , d]) => `${x},${y},${d}`).sort().join(";");
+        const key = (piece: Pentiamond) =>
+            piece.g$states
+                .map(([x, y, , d]) => `${x},${y},${d}`)
+                .sort()
+                .join(";");
         return !!this.hand && !!target && this.hand.g$kind === target.g$kind && key(this.hand) === key(target);
     }
     private makeQueue(sequence: BlockKind[]): BlockKind[] {
-        const last = sequence.slice(sequence.length - sequence.length % 6);
+        const last = sequence.slice(sequence.length - (sequence.length % 6));
         return [...sequence, ...kinds.filter((kind) => !last.includes(kind)), ...kinds, ...kinds];
     }
-    private takeNext(): BlockKind { if (this.queue.length <= Settings.next.length) this.queue.push(...kinds); return this.queue.shift()!; }
-    private spawnNext(): void { this.spawn(this.takeNext()); }
-    private spawn(kind: BlockKind): void { this.hand = new Pentiamond(Settings.initialX, Settings.initialY, kind); this.blocks.displayPentiamond(this.hand); }
+    private takeNext(): BlockKind {
+        if (this.queue.length <= Settings.next.length) this.queue.push(...kinds);
+        return this.queue.shift()!;
+    }
+    private spawnNext(): void {
+        this.spawn(this.takeNext());
+    }
+    private spawn(kind: BlockKind): void {
+        this.hand = new Pentiamond(Settings.initialX, Settings.initialY, kind);
+        this.blocks.displayPentiamond(this.hand);
+    }
 }

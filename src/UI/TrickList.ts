@@ -4,7 +4,6 @@ import { ElementManager } from "../Utilities/Element/ElementManager";
 import { EventScope } from "../Utilities/Event/EventScope";
 import { LoopManager } from "../Utilities/Loop/LoopManager";
 
-/** 役の名称・形・基本値の出典はゲーム本体の定義に統一する。 */
 export function setupTrickList(elementManager: ElementManager): void {
     const page = document.getElementById("trickList");
     const controller = page?.querySelector(".subPageController");
@@ -12,7 +11,6 @@ export function setupTrickList(elementManager: ElementManager): void {
     page.querySelectorAll(".subPage").forEach((element) => element.remove());
     const groups = new Map<string, TrickInfo[]>();
     trickInfos.forEach((trick) => {
-        // 同名でも基本値が異なる役は別の項目として扱う。
         const key = JSON.stringify([trick.name, trick.time, trick.attack]);
         const variants = groups.get(key) ?? [];
         variants.push(trick);

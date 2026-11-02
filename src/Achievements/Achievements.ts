@@ -68,7 +68,7 @@ export class Achievements {
         } catch (error) {
             this.flags.fill(0);
             this.counters.fill(0);
-            console.warn("実績を読み込めませんでした。 初期値で続行します。", error);
+            console.warn("実績を読み込めませんでした", error);
             return false;
         }
     }
@@ -81,7 +81,6 @@ export class Achievements {
                 this.counters[survivalCountIndex] = Math.max(this.counters[survivalCountIndex], 1);
             const times = [data.soloSprintTime, data.multiSprintTime].filter((time) => time > 0);
             if (times.length) this.counters[sprintCountIndex] = Math.max(this.counters[sprintCountIndex], 1);
-            // 旧統計にはハンデが残っていないため、条件付き実績を推測で解除しない。
             if (times.length) this.evaluateSprintTime(Math.min(...times));
             this.evaluateCounters();
         });
@@ -113,7 +112,6 @@ export class Achievements {
                 if (mode === 1) {
                     const standard = isStandardSurvivalRecord(info);
                     this.evaluateSurvival(info.score, info.playTime, standard);
-                    // 他プレイヤーとの合算ではなく、同じプレイヤーが全種類を揃える。
                     if (standard && player.trickCounts.every((count) => count > 0)) this.unlock("survival-tricks-all");
                 } else if (mode === 2 && game.playSetting.targetLines === 15 && info.line >= 15) {
                     this.evaluateSprintTime(info.playTime);
@@ -157,8 +155,8 @@ export class Achievements {
         try {
             localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values));
         } catch (error) {
-            console.warn("実績を保存できませんでした。 今回の起動中は保持します。", error);
-            PageNotice.notify("実績を保存できませんでした。 今回の起動中は保持しますが、 再読み込みすると失われます。 保存領域の空きやブラウザーの設定を確認してください。");
+            console.warn("実績を保存できませんでした\n再読み込みすると失われます。", error);
+            PageNotice.notify("実績を保存できませんでした。 再読み込みすると失われますので保存領域の空きやブラウザーの設定を確認してください。");
         }
     }
 

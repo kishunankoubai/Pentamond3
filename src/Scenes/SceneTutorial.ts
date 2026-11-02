@@ -240,23 +240,23 @@ export class SceneTutorial extends Scene {
             );
         } else {
             const introductions: Record<string, string[]> = {
-                move: ["黄色の枠に合うように、モンドを5個設置してください。"],
+                move: ["黄色の枠に合うようにモンドを5個設置してください。"],
                 rotate: [
                     "今度は回転です！1回で60度、3回で上下が反転します。",
                     `${this.controlMarkup("spin-left")}で左回転、${this.controlMarkup("spin-right")}で右回転します。`,
-                    "黄色の枠の形と三角形の向きを合わせて5個設置してください。",
+                    "黄色の枠に合わせて5個設置してください。",
                 ],
                 slide: [
-                    "屋根の下には、真下への設置だけでは入れません。",
-                    "黄色の枠の少し右へ動かしてから下へ進んでください。真下が塞がれていると、斜め下へ滑り込みます。",
+                    "真下への設置だけでは入れない場所があることがあります。そんなときは「滑り移動」！",
+                    "黄色の枠の少し右へ動かしてから下へ進んでください。真下が塞がれていると斜め下へ滑り込みます。",
                     "滑り移動を使って5個設置しましょう。",
                 ],
                 hold: [
-                    "黄色の枠と今のモンドの形が違いますね。こんなときはホールド！",
-                    `${this.controlMarkup("hold")}でモンドを取っておけます。空なら次のモンドが出現し、入っていれば入れ替わります。`,
-                    "ホールドを使って5個設置しましょう。次の課題にもホールドしたモンドが残ります。",
+                    "地形と今のモンドの形が合いませんね。 そんなときは「ホールド」！",
+                    `${this.controlMarkup("hold")}でモンドを持っておくことができます。すでに持っていれば入れ替えます。`,
+                    "では早速ホールドを駆使して、5個設置しましょう。",
                 ],
-                undo: ["設置を間違えたときには、一手戻しが使えます！", "まずは試しに、そのまま設置してみましょう。"],
+                undo: ["間違えて設置しちゃった！ そんなときは「一手戻し」！", "まずは、試しにそのまま設置してみましょう。"],
                 erase: ["今までに覚えた移動と設置で、黄色の枠に3個設置してみましょう。"],
             };
             await this.say(introductions[this.model.lesson.id], token);
@@ -349,7 +349,7 @@ export class SceneTutorial extends Scene {
         } else if (outcome.advance) {
             if (this.model instanceof Tutorial2Board && this.model.lesson.id === "variety") {
                 const model = this.model;
-                // 新しい役の説明に入る前だけ、消去後の盤面を見せる。
+                // 新しい役の説明に入る前は消去後の盤面を見せる
                 this.busy = true;
                 void this.afterBoardObservation(async () => {
                     this.model.continueAfterObservation();
@@ -362,7 +362,7 @@ export class SceneTutorial extends Scene {
                     if (this.isCurrent(token)) this.releasePractice();
                 });
             } else {
-                // 説明を挟まない設置では、同じ入力処理内で次のモンドを出現させる。
+                // 説明を挟まない設置では同じ入力処理内で次のモンドを出現させる
                 this.model.continueAfterObservation();
                 this.render();
             }
@@ -376,7 +376,6 @@ export class SceneTutorial extends Scene {
         }
     }
 
-    /** 入力を止め、覆いのない盤面を0.7秒見せる。休憩・退出・再挑戦にも追従する。 */
     private async afterBoardObservation(proceed: () => Promise<void>): Promise<void> {
         const token = this.generation;
         this.held.clear();
@@ -406,10 +405,10 @@ export class SceneTutorial extends Scene {
             this.releasePractice();
             return;
         }
-        await this.say([timedOut ? "持ち時間がなくなりました。もう一度挑戦しましょう！" : "あらら、課題を達成できませんでした。黄色の枠の形を確かめて、もう一度挑戦してください！"], token);
+        await this.say([timedOut ? "持ち時間がなくなりました。もう一度挑戦しましょう！" : "あらら、課題を達成できませんでした。もう一度挑戦しましょう！"], token);
         if (!this.isCurrent(token)) return;
         this.model.restart();
-        this.setText("lessonStatus", "地形と進捗をリセットしました。もう一度挑戦しましょう。");
+        this.setText("lessonStatus", "地形と進捗をリセットしました。もう一度挑戦しましょう！");
         this.render();
         this.releasePractice();
     }
@@ -430,22 +429,22 @@ export class SceneTutorial extends Scene {
         const token = this.generation;
         const phase = this.model.phase;
         if (phase === "autoPutReview") {
-            await this.say(["どうやら、設置をすると自動的に一番下まで行くようですね。"], token);
+            await this.say(["どうやら、 設置をすると自動的に一番下まで行くようですね。"], token);
             if (!this.isCurrent(token)) return;
             this.model.continueAfterObservation();
             this.render();
-            await this.say(["では最後に、黄色の枠に合うように5個設置してください。黄色の枠は順番に表示されます。"], token);
+            await this.say(["では最後に、 黄色の枠に合わせて5個設置してください。黄色の枠は順番に表示されます。"], token);
             if (this.isCurrent(token)) this.releasePractice();
             return;
         }
         const lines: Partial<Record<PracticePhase, string[]>> = {
-            down: ["いいですね！次は一番下まで動かしてみましょう。", `${this.controlMarkup("move-down")}を押し続けると下へ動かせます。`],
-            firstPut: ["いいですね！では、その場所に「設置」してみましょう。", `設置するには${this.controlMarkup("put")}を押します。`],
-            autoPut: ["うまくできました！次のモンドが出現したようですね。", "では、今度はそのまま設置をしてみましょう。"],
+            down: ["いいですね！ 次は一番下まで動かしてみましょう。", `${this.controlMarkup("move-down")}を押し続けると下へ動かせます。`],
+            firstPut: ["いいですね！ では、その場所に「設置」してみましょう。", `設置するには${this.controlMarkup("put")}を押します。`],
+            autoPut: ["うまくできました！ 次のモンドが出現したようですね。", "では、今度はそのまま設置をしてみましょう。"],
             targets:
                 this.model.lesson.id === "move"
                     ? ["どうやら、設置をすると自動的に一番下まで行くようですね。", "では最後に、黄色の枠に合うように5個設置してください。"]
-                    : ["元に戻せましたね！今度は黄色の枠に合う位置に設置してください。", "10個の指定位置に設置するとクリアです。間違えても一手戻しで直せます。"],
+                    : ["元に戻せましたね！今度は黄色の枠に合う位置に設置してください。", "10個の指定位置に設置するとクリアです。 間違えても一手戻しを使えますよ！"],
             undoBack: [`黄色の枠とは違う位置に設置されました。${this.controlMarkup("unput")}で一手戻ししてみましょう。`],
             erasing: ["3個とも設置できました！", "ここで「消去」を試してみましょう。一番下の列を消す操作です。", `${this.controlMarkup("removeLine")}で、役なしの列も含めて5回消してみましょう。`],
             done: ["成功しましたね！", `これにて「${this.model.lesson.name}」の教習を終了します！お疲れさまでした！`],
@@ -470,19 +469,19 @@ export class SceneTutorial extends Scene {
                 model.lesson.id === "chain"
                     ? [
                           "10列そろいました！ここからは連続で消してみましょう。",
-                          "役のある列を、設置を挟まずに続けて消すとチェインが増えます。設置や役なし消去でチェインは途切れます。",
+                          "役のある列を設置を挟まずに続けて消すと「チェイン」です。設置や役なし消去でチェインは途切れます。",
                           `${this.controlMarkup("removeLine")}で10回消して、役の名前とChainの数を見てみましょう！`,
                       ]
                     : model.lesson.id === "penalty"
-                      ? ["一手戻しで持ち時間が3減りましたね。次は役なし消去です。", `${this.controlMarkup("removeLine")}で続けて3回消しましょう。最初は減らず、その次からペナルティを受けます。`]
+                      ? ["一手戻しで持ち時間が3減りましたね。 次は役なし消去です。", `${this.controlMarkup("removeLine")}で続けて3回消しましょう。最初は減らず、その次からペナルティを受けます。`]
                       : [`形が完成しました！${this.controlMarkup("removeLine")}で最下列を消し、役を成立させましょう。`];
             await this.say(lines, token);
         } else if (["recoveryReview", "damageReview", "done"].includes(model.phase)) {
             const review =
                 model.phase === "recoveryReview"
                     ? [
-                          "一列揃えが成立しました！持ち時間が10回復し、役のスコア1000を獲得しました。回復しても最大持ち時間は超えません。",
-                          "サバイバルは、役を揃えて時間を回復しながら、スコアを伸ばすモードです！",
+                          "一列揃えが成立しました！ 持ち時間が10回復し、役のスコア1000を獲得しました。",
+                          "サバイバルは役を揃えて時間を回復しながらハイスコアを目指すモードです！ メインメニューから遊んでみてね！",
                       ]
                     : model.phase === "damageReview"
                       ? [
@@ -490,10 +489,10 @@ export class SceneTutorial extends Scene {
                             "受けた攻撃を相殺するには、待機中に役を揃えて攻撃をやり返しましょう。",
                         ]
                       : model.lesson.id === "chain"
-                        ? ["10回の役と10チェインを達成しました！Pentamondでは、役を揃えて消すことが遊びの中心です。"]
+                        ? ["10回の役と10チェインを達成しました！ Pentamondは、役を揃えて消すことを目指すゲームです。"]
                         : model.lesson.id === "variety"
-                          ? ["3種類の役が成立しました！ほかの形は役一覧でも確かめられます。"]
-                          : ["3回のペナルティを体験しました。持ち時間を見ながら、一手戻しや役なし消去を使いましょう！"];
+                          ? ["3種類の役が成立しました！ ほかの形は役一覧でも確かめられます。"]
+                          : ["3回のペナルティを体験しました。 一手戻しや役なし消去を使うときには持ち時間に気を付けましょう！"];
             model.setActive(false);
             model.phase = "done";
             TutorialProgress.complete(model.index);
@@ -517,12 +516,12 @@ export class SceneTutorial extends Scene {
         const token = this.generation;
         if (model.phase === "done") {
             const reviews: Record<typeof model.lesson.id, string> = {
-                next: "ネクストの予告どおりにモンドが出現しましたね！次の形も見ながら役を作る置き場所を考えましょう。",
-                holdReset: "同じモンドを初期位置に戻せました！ホールド2回は下へ動かしすぎたときの立て直しにも使えます。",
-                juggling: "ネクストだったモンドを取り出せました！現在とホールドの形が合わないときに使える手段です。ペナルティには気をつけましょう。",
-                rotation: "2つとも回転入れができました！滑り移動のあとに回転する方法も、置き場所を考える手がかりになります。",
-                leftPriority: "左右どちらにも滑れる場面で、左へ滑りましたね！右へ入れたいときは、滑る前の位置を調整しましょう。",
-                blockedSpawn: "一手戻しと消去のどちらでも、出現できるように戻せました！初期位置が埋まっても落ち着いて立て直しましょう。",
+                next: "ネクストの予告どおりにモンドが出現しましたね！ 次の形も見ながら置き場所を考えましょう。",
+                holdReset: "同じモンドを初期位置に戻せました！ホールドを2回することで、 下へ動かしすぎたときに立て直すことができます。",
+                juggling: "ネクストだったモンドを取り出せました！ 現在とホールドのモンドが使いづらいときに使える手段です。 ペナルティには気をつけましょう。",
+                rotation: "2つとも回転入れができました！ 置ける場所がなさそうでも、回転入れで窮地を救えるかも？",
+                leftPriority: "左右、 どちらにも滑れそうですが左へ滑りましたね！ 右へ入れたいときは左が埋まっている必要があります。",
+                blockedSpawn: "一手戻しと消去のどちらでも出現させることができました！ 初期位置が埋まっても焦ることはありません。",
             };
             TutorialProgress.complete(model.index);
             await this.say([reviews[model.lesson.id], `これにて「${model.lesson.name}」の教習を終了します！お疲れさまでした！`], token);
@@ -532,7 +531,7 @@ export class SceneTutorial extends Scene {
         if (model.lesson.id === "rotation") {
             await this.say(
                 [
-                    "滑り移動のあとに回転して屋根の下へ入れられましたね！次は別の形でも試しましょう。",
+                    "滑り移動のあとに回転して屋根の下へ入れられましたね！　次は別の形でも試しましょう。",
                     "次の地形では少し右へ動かしてから1回左回転し、下へ滑り込んだあとに右回転して黄色の枠へ入れましょう。",
                 ],
                 token
@@ -543,11 +542,11 @@ export class SceneTutorial extends Scene {
             await this.say(["初期位置が埋まり次のモンドが出現できませんね。移動やホールドでは動かせません。", `${this.controlMarkup("unput")}で直前の設置を戻してみましょう。`], token);
         } else if (model.lesson.id === "blockedSpawn" && model.stage === 2) {
             if (!model.g$recoveryConfirmed) {
-                await this.say(["一手戻しで設置前に戻りました！見た目は似ていますが、今のモンドはまた操作できます。", "左と右へ、それぞれ3回動かして確かめてみましょう。"], token);
+                await this.say(["一手戻しで設置前に戻りました！ 見た目は似ていますが今のモンドはまた操作できます。", "左と右へ動かして確かめてみましょう。"], token);
                 if (this.isCurrent(token)) this.releasePractice();
                 return;
             }
-            await this.say(["左右に動かせましたね！設置前の、操作できる状態に戻ったことが分かります。次は、一手戻しができない場面で消去を試します。"], token);
+            await this.say(["左右に動かせましたね！ 設置前の操作できる状態に戻ったことが分かります。次は、 一手戻しができない場面で消去してみましょう。"], token);
             if (!this.isCurrent(token)) return;
             model.continueAfterObservation();
             this.setText("lessonStatus", "今度は初期位置が埋まった地形です。消去して出現できるようにしましょう。");
@@ -565,7 +564,7 @@ export class SceneTutorial extends Scene {
         const model = this.model;
         const token = this.generation;
         if (model.phase === "erasing") {
-            await this.say([`形ができました！${this.controlMarkup("removeLine")}で最下列から順に消去して、できた役を確かめましょう。`], token);
+            await this.say([`形ができました！ ${this.controlMarkup("removeLine")}で最下列から順に消去しましょう。`], token);
         } else if (model.phase === "recoveryReview") {
             await this.say([model.lesson.review, "今度は補助なしで組んでみましょう。"], token);
             if (!this.isCurrent(token)) return;
@@ -593,7 +592,7 @@ export class SceneTutorial extends Scene {
         this.canvas.readData(graphics);
         this.canvas.paint();
         const introducingErase = this.model.lesson.id === "erase" && ["erasing", "done"].includes(this.model.phase);
-        this.setText("lessonKnowledge", this.model.lesson.id === "erase" && !introducingErase ? "黄色の枠に形と向きを合わせ、盤面を完成させましょう。" : this.model.lesson.knowledge);
+        this.setText("lessonKnowledge", this.model.lesson.id === "erase" && !introducingErase ? "黄色の枠に合わせて設置して、 盤面を完成させましょう。" : this.model.lesson.knowledge);
         this.setText("lessonCondition", `黄色の枠にモンドを${this.model.lesson.count}個設置しよう${introducingErase ? "／消去を5回しよう" : ""}`);
         this.setText(
             "lessonProgress",
@@ -605,14 +604,14 @@ export class SceneTutorial extends Scene {
             horizontal: "モンドを左右に20回動かしてみよう",
             down: "下へ動かして、一番下まで進もう",
             firstPut: "その場所に設置してみよう",
-            autoPut: "今度は動かさず、そのまま設置してみよう",
+            autoPut: "そのまま設置してみよう",
             autoPutReview: "設置後のモンドの位置を見てみよう",
-            targets: "黄色の枠の形・向きに合わせて設置しよう",
-            undoPut: "まずは動かさず、そのまま設置してみよう",
-            undoBack: "一手戻しで直前の設置を元に戻そう",
+            targets: "黄色の枠に合わせて設置しよう",
+            undoPut: "そのまま設置してみよう",
+            undoBack: "一手戻しをしてみよう",
             erasing: "一番下の列を5回消去しよう",
             done: "クリア！",
-            penalties: "一手戻しを体験しよう",
+            penalties: "一手戻しをしてみよう",
             damageReady: "設置しよう",
             damaging: "ダメージを見てみよう",
             damageReview: "変化した地形を見てみよう",
@@ -644,7 +643,7 @@ export class SceneTutorial extends Scene {
         return `<span data-lesson-control="${op}">${this.controlsFor(op)}</span>`;
     }
     private movementSpeech(): string {
-        return this.usingController ? "スティックや方向キーで動かせます。教習では初期配置を使います。" : "矢印キーで動かせます。まずは←か→を押してみてください。";
+        return this.usingController ? "スティックや方向キーで動かせます。（初期配置）" : "矢印キーで動かせます。まずは←か→を押してみてください。";
     }
     private resolveSpeechControls(html: string): string {
         const source = document.createElement("template");

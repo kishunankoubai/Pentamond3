@@ -5,7 +5,7 @@ import { PageNotice } from "../Utilities/Feedback/PageNotice";
 import { Achievements } from "../Achievements/Achievements";
 import { ReplayDataHandler } from "../Replay/ReplayDataHandler";
 
-/** 統計・教習記録・実績・初回案内を、データ管理上の「プレイデータ」として扱う。 */
+/** 統計・教習記録・実績・初回案内をデータ管理上の「プレイデータ」として扱う */
 export class PlayData {
     private static readonly guideKey = "Pentamond3-firstLaunchGuide";
     private static guideShown = false;

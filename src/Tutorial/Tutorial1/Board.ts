@@ -10,7 +10,6 @@ import type { PracticeOutcome, PracticePhase } from "../TutorialTypes";
 const bottom = Settings.playHeight - 1;
 const movement: OperateName[] = ["move-left", "move-right", "move-down", "put"];
 
-/** 通常ゲームの時間・ランダム・記録処理から独立した教材。衝突・回転・消去は本体と共通。 */
 export class Tutorial1Board {
     readonly lesson: (typeof tutorial1Lessons)[number];
     blocks = new BlockManager();
@@ -80,9 +79,7 @@ export class Tutorial1Board {
             this.blocks.removePentiamond(this.hand);
             ghost.s$visible = false;
             this.blocks.displayPentiamond(ghost);
-            while (this.blocks.fall(ghost)) {
-                /* 真下の着地点 */
-            }
+            while (this.blocks.fall(ghost));
             this.blocks.removePentiamond(ghost);
             this.blocks.displayPentiamond(this.hand);
         }
@@ -95,7 +92,6 @@ export class Tutorial1Board {
             const trick = this.blocks.removeLine();
             this.erased++;
             if (this.erased === 5) this.phase = "done";
-            // 役なしには専用の音を使い、役成立時の消去音と区別する。
             const sound = trick ? `消去音${Math.min(6, this.chain++)}` : "役無し消去音";
             if (!trick) this.chain = 0;
             return { trick: trick?.name ?? "役なし", sound };
@@ -142,19 +138,15 @@ export class Tutorial1Board {
             return { sound: "ホールド音" };
         }
         if (operation !== "put") return {};
-        // 一手戻し用の状態は設置の直前の「地形だけ」。移動状態は初期位置へ戻す。
         this.blocks.removePentiamond(this.hand);
         const terrain = this.blocks.g$blockProperties;
         this.blocks.displayPentiamond(this.hand);
-        while (this.blocks.fall(this.hand)) {
-            /* 本体と同じ真下への自動設置 */
-        }
+        while (this.blocks.fall(this.hand));
         this.undo = { terrain, kind: this.hand.g$kind, hold: this.hold, next: [...this.next] };
         if (this.phase === "firstPut") {
             this.spawn("I");
             this.phase = "autoPut";
         } else if (this.phase === "autoPut") {
-            // 自動落下を説明する間は、2個とも設置された盤面を保持する。
             this.hand = null;
             this.undo = null;
             this.phase = "autoPutReview";
@@ -224,14 +216,12 @@ export class Tutorial1Board {
         } else if (id === "erase") {
             if (this.placed === 0) {
                 this.blocks = new BlockManager();
-                // 下2列は役なし。上3列の穴を埋めると一列揃えになる。
                 for (let y = bottom - 1; y <= bottom; y++) for (const x of [0, 1, 2, 8, 14, 15, 16]) this.fill(x, y);
                 for (let y = bottom - 4; y <= bottom - 2; y++) for (let x = 0; x < Settings.playWidth; x++) if (x < 6 || x > 10) this.fill(x, y);
             }
             this.target = new Pentiamond(8, bottom - 2 - this.placed, "I");
             this.spawn("I");
         } else {
-            // 各小課題の最後に一列揃えが完成。達成後は次の教材地形へ切り替える。
             this.blocks = new BlockManager();
             const centers = [4, 12, 6, 10, 8];
             const x = id === "slide" ? centers[this.placed % centers.length] : [12, 4, 10, 6, 8][this.placed % 5];
@@ -240,7 +230,6 @@ export class Tutorial1Board {
             const holes = new Set(this.target.g$states.filter(([, y]) => y === bottom).map(([x]) => x));
             for (let column = 0; column < Settings.playWidth; column++) if (!holes.has(column)) this.fill(column, bottom);
             if (id === "slide") {
-                // 同じ高さでの左移動と真下落下の両方を塞ぐ屋根。右から下入力で滑り込む。
                 const terrain = this.blocks.g$blockProperties;
                 terrain[x - 3][bottom - 1] = ["g", true, true];
                 this.blocks.load(terrain);

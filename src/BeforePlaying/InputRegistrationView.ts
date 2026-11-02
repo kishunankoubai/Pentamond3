@@ -12,14 +12,14 @@ export class InputRegistrationView {
 
     static acceptsMenuInput(pageId: string, input: InputObserver): boolean {
         if (!document.getElementById(pageId)?.classList.contains("inputRegistrationPage")) return true;
-        // 初めての押下は登録だけに使う。登録済みの機器では待機中も「戻る」を選べる。
+        // 登録画面初めての入力は登録だけに反応する
+        // 登録済みであれば戻るを選択できる
         return !inputManager.g$registering || inputManager.g$registeredInputs.includes(input);
     }
 
     get g$ready(): boolean {
         const inputs = inputManager.g$registeredInputs;
-        return inputs.length === this.requiredNumber && inputs.every((input) =>
-            input.g$type === "keyboard" || input instanceof GamepadObserver && !!readGamepads()[input.g$index]?.connected);
+        return inputs.length === this.requiredNumber && inputs.every((input) => input.g$type === "keyboard" || (input instanceof GamepadObserver && !!readGamepads()[input.g$index]?.connected));
     }
 
     reset(requiredNumber: number): void {
@@ -37,14 +37,16 @@ export class InputRegistrationView {
         const ready = this.g$ready;
         message.textContent = ready ? "完了！" : `登録したい入力機器のボタンを押してください：あと${Math.max(0, this.requiredNumber - inputs.length)}人`;
         message.classList.toggle("registrationComplete", ready);
-        connections.replaceChildren(...inputs.map((input, index) => {
-            const icon = document.createElement("div");
-            icon.className = "inputTypeIcon";
-            icon.dataset.inputType = input.g$type;
-            icon.setAttribute("role", "img");
-            icon.setAttribute("aria-label", `プレイヤー${index + 1}：${input.g$type === "keyboard" ? "キーボード" : "コントローラー"}`);
-            return icon;
-        }));
+        connections.replaceChildren(
+            ...inputs.map((input, index) => {
+                const icon = document.createElement("div");
+                icon.className = "inputTypeIcon";
+                icon.dataset.inputType = input.g$type;
+                icon.setAttribute("role", "img");
+                icon.setAttribute("aria-label", `プレイヤー${index + 1}：${input.g$type === "keyboard" ? "キーボード" : "コントローラー"}`);
+                return icon;
+            })
+        );
         setInteractionEnabled(next, ready);
         if (ready && focusWhenReady) next.focus({ preventScroll: true });
     }

@@ -14,7 +14,8 @@ import { MyEventListener } from "../Utilities/Event/MyEventListener";
 
 /**
  * ゲームのセッティングから片付けまでやって捨てられるクラス
- * ending: 結果算定直後。finished: 終了演出の待機後。どちらもこの試合を同期通知する。
+ * ending: 結果算定直後
+ * finished: 終了演出の待機後
  */
 export class DisposableGame extends MyEventListener {
     readonly players: GamePlayer[];
@@ -133,11 +134,17 @@ export class DisposableGame extends MyEventListener {
     }
 
     private static createPlayers(playSetting: PlaySetting, inputs: InputObserver[], inputCount: number, randomSeeds: ReplayRandomSeeds, clock: SimulationClock) {
-        const players = inputs.map((input, i) =>
-            new GamePlayer(input, inputCount, {
-                next: randomSeeds.next[i],
-                nuisance: randomSeeds.nuisance[i],
-            }, clock)
+        const players = inputs.map(
+            (input, i) =>
+                new GamePlayer(
+                    input,
+                    inputCount,
+                    {
+                        next: randomSeeds.next[i],
+                        nuisance: randomSeeds.nuisance[i],
+                    },
+                    clock
+                )
         );
 
         players.forEach((player, i) => {
@@ -156,7 +163,6 @@ export class DisposableGame extends MyEventListener {
             player.playInfo.gameTime = playSetting.maxGameTime;
             player.playInfo.handy = playSetting.mode === 1 ? (playSetting.handy[i] ?? 1) : 1;
             player.playInfo.targetLines = playSetting.targetLines;
-
         });
 
         return players;

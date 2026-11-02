@@ -15,7 +15,6 @@ const bottom = Settings.playHeight - 1;
 const allMoves: OperateName[] = ["move-left", "move-right", "move-down", "spin-left", "spin-right", "put"];
 const variedNames = ["三つ子山", "トゲトゲ(下)", "地割れ(上)"];
 
-/** 教材の黄色の枠・固定6種一巡。役判定とダメージ処理は本編をそのまま利用する。 */
 export class Tutorial2Board {
     readonly lesson;
     blocks = new BlockManager();
@@ -60,14 +59,12 @@ export class Tutorial2Board {
         this.hand = null;
         this.phase = "targets";
         const id = this.lesson.id;
-        this.bag = id === "chain" ? ["U", "L", "q", "J", "p", "I"]
-            : id === "variety" ? ["L", "I", "J", "p", "q", "U"]
-            : id === "survival" ? ["p", "I", "L", "J", "q", "U"] : ["I", "L", "J", "p", "q", "U"];
+        this.bag =
+            id === "chain" ? ["U", "L", "q", "J", "p", "I"] : id === "variety" ? ["L", "I", "J", "p", "q", "U"] : id === "survival" ? ["p", "I", "L", "J", "q", "U"] : ["I", "L", "J", "p", "q", "U"];
         if (id === "chain") {
             this.targetsToPlace = [new Pentiamond(10, bottom - 9, "U", 3), new Pentiamond(6, bottom - 9, "L", 3), new Pentiamond(13, bottom - 9, "q", 3)];
             const terrain = this.blocks.g$blockProperties;
-            for (let y = bottom - 9; y <= bottom; y++)
-                for (let x = 0; x < Settings.playWidth; x++) terrain[x][y] = ["g", (x + y - bottom) % 2 === 0, true];
+            for (let y = bottom - 9; y <= bottom; y++) for (let x = 0; x < Settings.playWidth; x++) terrain[x][y] = ["g", (x + y - bottom) % 2 === 0, true];
             this.cutTargets(terrain);
             this.blocks.load(terrain);
         } else if (id === "variety") this.prepareVariety();
@@ -77,9 +74,13 @@ export class Tutorial2Board {
         } else if (id === "penalty") {
             this.targetsToPlace = [];
             this.phase = "penalties";
-            // 一手戻しのあとも残る、役に該当しない3列。消去による変化を見せる。
+            // 役に該当しない3列
             const terrain = this.blocks.g$blockProperties;
-            [[2, 5], [4, 8], [6, 11]].forEach(([left, right], row) => {
+            [
+                [2, 5],
+                [4, 8],
+                [6, 11],
+            ].forEach(([left, right], row) => {
                 for (let x = left; x <= right; x++) terrain[x][bottom - row] = ["g", (x + row) % 2 === 0, true];
             });
             this.blocks.load(terrain);
@@ -87,13 +88,14 @@ export class Tutorial2Board {
             this.targetsToPlace = [];
             this.phase = "damageReady";
             const terrain = this.blocks.g$blockProperties;
-            for (let y = bottom - 5; y <= bottom; y++)
-                for (let x = 2; x <= 14; x++) terrain[x][y] = ["g", (x + y - bottom) % 2 === 0, true];
+            for (let y = bottom - 5; y <= bottom; y++) for (let x = 2; x <= 14; x++) terrain[x][y] = ["g", (x + y - bottom) % 2 === 0, true];
             this.blocks.load(terrain);
             this.nuisance = new NuisanceMondManager(this.blocks, 0x50454e54);
             bindDamageSounds(this.nuisance);
             this.nuisance.addHandler("damageBoard", () => this.penalty++);
-            this.nuisance.addHandler("finishDamage", () => { this.phase = "damageReview"; });
+            this.nuisance.addHandler("finishDamage", () => {
+                this.phase = "damageReview";
+            });
         }
         this.spawnNext();
     }
@@ -107,7 +109,9 @@ export class Tutorial2Board {
         return [];
     }
 
-    get g$targets() { return this.phase === "targets" ? this.targetsToPlace[this.targetIndex]?.g$states ?? [] : []; }
+    get g$targets() {
+        return this.phase === "targets" ? (this.targetsToPlace[this.targetIndex]?.g$states ?? []) : [];
+    }
     get g$gameTime(): number {
         const maximum = this.lesson.id === "survival" ? 30 : this.lesson.id === "penalty" ? 150 : Infinity;
         return Math.max(0, Math.min(maximum, Math.ceil(maximum - this.elapsed / Settings.gameTimeRate) - this.penalty + this.recovery - this.surplus));
@@ -118,31 +122,47 @@ export class Tutorial2Board {
         return `${Number.isFinite(this.g$gameTime) ? `持ち時間 ${this.g$gameTime}　` : ""}スコア ${this.score}\nChain ${this.chain}　回復 +${this.recovery}　攻撃 ${this.attack}`;
     }
     get g$condition(): string {
-        return this.lesson.id === "penalty" ? "ペナルティを3回受ける" : this.lesson.id === "damage" ? "ダメージを体験する"
-            : this.lesson.id === "survival" ? "時間内に一列揃えを1回成立させよう" : `役を${this.lesson.count}回成立させよう`;
+        return this.lesson.id === "penalty"
+            ? "ペナルティを3回受ける"
+            : this.lesson.id === "damage"
+              ? "ダメージを体験する"
+              : this.lesson.id === "survival"
+                ? "時間内に一列揃えを1回成立させよう"
+                : `役を${this.lesson.count}回成立させよう`;
     }
     get g$progress(): string {
-        return this.lesson.id === "penalty" ? `ペナルティ ${this.penalties} / 3` : this.lesson.id === "damage" ? (this.phase === "damageReview" || this.phase === "done" ? "ダメージ体験完了" : this.phase === "damaging" ? "ダメージ体験中" : "ダメージ体験前")
-            : `役 ${this.tricks} / ${this.lesson.count}　設置 ${this.placed} / ${this.lesson.id === "chain" ? 3 : this.lesson.count}`;
+        return this.lesson.id === "penalty"
+            ? `ペナルティ ${this.penalties} / 3`
+            : this.lesson.id === "damage"
+              ? this.phase === "damageReview" || this.phase === "done"
+                  ? "ダメージ体験完了"
+                  : this.phase === "damaging"
+                    ? "ダメージ体験中"
+                    : "ダメージ体験前"
+              : `役 ${this.tricks} / ${this.lesson.count}　設置 ${this.placed} / ${this.lesson.id === "chain" ? 3 : this.lesson.count}`;
     }
     get g$knowledge(): string {
         if (this.lesson.id !== "variety") return this.lesson.knowledge;
-        if (this.tricks === 0) return "三つ子山：3つの山の間には空きがあります。黄色の枠の向きを合わせ、空きを残しましょう。";
-        if (this.tricks === 1) return "トゲトゲ(下)：下向きの三角形がひとつおきに並びます。回転と滑り移動を使い、黄色の枠に合わせましょう。";
-        return "地割れ：左右で三角形の向きが変わります。間の1か所の空きは、埋めずに残しましょう。";
+        if (this.tricks === 0) return "三つ子山：三つの山ができるように設置しましょう。";
+        if (this.tricks === 1) return "トゲトゲ(下)：下向きの三角形がひとつおきに並びます。滑り移動を使って黄色の枠に設置しましょう。";
+        return "地割れ：左右で三角形の向きが変わります。 間に隙間が一か所できるようにしましょう。";
     }
     get g$task(): string {
         if (this.phase === "done") return "クリア！";
-        if (this.phase === "damageReady") return "設置して、相手からのダメージを体験しよう";
-        if (this.phase === "damaging") return "じゃまモンドが落ち、地形が変わる様子を見てみよう";
+        if (this.phase === "damageReady") return "モンドを設置して相手からのダメージを体験しよう";
+        if (this.phase === "damaging") return "じゃまモンドが落ちて地形が変わる様子を見てみよう";
         if (this.phase === "damageReview") return "ダメージ後の地形を見てみよう";
-        if (this.phase === "recoveryReview") return "回復した持ち時間と、増えたスコアを見てみよう";
+        if (this.phase === "recoveryReview") return "回復した持ち時間と増えたスコアを見てみよう";
         if (this.phase === "penalties") return this.undo ? "一手戻しでペナルティを受けてみよう" : "まずモンドを1個設置しよう";
-        if (this.phase === "erasing") return this.lesson.id === "penalty" ? "役なしの列を続けて消してみよう"
-            : this.lesson.id === "variety" ? `最下列を消して「${variedNames[this.tricks]}」を成立させよう` : "設置を挟まず、役のある列を連続して消そう";
-        if (this.lesson.id === "variety") return `${variedNames[this.tricks]}：黄色の枠に合わせて設置しよう`;
-        if (this.lesson.id === "chain") return "黄色の枠の形・向きに合わせて設置しよう";
-        return "黄色の枠に合わせて設置し、最下列を消そう";
+        if (this.phase === "erasing")
+            return this.lesson.id === "penalty"
+                ? "役なしの列を続けて消してみよう"
+                : this.lesson.id === "variety"
+                  ? `最下列を消して「${variedNames[this.tricks]}」を成立させよう`
+                  : "設置を挟まずに役のある列を連続して消そう";
+        if (this.lesson.id === "variety") return `${variedNames[this.tricks]}：黄色の枠に設置しよう`;
+        if (this.lesson.id === "chain") return "黄色の枠に設置しよう";
+        return "黄色の枠に設置し、最下列を消そう";
     }
 
     get g$graphics(): GraphicData {
@@ -151,12 +171,16 @@ export class Tutorial2Board {
             this.blocks.removePentiamond(this.hand);
             ghost.s$visible = false;
             this.blocks.displayPentiamond(ghost);
-            while (this.blocks.fall(ghost)) { /* 本編の着地点 */ }
+            while (this.blocks.fall(ghost));
             this.blocks.removePentiamond(ghost);
             this.blocks.displayPentiamond(this.hand);
         }
-        return { blockProperties: this.blocks.g$blockProperties, ghostMondState: ghost?.g$states ?? [],
-            next: Array.from({ length: Settings.next.length }, (_, i) => this.bag[(this.consumed + i) % 6]), hold: null };
+        return {
+            blockProperties: this.blocks.g$blockProperties,
+            ghostMondState: ghost?.g$states ?? [],
+            next: Array.from({ length: Settings.next.length }, (_, i) => this.bag[(this.consumed + i) % 6]),
+            hold: null,
+        };
     }
 
     apply(operation: OperateName): PracticeOutcome {
@@ -189,10 +213,9 @@ export class Tutorial2Board {
         this.blocks.removePentiamond(this.hand);
         const terrain = this.blocks.g$blockProperties;
         this.blocks.displayPentiamond(this.hand);
-        while (this.blocks.fall(this.hand)) { /* 真下へ設置 */ }
+        while (this.blocks.fall(this.hand));
         const target = this.targetsToPlace[this.targetIndex];
-        if (this.phase === "targets" && (!target || !this.matches(target) || (this.lesson.id === "variety" && this.tricks === 1 && !this.slid)))
-            return { failed: true, sound: "設置音" };
+        if (this.phase === "targets" && (!target || !this.matches(target) || (this.lesson.id === "variety" && this.tricks === 1 && !this.slid))) return { failed: true, sound: "設置音" };
         this.score += 10;
         this.chain = 0;
         this.penaltyTask = Math.max(0, this.penaltyTask - 1);
@@ -210,7 +233,10 @@ export class Tutorial2Board {
         }
         this.targetIndex++;
         if (this.targetIndex === this.targetsToPlace.length) this.phase = "erasing";
-        else { this.pendingTarget = true; return { sound: "設置音", advance: true }; }
+        else {
+            this.pendingTarget = true;
+            return { sound: "設置音", advance: true };
+        }
         return { sound: "設置音" };
     }
 
@@ -225,8 +251,14 @@ export class Tutorial2Board {
         this.elapsed += milliseconds;
         return this.g$gameTime === 0 ? { failed: true, message: "持ち時間がなくなりました。" } : {};
     }
-    setActive(active: boolean): void { if (active && this.phase === "damaging") this.nuisance?.start(); else this.nuisance?.stop(); }
-    dispose(): void { this.nuisance?.dispose(); this.nuisance = null; }
+    setActive(active: boolean): void {
+        if (active && this.phase === "damaging") this.nuisance?.start();
+        else this.nuisance?.stop();
+    }
+    dispose(): void {
+        this.nuisance?.dispose();
+        this.nuisance = null;
+    }
 
     private erase(): PracticeOutcome {
         const trick = this.blocks.removeLine();
@@ -253,7 +285,10 @@ export class Tutorial2Board {
         // 本編と同様に上限を超えた回復は持ち越さない。
         if (this.lesson.id === "survival") this.surplus += Math.max(0, Math.ceil(30 - this.elapsed / Settings.gameTimeRate) - this.penalty + this.recovery - this.surplus - 30);
         if (this.tricks === this.lesson.count) this.phase = this.lesson.id === "survival" ? "recoveryReview" : "done";
-        else if (this.lesson.id === "variety") { this.pendingTarget = true; this.phase = "targets"; }
+        else if (this.lesson.id === "variety") {
+            this.pendingTarget = true;
+            this.phase = "targets";
+        }
         return { trick: trick.name, sound, advance: this.pendingTarget, message: `${trick.name}！ 回復 +${reward.recovery}／スコア +${reward.score}` };
     }
 
@@ -263,7 +298,11 @@ export class Tutorial2Board {
         this.blocks.displayPentiamond(this.hand);
     }
     private matches(target: Pentiamond): boolean {
-        const keys = (piece: Pentiamond) => piece.g$states.map(([x, y, , d]) => `${x},${y},${d}`).sort().join(";");
+        const keys = (piece: Pentiamond) =>
+            piece.g$states
+                .map(([x, y, , d]) => `${x},${y},${d}`)
+                .sort()
+                .join(";");
         return !!this.hand && target.g$kind === this.hand.g$kind && keys(target) === keys(this.hand);
     }
     private cutTargets(terrain: BlockProperty[][]): void {
@@ -272,15 +311,14 @@ export class Tutorial2Board {
     private prepareTrick(name: string): void {
         const trick = trickInfos.find((trick) => trick.name === name && (name !== "地割れ(上)" || !trick.shape[5][1]))!;
         const terrain = this.blocks.g$blockProperties;
-        trick.shape.forEach(([d, visible], x) => terrain[x][bottom] = ["g", d, visible]);
+        trick.shape.forEach(([d, visible], x) => (terrain[x][bottom] = ["g", d, visible]));
         this.cutTargets(terrain);
         this.blocks.load(terrain);
     }
     private prepareVariety(): void {
         this.blocks = new BlockManager();
         this.targetIndex = 0;
-        this.targetsToPlace = [this.tricks === 0 ? new Pentiamond(2, bottom, "L")
-            : this.tricks === 1 ? new Pentiamond(7, bottom - 1, "I", 1) : new Pentiamond(13, bottom, "J")];
+        this.targetsToPlace = [this.tricks === 0 ? new Pentiamond(2, bottom, "L") : this.tricks === 1 ? new Pentiamond(7, bottom - 1, "I", 1) : new Pentiamond(13, bottom, "J")];
         this.prepareTrick(variedNames[this.tricks]);
         if (this.tricks === 1) {
             const terrain = this.blocks.g$blockProperties;

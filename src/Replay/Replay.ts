@@ -46,10 +46,7 @@ export class Replay {
         const signature = JSON.stringify(replayDataList.map((data) => data.date));
         if (this.renderedSavedPages.get(container) === signature) return;
 
-        // Dom
         const buttons = ReplayDom.setupSavedReplayPage(replayDataList);
-
-        // Event
         ReplayEventSetter.setSavedReplayPageEvent(replayDataList, buttons);
         this.renderedSavedPages.set(container, signature);
     }

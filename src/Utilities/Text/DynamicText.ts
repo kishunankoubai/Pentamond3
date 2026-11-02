@@ -117,8 +117,6 @@ export class DynamicText extends LoopManager {
     private write(): void {
         if (this.hasFinished) return;
         this.progress++;
-        // 表示中のHTMLは操作キー案内などで書き換わるため、進行位置の判定に使わない。
-        // 元のDOMから文字数だけで切り出し、属性内の文字・HTML実体参照にも影響されない。
         this.element.innerHTML = this.createPrefix(this.progress);
         this.executeEvent("write");
         if (this.textLength <= this.progress) this.finish();
@@ -140,7 +138,6 @@ export class DynamicText extends LoopManager {
         let remaining = length;
         const copy = (source: Node, parent: Node): void => {
             if (source instanceof Element && this.fastRuby && source.matches("rt, rp")) {
-                // 読み方は、対応する親文字が表示されてからまとめて表示する。
                 if (parent.textContent) parent.appendChild(source.cloneNode(true));
                 return;
             }

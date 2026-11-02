@@ -88,7 +88,7 @@ export class ElementManager extends MyEventListener {
     }
 
     static scrollToCenter(element: HTMLElement): void {
-        // マウスオーバーで一覧が動くと、クリック先そのものがすり替わってしまう。
+        // マウスオーバーで一覧が動くとクリック先そのものがすり替わってしまう
         if (!document.body.classList.contains("cursorHidden")) return;
         const y = element.clientHeight / 2 + element.getBoundingClientRect().y;
         const parent = element.parentElement;
