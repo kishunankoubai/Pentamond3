@@ -91,7 +91,7 @@
                     <div class="text">音楽や操作の配置、<br />ゲームルールを変更できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">このゲームの作者と使用されているものが見れるよ！</div>
+                    <div class="text">このゲームに使用されている<br />ライブラリなどが見れるよ！</div>
                 </div>
             </div>
         </div>
@@ -162,12 +162,14 @@
             <div class="selectWithDescriptionOptions">
                 <div class="button" data-page="playerRegister" data-xy="[0,0]" data-mode="1" data-player="1">サバイバル</div>
                 <div class="button" data-page="playerRegister" data-xy="[0,1]" data-mode="2" data-player="1">十五列揃え</div>
+                <div class="button" data-page="playerRegister" data-xy="[0,2]" data-mode="3" data-player="1">五万点チャレンジ</div>
             </div>
             <div class="selectOptionDescriptions">
                 <div>
                     <div class="text">
                         基本的なモード。<br />
-                        タイムがなくなるまで<br />役を揃え続けよう！
+                        タイムがなくなるまで<br />
+                        役を揃え続けよう！
                     </div>
                 </div>
                 <div>
@@ -176,9 +178,16 @@
                         自分の限界に挑戦しよう！
                     </div>
                 </div>
+                <div>
+                    <div class="text">
+                        五万点を目指すタイムアタック。<br />
+                        役を揃えていち早くクリアしよう！<br />
+                        難しい役はスコアアップ！
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="back button" data-xy="[0,2]">戻る</div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
     </div>
 
     <div class="page" id="multiStageSelect">
@@ -187,6 +196,7 @@
             <div class="selectWithDescriptionOptions">
                 <div class="button" data-page="playerNumberSelect" data-xy="[0,0]" data-mode="1">サバイバル</div>
                 <div class="button" data-page="playerNumberSelect" data-xy="[0,1]" data-mode="2">十五列揃え</div>
+                <div class="button" data-page="playerNumberSelect" data-xy="[0,2]" data-mode="3">五万点チャレンジ</div>
             </div>
             <div class="selectOptionDescriptions">
                 <div>
@@ -201,9 +211,15 @@
                         相手よりも速く揃えよう！
                     </div>
                 </div>
+                <div>
+                    <div class="text">
+                        五万点を目指すタイムアタック。<br />
+                        相手よりも速く達成しよう！
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="back button" data-xy="[0,2]">戻る</div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
     </div>
 
     <div class="page" id="playerNumberSelect">
@@ -418,10 +434,12 @@
         <div class="options">
             <div class="button" data-page="soloSurvivalHelp" data-xy="[0,0]">ソロ：サバイバル</div>
             <div class="button" data-page="soloLineHelp" data-xy="[0,1]">ソロ：十五列揃え</div>
-            <div class="button" data-page="multiSurvivalHelp" data-xy="[0,2]">マルチ：サバイバル</div>
-            <div class="button" data-page="multiLineHelp" data-xy="[0,3]">マルチ：十五列揃え</div>
+            <div class="button" data-page="soloScoreHelp" data-xy="[0,2]">ソロ：五万点チャレンジ</div>
+            <div class="button" data-page="multiSurvivalHelp" data-xy="[0,3]">マルチ：サバイバル</div>
+            <div class="button" data-page="multiLineHelp" data-xy="[0,4]">マルチ：十五列揃え</div>
+            <div class="button" data-page="multiScoreHelp" data-xy="[0,5]">マルチ：五万点チャレンジ</div>
         </div>
-        <div class="back button" data-xy="[0,4]">戻る</div>
+        <div class="back button" data-xy="[0,6]">戻る</div>
     </div>
 
     <div class="page helpReference" id="soloSurvivalHelp">
@@ -451,8 +469,27 @@
         </div>
         <div class="back button" data-xy="[0,0]">戻る</div>
     </div>
+    <div class="page helpReference" id="soloScoreHelp">
+        <div class="label headingLabel">ソロ：五万点チャレンジ</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
     <div class="page helpReference" id="multiLineHelp">
         <div class="label headingLabel">マルチ：十五列揃え</div>
+        <div class="subPageController">
+            <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
+            <div class="label subPageLabel"></div>
+            <div class="subPageNext button" data-xy="[2,0]">次へ</div>
+        </div>
+        <div class="back button" data-xy="[0,0]">戻る</div>
+    </div>
+
+    <div class="page helpReference" id="multiScoreHelp">
+        <div class="label headingLabel">マルチ：五万点チャレンジ</div>
         <div class="subPageController">
             <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
             <div class="label subPageLabel"></div>
@@ -473,18 +510,28 @@
             <div class="selectOptionDescriptions">
                 <div>
                     <div class="text">
-                        最近のプレイを、<br />最大で10件まで見れるよ！<br />
+                        最近のプレイを<br />
+                        最大で10件まで見れるよ！<br />
                         保存しないと消えちゃうので注意！
                     </div>
                 </div>
                 <div>
-                    <div class="text">お気に入りのプレイを<br />最大で10件まで保存できるよ！</div>
+                    <div class="text">
+                        お気に入りのプレイを<br />
+                        最大で10件まで保存できるよ！
+                    </div>
                 </div>
                 <div>
-                    <div class="text">今までのプレイの<br />いろいろな記録が見れるよ！</div>
+                    <div class="text">
+                        今までのプレイの<br />
+                        いろいろな記録が見れるよ！
+                    </div>
                 </div>
                 <div>
-                    <div class="text">いろいろな目標に挑戦してみよう！<br />どれだけ実績を集められるかな？</div>
+                    <div class="text">
+                        いろいろな目標に挑戦してみよう！<br />
+                        どれだけ実績を集められるかな？
+                    </div>
                 </div>
             </div>
         </div>
@@ -534,6 +581,7 @@
             <div class="statisticRow"><span>サバイバル：最長プレイ時間</span><span data-statistic="soloSurvivalTime" data-format="time"></span></div>
             <div class="statisticRow"><span>サバイバル：累計回復</span><span data-statistic="soloRecovery"></span></div>
             <div class="statisticRow"><span>十五列揃え：最速タイム</span><span data-statistic="soloSprintTime" data-format="time"></span></div>
+            <div class="statisticRow"><span>五万点チャレンジ：最速タイム</span><span data-statistic="soloScoreChallengeTime" data-format="time"></span></div>
         </div>
         <div class="subPage">
             <div class="statisticSection">マルチ</div>
@@ -541,6 +589,7 @@
             <div class="statisticRow"><span>サバイバル：最高スコア</span><span data-statistic="multiSurvivalScore"></span></div>
             <div class="statisticRow"><span>サバイバル：最大攻撃</span><span data-statistic="multiSurvivalAttack"></span></div>
             <div class="statisticRow"><span>十五列揃え：最速タイム</span><span data-statistic="multiSprintTime" data-format="time"></span></div>
+            <div class="statisticRow"><span>五万点チャレンジ：最速タイム</span><span data-statistic="multiScoreChallengeTime" data-format="time"></span></div>
         </div>
         <div class="subPageController">
             <div class="subPagePrev button" data-xy="[1,0]">前へ</div>
@@ -612,19 +661,35 @@
             </div>
             <div class="selectOptionDescriptions">
                 <div>
-                    <div class="text">音量や流れるBGMを<br />変更できるよ！<br />サウンドテストもあるよ！</div>
+                    <div class="text">
+                        音量や流れるBGMを<br />
+                        変更できるよ！<br />
+                        サウンドテストもあるよ！
+                    </div>
                 </div>
                 <div>
-                    <div class="text">保存されているデータの容量を<br />確認・消去できるよ！</div>
+                    <div class="text">
+                        保存されているデータの容量を<br />
+                        確認・消去できるよ！
+                    </div>
                 </div>
                 <div>
-                    <div class="text">各モードの最大持ち時間や<br />クリア条件を設定できるよ！</div>
+                    <div class="text">
+                        各モードの最大持ち時間や<br />
+                        クリア条件を設定できるよ！
+                    </div>
                 </div>
                 <div>
-                    <div class="text">演出や盤面の表示を<br />変更できるよ！</div>
+                    <div class="text">
+                        演出や盤面の表示を<br />
+                        変更できるよ！
+                    </div>
                 </div>
                 <div>
-                    <div class="text">キーボードやコントローラーの<br />配置を変更できるよ！</div>
+                    <div class="text">
+                        キーボードやコントローラーの<br />
+                        配置を変更できるよ！
+                    </div>
                 </div>
             </div>
         </div>
@@ -640,10 +705,17 @@
             </div>
             <div class="selectOptionDescriptions">
                 <div>
-                    <div class="text">プレイ中のキーを変更できるよ！<br />1つまで保存できます。</div>
+                    <div class="text">
+                        プレイ中のキーを変更できるよ！<br />
+                        1つまで保存できます。
+                    </div>
                 </div>
                 <div>
-                    <div class="text">ボタンやスティックの<br />配置を変更できるよ！<br />3つまで保存できます。</div>
+                    <div class="text">
+                        ボタンやスティックの<br />
+                        配置を変更できるよ！<br />
+                        3つまで保存できます。
+                    </div>
                 </div>
             </div>
         </div>
@@ -677,17 +749,31 @@
             <div class="selectWithDescriptionOptions">
                 <div class="button" data-page="survivalPlaySetting" data-xy="[0,0]">サバイバル</div>
                 <div class="button" data-page="linePlaySetting" data-xy="[0,1]">十五列揃え</div>
+                <div class="button" data-page="scorePlaySetting" data-xy="[0,2]">五万点チャレンジ</div>
             </div>
             <div class="selectOptionDescriptions">
                 <div>
-                    <div class="text">最大持ち時間と、<br />各プレイヤーのハンデを<br />設定します。</div>
+                    <div class="text">
+                        最大持ち時間と<br />
+                        各プレイヤーのハンデを<br />
+                        設定します。
+                    </div>
                 </div>
                 <div>
-                    <div class="text">クリアに必要な、<br />一列揃えの回数を設定します。</div>
+                    <div class="text">
+                        クリアに必要な<br />
+                        一列揃えの回数を設定します。
+                    </div>
+                </div>
+                <div>
+                    <div class="text">
+                        クリアに必要な<br />
+                        目標スコアを設定します。
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="back button" data-xy="[0,2]">戻る</div>
+        <div class="back button" data-xy="[0,3]">戻る</div>
     </div>
 
     <div class="page" id="survivalPlaySetting">
@@ -754,6 +840,20 @@
                 <div class="button" data-target-lines-delta="10" data-xy="[3,0]">＋10</div>
             </div>
             <div class="text">1～30列の範囲で設定できます。</div>
+        </div>
+        <div class="back button" data-xy="[0,1]">戻る</div>
+    </div>
+
+    <div class="page" id="scorePlaySetting">
+        <div class="label headingLabel">五万点チャレンジ設定</div>
+        <div class="playSettingPanel lineTargetSetting">
+            <div class="label playSettingSectionTitle">目標スコア</div>
+            <div class="options" data-direction="row">
+                <div class="button" data-target-score-delta="-10000" data-xy="[0,0]">－1万</div>
+                <div class="label settingValue" id="targetScoreValue">5万点</div>
+                <div class="button" data-target-score-delta="10000" data-xy="[1,0]">＋1万</div>
+            </div>
+            <div class="text">1万～9万点の範囲で1万点ずつ設定できます。</div>
         </div>
         <div class="back button" data-xy="[0,1]">戻る</div>
     </div>
@@ -849,10 +949,16 @@
                     <div class="text">BGM・SE音量を変更できるよ！</div>
                 </div>
                 <div>
-                    <div class="text">プレイ中に流れるBGMを、<br />変更できるよ！</div>
+                    <div class="text">
+                        プレイ中に流れるBGMを<br />
+                        変更できるよ！
+                    </div>
                 </div>
                 <div>
-                    <div class="text">Pentamondで流れる<br />BGMたちを聴けるよ！</div>
+                    <div class="text">
+                        Pentamondで流れる<br />
+                        BGMたちを聴けるよ！
+                    </div>
                 </div>
             </div>
         </div>

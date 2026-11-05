@@ -1,10 +1,11 @@
+import { defaultTargetScore } from "../Game/ScoreChallengeRules";
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
 import { globalValues } from "../Config/UserSettings";
 import { UInt32Codec } from "../Utilities/Data/UInt32Codec";
 import { isStandardSurvivalRecord } from "../Game/SurvivalRules";
 import { PageNotice } from "../Utilities/Feedback/PageNotice";
 
-// 保存順は形式v1の一部。順番を変更しない。
+// 保存順は形式v1から共通。順番を変更しない。v3ではスコアチャレンジの標準目標と得点計算を変更。
 const fields = [
     "playCount",
     "putCount",
@@ -19,6 +20,8 @@ const fields = [
     "multiSurvivalScore",
     "multiSurvivalAttack",
     "multiSprintTime",
+    "soloScoreChallengeTime",
+    "multiScoreChallengeTime",
 ] as const;
 export type PlayStatisticKey = (typeof fields)[number];
 export type PlayStatisticData = Record<PlayStatisticKey, number>;
@@ -42,9 +45,13 @@ export class PlayStatistics {
         try {
             const raw = localStorage.getItem(this.storageKey);
             if (!raw) return;
-            if (!raw.startsWith("1:")) throw new Error("未対応のプレイ統計です");
+            if (!raw.startsWith("1:") && !raw.startsWith("2:") && !raw.startsWith("3:")) throw new Error("未対応のプレイ統計です");
             const values = UInt32Codec.decode(raw.slice(2), fields.length);
             fields.forEach((field, i) => (this.data[field] = values[i] ?? 0));
+            if (!raw.startsWith("3:")) {
+                this.data.soloScoreChallengeTime = 0;
+                this.data.multiScoreChallengeTime = 0;
+            }
         } catch (error) {
             console.warn("プレイ統計を読み込めませんでした。初期値で続行します。", error);
         }
@@ -103,6 +110,8 @@ export class PlayStatistics {
                 }
             } else if (game.playSetting.mode === 2 && game.playSetting.targetLines === 15 && p.line >= 15) {
                 minTime(solo ? "soloSprintTime" : "multiSprintTime", p.playTime);
+            } else if (game.playSetting.mode === 3 && game.playSetting.targetScore === defaultTargetScore && p.score >= defaultTargetScore) {
+                minTime(solo ? "soloScoreChallengeTime" : "multiScoreChallengeTime", p.playTime);
             }
         });
         this.save();
@@ -114,7 +123,7 @@ export class PlayStatistics {
         const values = fields.map((field) => this.data[field]);
         while (values.at(-1) === 0) values.pop();
         try {
-            localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values));
+            localStorage.setItem(this.storageKey, "3:" + UInt32Codec.encode(values));
         } catch (error) {
             console.warn("プレイ統計を保存できませんでした。", error);
             PageNotice.notify("プレイ記録を保存できませんでした。 再読み込みすると失われるので保存領域の空きやブラウザーの設定を確認してください。");

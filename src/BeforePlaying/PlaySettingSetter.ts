@@ -2,6 +2,8 @@ import { htmlQSAddEvent } from "../Utilities/Element/Query";
 import { sceneManager } from "../Utilities/Scene/SceneManager";
 import { defaultMaxGameTime } from "../Config/GameConfig";
 import { getModeHelpPageId } from "../UI/HelpPages";
+import { defaultTargetScore, minTargetScore, maxTargetScore } from "../Game/ScoreChallengeRules";
+import { formatScoreTarget } from "../Utilities/Text/JapaneseText";
 
 export type PlaySetting = Readonly<EditablePlaySetting>;
 
@@ -11,6 +13,7 @@ type EditablePlaySetting = {
     maxGameTime: number;
     handy: number[];
     targetLines: number;
+    targetScore: number;
 };
 
 /**
@@ -23,6 +26,7 @@ export class PlaySettingSetter {
         maxGameTime: defaultMaxGameTime,
         handy: [1],
         targetLines: 15,
+        targetScore: defaultTargetScore,
     };
 
     /**
@@ -47,7 +51,7 @@ export class PlaySettingSetter {
         });
 
         htmlQSAddEvent("#playPrepareSettingButton", "click", () => {
-            sceneManager.g$currentPageManager?.openPage(this.playSetting.mode === 1 ? "survivalPlaySetting" : "linePlaySetting");
+            sceneManager.g$currentPageManager?.openPage(this.playSetting.mode === 1 ? "survivalPlaySetting" : this.playSetting.mode === 2 ? "linePlaySetting" : "scorePlaySetting");
         });
 
         document.querySelectorAll<HTMLElement>("#survivalPlaySetting [data-max-time]").forEach((button) => {
@@ -74,7 +78,14 @@ export class PlaySettingSetter {
             });
         });
 
-        sceneManager.g$currentPageManager?.addHandler(["changePage-playPrepare", "changePage-survivalPlaySetting", "changePage-linePlaySetting"], () => this.render());
+        document.querySelectorAll<HTMLElement>("#scorePlaySetting [data-target-score-delta]").forEach((button) => {
+            button.addEventListener("click", () => {
+                this.playSetting.targetScore = Math.max(minTargetScore, Math.min(maxTargetScore, this.playSetting.targetScore + Number(button.dataset.targetScoreDelta)));
+                this.render();
+            });
+        });
+
+        sceneManager.g$currentPageManager?.addHandler(["changePage-playPrepare", "changePage-survivalPlaySetting", "changePage-linePlaySetting", "changePage-scorePlaySetting"], () => this.render());
         this.render();
     }
 
@@ -86,20 +97,20 @@ export class PlaySettingSetter {
         if (prepare) prepare.dataset.mode = String(this.playSetting.mode);
         const trickListButton = document.getElementById("playPrepareTrickListButton");
         if (trickListButton) {
-            trickListButton.hidden = this.playSetting.mode !== 1;
+            trickListButton.hidden = this.playSetting.mode === 2;
             trickListButton.dataset.xy = "[0,2]";
         }
         const back = prepare?.querySelector<HTMLElement>(".back");
-        if (back) back.dataset.xy = this.playSetting.mode === 1 ? "[-1,3]" : "[-1,2]";
+        if (back) back.dataset.xy = this.playSetting.mode !== 2 ? "[-1,3]" : "[-1,2]";
         const controls = document.getElementById("playPrepareControllerButton");
         if (controls) controls.textContent = this.playSetting.playerNumber === 1 ? "操作設定" : "プレイヤー別配置";
         const summary = document.getElementById("playPrepareSummary");
         if (summary) {
-            const { mode, playerNumber, maxGameTime, targetLines, handy } = this.playSetting;
+            const { mode, playerNumber, maxGameTime, targetLines, targetScore, handy } = this.playSetting;
             summary.replaceChildren();
             const rule = document.createElement("div");
             rule.className = "prepareRule";
-            rule.textContent = `${mode === 1 ? "サバイバル" : "十五列揃え"} ／ ${playerNumber === 1 ? "ひとりで" : `${playerNumber}人で`} ／ ${mode === 1 ? `最大持ち時間 ${maxGameTime === Infinity ? "" : maxGameTime}` : `${targetLines}列`}`;
+            rule.textContent = `${mode === 1 ? "サバイバル" : mode === 2 ? "十五列揃え" : "五万点チャレンジ"} ／ ${playerNumber === 1 ? "ひとりで" : `${playerNumber}人で`} ／ ${mode === 1 ? `最大持ち時間 ${maxGameTime === Infinity ? "" : maxGameTime}` : mode === 2 ? `${targetLines}列` : `目標スコア ${formatScoreTarget(targetScore)}`}`;
             if (mode === 1 && maxGameTime === Infinity) {
                 const symbol = document.createElement("span");
                 symbol.className = "infinitySymbol";
@@ -127,6 +138,8 @@ export class PlaySettingSetter {
             if (value) value.textContent = `×${(this.playSetting.handy[playerIndex] ?? 1).toFixed(1)}`;
         });
 
+        const targetScore = document.getElementById("targetScoreValue");
+        if (targetScore) targetScore.textContent = formatScoreTarget(this.playSetting.targetScore);
         const targetLines = document.getElementById("targetLinesValue");
         if (targetLines) targetLines.textContent = `${this.playSetting.targetLines}列`;
     }

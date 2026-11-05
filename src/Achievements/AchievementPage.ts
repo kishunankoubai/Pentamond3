@@ -34,7 +34,7 @@ export function setupAchievementPage(scene: Scene, elements: ElementManager): vo
     });
     const buttons = new Map<HTMLElement, Achievement>();
     const perPage = 12;
-    for (const category of ["general", "survival", "sprint"] as const) {
+    for (const category of ["general", "survival", "sprint", "scoreChallenge"] as const) {
         const items = achievements.filter((achievement) => achievement.category === category);
         const pages = Math.ceil(items.length / perPage);
         for (let part = 0; part < pages; part++) {

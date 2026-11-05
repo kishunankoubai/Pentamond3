@@ -1,12 +1,13 @@
+import { defaultTargetScore } from "../Game/ScoreChallengeRules";
 import type { DisposableGame } from "../GameProcessing/DisposableGame";
 import type { PlayStatisticData } from "../Storage/PlayStatistics";
 import { globalValues } from "../Config/UserSettings";
 import { isStandardSurvivalRecord } from "../Game/SurvivalRules";
 import { UInt32Codec } from "../Utilities/Data/UInt32Codec";
 import { PageNotice } from "../Utilities/Feedback/PageNotice";
-import { achievements, achievementCounterCount, achievementTricks, survivalCountIndex, sprintCountIndex, type AchievementGrade } from "./Definitions";
+import { achievements, achievementCounterCount, achievementTricks, survivalCountIndex, sprintCountIndex, scoreChallengeCountIndex, type AchievementGrade } from "./Definitions";
 
-/** 実績55件は2つの32bitビット列、累計10項目は可変長整数で保存する。 */
+/** 実績65件は3つの32bitビット列、累計11項目は可変長整数で保存する。 */
 export class Achievements {
     static readonly storageKey = "Pentamond3-achievements";
     private static readonly flagCount = Math.ceil(achievements.length / 32);
@@ -57,12 +58,30 @@ export class Achievements {
         try {
             const raw = localStorage.getItem(this.storageKey);
             if (!raw) return false;
-            if (!raw.startsWith("1:")) throw new Error("未対応の実績データです");
-            const values = UInt32Codec.decode(raw.slice(2), this.flagCount + achievementCounterCount);
-            this.flags = Array.from({ length: this.flagCount }, (_, i) => values[i] ?? 0);
+            if (!raw.startsWith("1:") && !raw.startsWith("2:") && !raw.startsWith("3:")) throw new Error("未対応の実績データです");
+            // v1・v2は実績64件までの2ワード。v3は65件へ拡張し、カウンターの開始位置が変わる。
+            const storedFlagCount = raw.startsWith("3:") ? this.flagCount : 2;
+            const values = UInt32Codec.decode(raw.slice(2), storedFlagCount + achievementCounterCount);
+            this.flags = Array.from({ length: this.flagCount }, (_, i) => i < storedFlagCount ? (values[i] ?? 0) : 0);
             const lastBits = achievements.length % 32;
             if (lastBits && this.flags.at(-1)! >= 2 ** lastBits) throw new Error("実績のビット数が不正です");
-            this.counters = Array.from({ length: achievementCounterCount }, (_, i) => values[this.flagCount + i] ?? 0);
+            this.counters = Array.from({ length: achievementCounterCount }, (_, i) => values[storedFlagCount + i] ?? 0);
+            if (raw.startsWith("1:")) {
+                // 旧形式の三万点のクリア実績を現在の目標へ持ち越さない。プレイ回数と他モードの実績は維持する。
+                achievements.forEach(({ category, counter }, index) => {
+                    if (category === "scoreChallenge" && counter === undefined)
+                        this.flags[Math.floor(index / 32)] = (this.flags[Math.floor(index / 32)] & ~(1 << (index % 32))) >>> 0;
+                });
+            }
+            if (raw.startsWith("2:")) {
+                // 旧秒数から確実に達成できる新条件も反映する。既存の実績スロットは同順で条件を緩和している。
+                const firstTimeIndex = achievements.findIndex(({ id }) => id.startsWith("score-challenge-time-"));
+                const previousTargets = [900, 600, 360, 240, 150].filter((_, offset) => {
+                    const index = firstTimeIndex + offset;
+                    return !!(this.flags[Math.floor(index / 32)] & (1 << (index % 32)));
+                });
+                if (previousTargets.length) this.evaluateScoreChallengeTime(Math.min(...previousTargets) * 1000);
+            }
             this.evaluateCounters();
             return true;
         } catch (error) {
@@ -82,6 +101,9 @@ export class Achievements {
             const times = [data.soloSprintTime, data.multiSprintTime].filter((time) => time > 0);
             if (times.length) this.counters[sprintCountIndex] = Math.max(this.counters[sprintCountIndex], 1);
             if (times.length) this.evaluateSprintTime(Math.min(...times));
+            const scoreTimes = [data.soloScoreChallengeTime, data.multiScoreChallengeTime].filter((time) => time > 0);
+            if (scoreTimes.length) this.counters[scoreChallengeCountIndex] = Math.max(this.counters[scoreChallengeCountIndex], 1);
+            if (scoreTimes.length) this.evaluateScoreChallengeTime(Math.min(...scoreTimes));
             this.evaluateCounters();
         });
     }
@@ -104,7 +126,7 @@ export class Achievements {
         this.recordedGames.add(game);
         this.change(() => {
             const mode = game.playSetting.mode;
-            const countIndex = mode === 1 ? survivalCountIndex : sprintCountIndex;
+            const countIndex = mode === 1 ? survivalCountIndex : mode === 2 ? sprintCountIndex : scoreChallengeCountIndex;
             this.counters[countIndex] = Math.min(UInt32Codec.max, this.counters[countIndex] + 1);
             game.players.forEach((player) => {
                 const info = player.playInfo;
@@ -117,6 +139,9 @@ export class Achievements {
                     this.evaluateSprintTime(info.playTime);
                     if (info.hold === 0 && info.remove === 15) this.unlock("sprint-no-hold");
                     if (info.put === 51) this.unlock("sprint-51-puts");
+                } else if (mode === 3 && game.playSetting.targetScore === defaultTargetScore && info.score >= defaultTargetScore) {
+                    this.evaluateScoreChallengeTime(info.playTime);
+                    if (info.hold === 0) this.unlock("score-challenge-no-hold");
                 }
             });
             this.evaluateCounters();
@@ -146,6 +171,13 @@ export class Achievements {
         });
     }
 
+    private static evaluateScoreChallengeTime(time: number): void {
+        if (!Number.isFinite(time) || time <= 0) return;
+        achievements.forEach(({ id, target }) => {
+            if (id.startsWith("score-challenge-time-") && target !== undefined && time <= target) this.unlock(id);
+        });
+    }
+
     private static change(action: () => void): void {
         const before = this.values().join(",");
         action();
@@ -153,7 +185,7 @@ export class Achievements {
         const values = this.values();
         while (values.at(-1) === 0) values.pop();
         try {
-            localStorage.setItem(this.storageKey, "1:" + UInt32Codec.encode(values));
+            localStorage.setItem(this.storageKey, "3:" + UInt32Codec.encode(values));
         } catch (error) {
             console.warn("実績を保存できませんでした\n再読み込みすると失われます。", error);
             PageNotice.notify("実績を保存できませんでした。 再読み込みすると失われますので保存領域の空きやブラウザーの設定を確認してください。");
@@ -166,7 +198,7 @@ export class Achievements {
 
     static reset(): void {
         // 空の現行形式を残し、明示的な削除後に旧リプレイから実績を復元しない。
-        localStorage.setItem(this.storageKey, "1:");
+        localStorage.setItem(this.storageKey, "3:");
         this.flags.fill(0);
         this.counters.fill(0);
     }

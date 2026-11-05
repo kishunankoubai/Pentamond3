@@ -6,7 +6,7 @@ export function achievementTrickIndex(name: string): number {
 }
 
 export type AchievementGrade = "bronze" | "silver" | "gold";
-export type AchievementCategory = "general" | "survival" | "sprint";
+export type AchievementCategory = "general" | "survival" | "sprint" | "scoreChallenge";
 export type Achievement = {
     id: string;
     category: AchievementCategory;
@@ -18,12 +18,14 @@ export type Achievement = {
 };
 
 export const achievementGrades = { bronze: "銅", silver: "銀", gold: "金" } as const;
-export const achievementCategories = { general: "全体", survival: "サバイバル", sprint: "十五列揃え" } as const;
+export const achievementCategories = { general: "全体", survival: "サバイバル", sprint: "十五列揃え", scoreChallenge: "五万点チャレンジ" } as const;
 export const survivalCountIndex = achievementTricks.length;
 export const sprintCountIndex = survivalCountIndex + 1;
-export const achievementCounterCount = sprintCountIndex + 1;
+export const scoreChallengeCountIndex = sprintCountIndex + 1;
+export const achievementCounterCount = scoreChallengeCountIndex + 1;
 const completedNote = "完了した通常プレイが対象です。 養成所では加算されません。";
 const sprintNote = "15列設定でクリアした通常プレイが対象です。";
+const scoreChallengeNote = "5万点設定でクリアした通常プレイが対象です。";
 
 // 保存するビットの番号なので、追加は末尾へ。既存の順番を変更しない。
 export const achievements: readonly Achievement[] = [
@@ -167,6 +169,45 @@ export const achievements: readonly Achievement[] = [
         grade,
         description: `十五列揃えを${seconds}秒以内にクリアしよう`,
         note: sprintNote,
+        target: seconds * 1000,
+    })),
+    ...(
+        [
+            [1, "bronze"],
+            [10, "silver"],
+            [100, "gold"],
+        ] as const
+    ).map(([target, grade]) => ({
+        id: `score-challenge-play-${target}`,
+        category: "scoreChallenge" as const,
+        grade,
+        description: target === 1 ? "五万点チャレンジをプレイしよう" : `五万点チャレンジを${target}回プレイしよう`,
+        note: "完了した通常プレイを1ゲームにつき1回数えます。 目標スコアの設定は問いません。",
+        counter: scoreChallengeCountIndex,
+        target,
+    })),
+    {
+        id: "score-challenge-no-hold",
+        category: "scoreChallenge",
+        grade: "gold",
+        description: "ホールドを使用せずに五万点チャレンジをクリアしよう",
+        note: `${scoreChallengeNote} ホールドは0回です。`,
+    },
+    ...(
+        [
+            [1500, "bronze"],
+            [1000, "bronze"],
+            [500, "silver"],
+            [300, "silver"],
+            [200, "gold"],
+            [180, "gold"],
+        ] as const
+    ).map(([seconds, grade]) => ({
+        id: `score-challenge-time-${seconds}`,
+        category: "scoreChallenge" as const,
+        grade,
+        description: `五万点チャレンジを${seconds}秒以内にクリアしよう`,
+        note: scoreChallengeNote,
         target: seconds * 1000,
     })),
 ];

@@ -1,5 +1,6 @@
 import { Mode1 } from "../Game/Modes/Mode1";
 import { Mode2 } from "../Game/Modes/Mode2";
+import { Mode3 } from "../Game/Modes/Mode3";
 import { AutoInputObserver } from "../Utilities/Interaction/AutoInputObserver";
 import { inputManager } from "../Utilities/Interaction/InputManager";
 import { playBackground } from "../Rendering/PlayBackground";
@@ -23,7 +24,7 @@ import { setInteractionEnabled } from "../Utilities/Element/InteractionElement";
 
 //ゲーム開始
 export class GameProcessing {
-    private static readonly ModeClassList = [Mode1, Mode2];
+    private static readonly ModeClassList = [Mode1, Mode2, Mode3];
     static readonly replaySpeeds = [0.25, 0.5, 0.75, 1, 1.5, 2, 4] as const;
     private static replaySpeedIndex = 3;
     private static replayControlsEnabled = false;

@@ -163,6 +163,7 @@ export class DisposableGame extends MyEventListener {
             player.playInfo.gameTime = playSetting.maxGameTime;
             player.playInfo.handy = playSetting.mode === 1 ? (playSetting.handy[i] ?? 1) : 1;
             player.playInfo.targetLines = playSetting.targetLines;
+            player.playInfo.targetScore = playSetting.targetScore;
         });
 
         return players;

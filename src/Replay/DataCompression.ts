@@ -1,5 +1,6 @@
 import type { ReplayData } from "./Replay";
 import LZString from "lz-string";
+import { defaultTargetScore, minTargetScore, targetScoreStep } from "../Game/ScoreChallengeRules";
 import { operationKeyCodes, replayKeyCodes } from "../Game/Operations";
 
 function requireData(condition: unknown): asserts condition {
@@ -35,6 +36,7 @@ export function replayDataEncryption(data: ReplayData): string {
                 data.playSetting.maxGameTime === Infinity ? "I" : data.playSetting.maxGameTime,
                 data.playSetting.handy,
                 data.playSetting.targetLines,
+                data.playSetting.targetScore,
             ],
             data.finishTime,
             data.finishPlayers,
@@ -53,10 +55,12 @@ export function replayDataDecryption(encryptedData: string): ReplayData {
     const data = JSON.parse(source);
     requireData(Array.isArray(data) && data.length === 9 && [3, 4, 5, 6].includes(data[0]));
     const [_, encodedInputs, settings, finishTime, finishPlayers, date, next, nuisance, order] = data;
-    requireData(Array.isArray(settings) && settings.length === 5);
-    const [playerNumber, mode, maxTime, handy, targetLines] = settings;
+    requireData(Array.isArray(settings) && (settings.length === 5 || settings.length === 6));
+    const [playerNumber, mode, maxTime, handy, targetLines, targetScore = defaultTargetScore] = settings;
     requireData(Number.isInteger(playerNumber) && playerNumber >= 1 && playerNumber <= 4);
-    requireData(mode === 1 || mode === 2);
+    requireData(mode === 1 || mode === 2 || (mode === 3 && data[0] === 6 && settings.length === 6));
+    // 旧設定で保存したリプレイは、現在の設定上限(9万点)を超えていても読み込む。
+    requireData(Number.isInteger(targetScore) && targetScore >= minTargetScore && targetScore <= 200000 && targetScore % targetScoreStep === 0);
     requireData(data[0] !== 3 || mode !== 1 || playerNumber === 1);
     requireData(maxTime === "I" || finitePositive(maxTime));
     requireData(data[0] >= 5 || mode !== 1 || maxTime === "I" || maxTime <= 30);
@@ -101,6 +105,6 @@ export function replayDataDecryption(encryptedData: string): ReplayData {
         finishPlayers,
         date,
         randomSeeds: { next, nuisance },
-        playSetting: { playerNumber, mode, maxGameTime: maxTime === "I" ? Infinity : maxTime, handy: handy.slice(0, playerNumber), targetLines },
+        playSetting: { playerNumber, mode, maxGameTime: maxTime === "I" ? Infinity : maxTime, handy: handy.slice(0, playerNumber), targetLines, targetScore },
     };
 }

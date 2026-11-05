@@ -8,6 +8,8 @@ export function newRecordHighlights(before: Readonly<PlayStatisticData>, after: 
         ["multiSurvivalScore", "最高スコア更新！", false],
         ["multiSurvivalAttack", "最大攻撃更新！", false],
         ["multiSprintTime", "最速タイム更新！", true],
+        ["soloScoreChallengeTime", "最速タイム更新！", true],
+        ["multiScoreChallengeTime", "最速タイム更新！", true],
     ];
     return records
         .filter(([key]) => after[key] > 0 && after[key] !== before[key])

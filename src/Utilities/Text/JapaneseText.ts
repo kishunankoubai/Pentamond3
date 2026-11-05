@@ -1,3 +1,8 @@
+/** 目標スコアをモード設定やリプレイ向けに表示する。 */
+export function formatScoreTarget(score: number): string {
+    return `${score / 10000}万点`;
+}
+
 /** 句読点・！の直後の間隔を確保するための任意の整形。既存の空白は重ねない。 */
 export function spaceJapanesePunctuation(text: string): string {
     return text.replace(/([、。])(?! )/g, "$1 ").replace(/！(?=[^\s])/g, "！ ");

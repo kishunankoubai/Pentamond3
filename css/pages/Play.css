@@ -18,6 +18,10 @@
     margin-right: 0.5cqh;
 }
 
+#play .playField.timeAttackGoalReady {
+    background-color: #eeee99;
+}
+
 #play .playField .playCanvas {
     height: 95%;
 }

@@ -1,3 +1,4 @@
+import { formatScoreTarget } from "../Utilities/Text/JapaneseText";
 import { htmlQS, htmlQSAll } from "../Utilities/Element/Query";
 import { ReplayData } from "./Replay";
 
@@ -74,7 +75,7 @@ export class ReplayDom {
         const setting =
             replayData.playSetting.mode === 1
                 ? `最大持ち時間: ${replayData.playSetting.maxGameTime === Infinity ? '<span class="infinitySymbol">∞</span>' : replayData.playSetting.maxGameTime}`
-                : `クリア列数: ${replayData.playSetting.targetLines}列`;
+                : replayData.playSetting.mode === 2 ? `クリア列数: ${replayData.playSetting.targetLines}列` : `目標スコア: ${formatScoreTarget(replayData.playSetting.targetScore)}`;
 
         return `${solo} : ${mode}<br>${setting}<br>時間: ${time}`;
     }
@@ -85,6 +86,8 @@ export class ReplayDom {
                 return "サバイバル";
             case 2:
                 return "十五列揃え";
+            case 3:
+                return "五万点チャレンジ";
             default:
                 return "不明なモード";
         }

@@ -225,31 +225,32 @@
 }
 
 #survivalPlaySetting,
-#linePlaySetting {
+#linePlaySetting,
+#scorePlaySetting {
     justify-content: flex-start;
     box-sizing: border-box;
 }
 
-:is(#survivalPlaySetting, #linePlaySetting) .playSettingPanel {
+:is(#survivalPlaySetting, #linePlaySetting, #scorePlaySetting) .playSettingPanel {
     width: 125cqh;
     display: flex;
     flex-direction: column;
     gap: 2cqh;
 }
 
-:is(#survivalPlaySetting, #linePlaySetting) .playSettingSection {
+:is(#survivalPlaySetting, #linePlaySetting, #scorePlaySetting) .playSettingSection {
     width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1cqh;
 }
 
-:is(#survivalPlaySetting, #linePlaySetting) .playSettingSectionTitle {
+:is(#survivalPlaySetting, #linePlaySetting, #scorePlaySetting) .playSettingSectionTitle {
     font-size: 4cqh;
     color: #6bd;
 }
 
-:is(#survivalPlaySetting, #linePlaySetting) .button:not(.back) {
+:is(#survivalPlaySetting, #linePlaySetting, #scorePlaySetting) .button:not(.back) {
     margin-left: 0;
     font-size: 3.2cqh;
     height: 6cqh;
@@ -260,7 +261,7 @@
     margin-bottom: -2cqh;
 }
 
-:is(#survivalPlaySetting, #linePlaySetting) .selectedValue {
+:is(#survivalPlaySetting, #linePlaySetting, #scorePlaySetting) .selectedValue {
     color: #ee8888;
     border-bottom-color: #ee8888;
 }
@@ -280,13 +281,15 @@
     color: #d76;
 }
 
-#linePlaySetting .settingValue {
+#linePlaySetting .settingValue,
+#scorePlaySetting .settingValue {
     width: 16cqh;
     font-size: 5cqh;
     color: #d76;
 }
 
-#linePlaySetting .text {
+#linePlaySetting .text,
+#scorePlaySetting .text {
     font-size: 3cqh;
 }
 
@@ -792,12 +795,14 @@
 }
 
 #survivalPlaySetting,
-#linePlaySetting {
+#linePlaySetting,
+#scorePlaySetting {
     padding-top: 19cqh;
 }
 
 #survivalPlaySetting .playSettingPanel,
-#linePlaySetting .playSettingPanel {
+#linePlaySetting .playSettingPanel,
+#scorePlaySetting .playSettingPanel {
     width: 124cqh;
     padding: 3cqh 4cqh;
     box-sizing: border-box;
@@ -808,13 +813,15 @@
 }
 
 #survivalPlaySetting .playSettingSectionTitle,
-#linePlaySetting .playSettingSectionTitle {
+#linePlaySetting .playSettingSectionTitle,
+#scorePlaySetting .playSettingSectionTitle {
     color: #228899;
     font-size: 4cqh;
 }
 
 #survivalPlaySetting .button:not(.back),
-#linePlaySetting .button:not(.back) {
+#linePlaySetting .button:not(.back),
+#scorePlaySetting .button:not(.back) {
     height: auto;
     padding-block: 0.6cqh;
     margin-bottom: 0;
@@ -853,20 +860,23 @@
 }
 
 #survivalPlaySetting .handyRow .handyValue,
-#linePlaySetting .settingValue {
+#linePlaySetting .settingValue,
+#scorePlaySetting .settingValue {
     color: #6bd;
     background: #e5f2fa;
     border-radius: 1cqh;
     padding: 0.5cqh 1cqh;
 }
 
-#linePlaySetting .lineTargetSetting {
+#linePlaySetting .lineTargetSetting,
+#scorePlaySetting .lineTargetSetting {
     margin-top: 12cqh;
     gap: 4cqh;
     padding-block: 5cqh;
 }
 
-#linePlaySetting .lineTargetSetting .options {
+#linePlaySetting .lineTargetSetting .options,
+#scorePlaySetting .lineTargetSetting .options {
     gap: 5cqh;
 }
 
@@ -880,4 +890,8 @@
 #dataSetting .dataManagementTotal {
     background: #e5f2fa;
     border-radius: 1cqh;
+}
+
+#scorePlaySetting .settingValue {
+    width: 25cqh;
 }

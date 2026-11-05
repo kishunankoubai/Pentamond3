@@ -111,14 +111,13 @@ export class SceneManager extends MyEventListener {
     async change(scene: SceneClass, defaultStart: boolean = true): Promise<boolean> {
         const generation = ++this.changeGeneration;
         this.loadingController?.abort();
-        const controller = this.loadingController = new AbortController();
+        const controller = (this.loadingController = new AbortController());
         const timeout = setTimeout(() => controller.abort(), 15000);
         const previous = this.currentScene;
         let nextScene: Scene | null = null;
         let committed = false;
         try {
             nextScene = new scene();
-            // 読み込みが成功するまでは、元の画面とその入力処理を残す。
             const html = await this.loadSceneHTML(nextScene.g$htmlPath, controller.signal);
             if (generation !== this.changeGeneration) return false;
             SceneRecovery.close();
@@ -139,7 +138,11 @@ export class SceneManager extends MyEventListener {
             if (generation !== this.changeGeneration) return false;
             console.warn("画面を切り替えられませんでした", error);
             if (committed) {
-                try { nextScene?.executeEvent("sceneEnd"); } catch { /* 復帰画面は必ず表示する。 */ }
+                try {
+                    nextScene?.executeEvent("sceneEnd");
+                } catch {
+                    /* 復帰画面は必ず表示する。 */
+                }
                 this.currentScene = null;
                 PageNotice.detach();
             } else previous?.executeEvent("sceneLoadFailed");

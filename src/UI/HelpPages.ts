@@ -5,7 +5,7 @@ type HelpSection = { title: string; paragraphs: string[] };
 type HelpDocument = { id: string; sections: HelpSection[] };
 
 export function getModeHelpPageId(mode: number, players: number): string {
-    return `${players === 1 ? "solo" : "multi"}${mode === 1 ? "Survival" : "Line"}Help`;
+    return `${players === 1 ? "solo" : "multi"}${mode === 1 ? "Survival" : mode === 2 ? "Line" : "Score"}Help`;
 }
 
 const basicSections: HelpSection[] = [
@@ -43,7 +43,7 @@ const basicSections: HelpSection[] = [
         title: "揃えた役を消去しよう！",
         paragraphs: [
             "「消去」すると盤面の一番下の列が消えます。役の形を揃えるだけでなく、 その列を消去して初めて役として成立します。",
-            "役のある列を連続して消去すると「チェイン」になります。 サバイバルではスコアや攻撃にボーナスが付きます。",
+            "役のある列を連続して消去すると「チェイン」になります。 サバイバルや五万点チャレンジではスコアにボーナスが付きます。 マルチのサバイバルでは攻撃にもボーナスが付きます。",
             "何列かまとめて役を揃えて一気に消すとより高いスコアを目指せます。 ただし、 途中で設置するとチェインが途切れるので注意しましょう。",
         ],
     },
@@ -52,7 +52,7 @@ const basicSections: HelpSection[] = [
         paragraphs: [
             "サバイバルの残り時間を「持ち時間」、 その上限を「最大持ち時間」といいます。 持ち時間が0になるとゲームオーバーです。 役を成立させると回復できます。",
             "役のない列も消すことができますが、役なし消去を繰り返すと持ち時間が減ってしまいます。 使いどころには気を付けましょう。",
-            "十五列揃えには持ち時間の制限はありません。 詳しい違いはヘルプの「モード説明」で確認できます。",
+            "十五列揃えや五万点チャレンジには持ち時間の制限はありません。 詳しい違いはヘルプの「モード説明」で確認できます。",
         ],
     },
     {
@@ -185,8 +185,32 @@ function lineSections(multi: boolean): HelpSection[] {
             title: "クリア列数と記録",
             paragraphs: [
                 "プレイ準備の「プレイ設定」からクリアまでの列数を1～30列に変更できます。 初期値は15列です。",
+                "今ある地形を下からすべて消去すると目標の列数に届くとき盤面の枠が黄色くなります。",
                 "サバイバルの最大持ち時間やハンデの設定はこのモードには影響しません。",
                 "情報ページの最速タイムは15列設定でクリアしたプレイだけが記録されます。",
+            ],
+        },
+    ];
+}
+
+function scoreSections(multi: boolean): HelpSection[] {
+    return [
+        {
+            title: multi ? "相手より速く五万点を達成しよう！" : "五万点を目指すタイムアタック！",
+            paragraphs: [
+                "スコアが5万点に達するまでのタイムを競います。 一列揃えだけでなくすべての役が成立します。",
+                multi ? "全員が同時にスタートし、 最初に目標スコアに達したプレイヤーが勝者です。" : "持ち時間の制限はありません。 できるだけ短いタイムでのクリアを目指しましょう。",
+                "一列揃えよりも大きな役では基本点が高くなります。 チェインでもらえるスコアはサバイバルより控えめです。",
+                "このモードには攻撃も一手戻し・役なし消去によるペナルティもありません。 設置や役なし消去でチェインが途切れます。",
+            ],
+        },
+        {
+            title: "目標スコアと記録",
+            paragraphs: [
+                "プレイ準備の「プレイ設定」から目標スコアを1万～9万点の範囲で1万点単位で変更できます。 初期値は5万点です。",
+                "今ある地形を下からすべて消去すると目標スコアに届くとき盤面の枠が黄色くなります。 ",
+                "サバイバルの最大持ち時間やハンデの設定はこのモードには影響しません。",
+                "情報ページの最速タイムは5万点設定でクリアしたプレイだけが記録されます。",
             ],
         },
     ];
@@ -200,6 +224,8 @@ export function setupHelpPages(): void {
         { id: "multiSurvivalHelp", sections: survivalSections(true) },
         { id: "soloLineHelp", sections: lineSections(false) },
         { id: "multiLineHelp", sections: lineSections(true) },
+        { id: "soloScoreHelp", sections: scoreSections(false) },
+        { id: "multiScoreHelp", sections: scoreSections(true) },
     ];
     documents.forEach(({ id, sections }) => {
         const page = document.getElementById(id)!;

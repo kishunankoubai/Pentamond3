@@ -1,3 +1,4 @@
+import { formatScoreTarget } from "../Utilities/Text/JapaneseText";
 import { GamePlayer } from "../Game/GamePlayer";
 import { htmlQSAll, htmlQS } from "../Utilities/Element/Query";
 import { sleep } from "../Utilities/Common";
@@ -157,8 +158,8 @@ export class ResultPageHandler {
             <div class="subPage">
                 <div class="text">
                     Player人数 : ${players.length}<br />
-                    モード : ${playSetting.mode == 1 ? "サバイバル" : "十五列揃え"}<br />
-                    ${playSetting.mode == 1 ? `初期最大持ち時間 : ${this.formatValue(playSetting.maxGameTime)}<br />` : `クリア列数 : ${playSetting.targetLines}<br />`}
+                    モード : ${playSetting.mode == 1 ? "サバイバル" : playSetting.mode == 2 ? "十五列揃え" : "五万点チャレンジ"}<br />
+                    ${playSetting.mode == 1 ? `初期最大持ち時間 : ${this.formatValue(playSetting.maxGameTime)}<br />` : playSetting.mode == 2 ? `クリア列数 : ${playSetting.targetLines}<br />` : `目標スコア : ${formatScoreTarget(playSetting.targetScore)}<br />`}
                     ${players.length != 1 ? `結果 : ${htmlQS(".resultLabel").innerHTML}<br />` : ""}
                 </div>
             </div>    

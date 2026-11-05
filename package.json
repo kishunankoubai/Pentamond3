@@ -1,7 +1,8 @@
 {
   "scripts": {
     "build": "vite build",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:score-challenge": "node scripts/test-score-challenge.mjs"
   },
   "dependencies": {
     "lz-string": "^1.5.0",

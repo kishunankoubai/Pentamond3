@@ -14,6 +14,7 @@ import { MusicManager } from "../Utilities/Music/MusicManager";
 import { achievementTrickIndex, achievementTricks } from "../Achievements/Definitions";
 import { PlayFeedback } from "./PlayFeedback";
 import { bindDamageSounds } from "./DamageSounds";
+import { defaultTargetScore } from "./ScoreChallengeRules";
 
 export class GamePlayer {
     readonly trickCounts = Array<number>(achievementTricks.length).fill(0);
@@ -52,6 +53,7 @@ export class GamePlayer {
         remove: 0,
         handy: 1,
         targetLines: 15,
+        targetScore: defaultTargetScore,
     };
     state = {
         hasFinished: false,

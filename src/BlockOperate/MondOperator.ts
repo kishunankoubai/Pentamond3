@@ -30,6 +30,15 @@ export class MondOperator extends MyEventListener {
         };
     }
 
+    /** 操作中のモンドを除いた設置済み地形。盤面自体は変更しない。 */
+    get g$settledBlockProperties() {
+        const properties = this.blockManager.g$blockProperties;
+        if (this.hand.g$visible) {
+            this.hand.g$states.forEach(([x, y]) => properties[x][y] = ["g", true, false]);
+        }
+        return properties;
+    }
+
     get g$blockManager(): BlockManager {
         return this.blockManager;
     }
